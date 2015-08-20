@@ -2,7 +2,7 @@
   "name": "universal-react",
   "version": "0.1.0",
   "description": "Universal React",
-  "main": "srcr/js/server-index.js",
+  "main": "srcr/js/server/index.js",
   "scripts": {
     "test": "npm run build && tapes test/**/*.js test/**/**/*.js | tap-spec",
     "build": "make",
