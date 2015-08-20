@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title><%- title %></title>
+  <link href="/build.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript">
+    window.browserEnv = <%- JSON.stringify(browserEnv) %>;
+  </script>
+</head>
+<body>
+  <div id="universal-app-container"><%- HTML %></div>
+  <script src="/build.js" type="text/javascript" charset="utf-8"></script>
+</body>
+</html>

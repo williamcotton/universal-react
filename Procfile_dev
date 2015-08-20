@@ -1,0 +1,1 @@
+web: ./node_modules/.bin/nodemon src/js/server/index.js --watch src/js/ --watch src/jsx/ --ext js,jsx
