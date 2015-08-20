@@ -54,6 +54,27 @@ module.exports = function(options) {
 
   /*
 
+    Google Image Search
+    -------------------
+    server version
+
+  */
+
+  var googleImages = require("google-images");
+
+  var imageSearch = function(searchTerm, callback) {
+    googleImages.search(searchTerm, callback);
+  };
+
+  serverApp.get("/data/images/:searchTerm", function(req, res) {
+    var searchTerm = req.params.searchTerm;
+    imageSearch(searchTerm, function(err, images) {
+      res.send(images);
+    });
+  }); 
+
+  /*
+
     universalApp
     ------------
     server version
@@ -62,7 +83,8 @@ module.exports = function(options) {
 
   var universalServerApp = require("../universal-app")({
     renderApp: renderServerApp,
-    app: serverApp
+    app: serverApp,
+    imageSearch: imageSearch
   });
 
   var server;

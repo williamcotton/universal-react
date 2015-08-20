@@ -17,7 +17,10 @@ cookie.serializeObject = function(obj, options) {
   return output;
 };
 
+
+
 var browserSession = function(options) {
+
   var localStorage = options.localStorage;
   var document = options.document;
   return {

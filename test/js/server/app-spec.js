@@ -48,7 +48,7 @@ test('serverApp', function (t) {
     });
   });
 
-  t.test('should load all the routes specified in the routes map', function (t) {
+  t.test('server should load all the routes specified in the routes map', function (t) {
     var routes = Object.keys(routesMap);
     t.plan(routes.length);
     async.each(routes, function(route, callback) {

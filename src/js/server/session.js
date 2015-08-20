@@ -19,7 +19,8 @@ var serverSession = function(req, res, next) {
       return value;
     },
     set: function(key, value) {},
-    remove: function(key) {}
+    remove: function(key) {},
+    removeAll: function() {}
   }
   req.session = session;
   next();

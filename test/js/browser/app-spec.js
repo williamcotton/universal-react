@@ -1,6 +1,7 @@
 var test = require('tapes');
 var jsdom = require('jsdom');
 var async = require('async');
+var request = require('request');
 
 var routesMap = require('../../json/routes-map.json');
 
@@ -12,6 +13,7 @@ if (!global.document) {
   };
 }
 
+// prouter needs these globals
 global.addEventListener = global.window.addEventListener;
 global.location = global.window.location;
 global.history = global.window.history;
@@ -28,19 +30,11 @@ var browserApp = require("../../../src/js/browser/app.js")({
   browserEnv: {
     nodeEnv: "test"
   },
-  localStorage: localStorage
+  localStorage: localStorage,
+  request: request
 });
 
 browserApp.listen();
-
-var setLocation = function(location) {
-  global.window.location.href = location;
-  global.window.history.pushState({},"", global.window.location.href);
-  var event = new global.document.createEvent('Event');
-  event.initEvent('popstate', true, true);
-  global.window.dispatchEvent(event);
-};
-
 
 test('browserApp', function (t) {
 
@@ -50,13 +44,14 @@ test('browserApp', function (t) {
     t.end();
   });
 
-  t.test('should load all the routes specified in the routes map', function (t) {
+  t.test('browser should load all the routes specified in the routes map', function (t) {
     var routes = Object.keys(routesMap);
     t.plan(routes.length);
     async.each(routes, function(route, callback) {
       var className = routesMap[route];
-      setLocation(route);
-      var container = global.document.getElementsByClassName(className)[0].innerHTML;
+      browserApp.navigate(route);
+      var element = global.document.querySelector("." + className);
+      var container = element ? element.innerHTML : false;
       t.ok(container, route + " has " + className);
       callback();
     });    

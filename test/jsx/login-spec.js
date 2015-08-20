@@ -30,11 +30,12 @@ test('Login component', function (t) {
 
   t.test('should call the login function', function (t) {
     var username = "test-name";
-    t.plan(2);
+    t.plan(3);
     var loginFunction = function(options, callback) {
       callback(false, {success: true, username: options.username});
       renderedComponent.forceUpdate(function() {
         t.equal(renderedComponent.state.didLogin, true, "updated Login state:didLogin");
+        t.equal(renderedComponent.state.username, username, "updated Login state:username");
         t.equal(options.username, username, "called login function with username");
       });
     }

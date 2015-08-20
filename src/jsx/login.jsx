@@ -1,5 +1,10 @@
 var React = require('react');
 
+var ReactBootstrap = require('react-bootstrap');
+
+var Input = ReactBootstrap.Input;
+var Button = ReactBootstrap.Button;
+
 var Login = React.createClass({
   getInitialState: function() {
     return {
@@ -9,7 +14,7 @@ var Login = React.createClass({
   login: function(event) {
     var component = this;
     event.preventDefault();
-    var username = this.refs.username.getDOMNode().value;
+    var username = this.refs.username.getValue();
     this.props.login({username: username}, function(err, loginReceipt) {
       component.setState({
         didLogin: loginReceipt.success, 
@@ -20,14 +25,14 @@ var Login = React.createClass({
   render: function() {
     var didLoginAlert;
     if (this.state.didLogin) {
-      didLoginAlert = <p className="alert alert-success">Login successful. Welcome, {this.state.username}.</p>;
+      didLoginAlert = <div className="alert alert-success">Login successful.</div>;
     }
     return (
       <div className="login-container">
         {didLoginAlert}
         <form onSubmit={this.login} >
-          <input ref="username"/>
-          <button onClick={this.login}>Login</button>
+          <Input type='text' label='Username' ref='username' placeholder='Enter Username' />
+          <Button bsStyle="primary" onClick={this.login}>Login</Button>
         </form>
       </div>
     );

@@ -1,8 +1,11 @@
+var request = require('request');
+
 var browserApp = require('./app')({
   localStorage: window.localStorage,
   document: document,
   window: window,
-  browserEnv: window.browserEnv
+  browserEnv: window.browserEnv,
+  request: request
 });
 
 browserApp.listen(function() {

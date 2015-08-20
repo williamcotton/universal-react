@@ -1,11 +1,31 @@
 module.exports = function(options) {
 
   var browserEnv = options.browserEnv;
+  var request = options.request;
 
   var browserSession = require('./session')({
     localStorage: options.localStorage,
     document: options.document
   });
+
+
+  /*
+
+    Google Image Search
+    -------------------
+    browser version
+
+  */
+
+  var imageSearch = function(searchTerm, callback) {
+    request('/data/images/' + searchTerm, function(err, res, body) {
+      if (err) {
+        return callback(true, []);
+      }
+      var images = JSON.parse(body);
+      callback(err, images);
+    });
+  }
 
   /*
 
@@ -54,6 +74,7 @@ module.exports = function(options) {
   var renderBrowserApp = function(content, req, res, opts) {
     React.initializeTouchEvents(true);
     React.render(App({
+      navigate: Router.navigate,
       content: content,
       opts: opts,
       browserEnv: browserEnv,
@@ -71,13 +92,15 @@ module.exports = function(options) {
 
   var universalApp = require("../universal-app")({
     renderApp: renderBrowserApp,
-    app: browserApp
+    app: browserApp,
+    imageSearch: imageSearch
   });
 
   return {
     listen: function(callback) {
       universalApp.listen(callback);
-    }
+    },
+    navigate: Router.navigate
   }
 
 }

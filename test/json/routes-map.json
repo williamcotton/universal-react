@@ -1,4 +1,6 @@
 {
   "/": "front-page-container",
-  "/login": "login-container"
+  "/login": "login-container",
+  "/images": "images-container",
+  "/images/cat": "images-container"
 }
