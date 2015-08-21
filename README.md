@@ -458,7 +458,7 @@ module.exports = function(t, domRoute, defaultTitle) {
     });
   });
 
-  t.test('browser should load all the routes specified in the routes map', function (t) {
+  t.test('should load all the routes specified in the routes map and find the expected DOM elements', function (t) {
     var routes = Object.keys(routesMap);
     t.plan(routes.length);
     async.each(routes, function(route, callback) {
