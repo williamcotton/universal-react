@@ -125,6 +125,8 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var serverSession = require('./session');
 
+var formatTitle = require('../format-title');
+
 var serverApp = express();
 var publicDir = __dirname + '/../../../public';
 serverApp.set('port', port);
@@ -135,7 +137,7 @@ serverApp.use(serverSession);
 serverApp.use(express.static(publicDir));
 serverApp.use(function(req, res, next) {
   res.renderApp = function(content, opts) {
-    var title = defaultTitle + (opts ? " - " + opts.title : "");
+    var title = formatTitle(defaultTitle, opts.title);
     var HTML = React.renderToStaticMarkup(App({
       content: content,
       opts: opts,
@@ -232,14 +234,14 @@ var App = React.createFactory(require('../../jsx/app.jsx'));
 var prouter = require("prouter");
 var Router = prouter.Router;
 
+var formatTitle = require('../format-title');
+
 var browserApp = {
   get: function(route, handler) {
     Router.use(route, function(req) {
       var res = {
         renderApp: function(content, opts) {
-          if (opts.title) {
-            options.document.title = browserEnv.defaultTitle + " - " + opts.title;
-          }
+          options.document.title = formatTitle(browserEnv.defaultTitle, opts.title);
           React.initializeTouchEvents(true);
           React.render(App({
             navigate: Router.navigate,
