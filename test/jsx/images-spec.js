@@ -38,7 +38,7 @@ test('Images component', function (t) {
     t.end();
   });
 
-  t.test('should try to navigate when searching', function (t) {
+  t.test('should navigate to new location when searching', function (t) {
     var searchTerm = "cat";
     t.plan(1);
     var navigateFunction = function(pathname) {

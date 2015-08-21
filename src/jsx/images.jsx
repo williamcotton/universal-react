@@ -6,7 +6,7 @@ var Input = ReactBootstrap.Input;
 var Button = ReactBootstrap.Button;
 
 var Images = React.createClass({
-  imageSearch: function(event) {
+  search: function(event) {
     event.preventDefault();
     var searchTerm = this.refs.searchTerm.getValue();
     this.props.navigate("/images/" + searchTerm);
@@ -14,8 +14,8 @@ var Images = React.createClass({
   render: function() {
     var searchTerm = this.props.searchTerm;
     var images = this.props.images || [];
-    var createImageItem = function(image) {
-      return <li><img src={image.url} /></li>
+    var createImageItem = function(image, i) {
+      return <li key={i}><img src={image.url} /></li>
     }
     var header = "Images";
     if (searchTerm) {
@@ -24,9 +24,9 @@ var Images = React.createClass({
     return (
       <div className="images-container">
         <h3>{header}</h3>
-        <form className="panel panel-default" onSubmit={this.imageSearch} >
+        <form className="panel panel-default" onSubmit={this.search} >
           <Input type='text' label='Search Term' ref='searchTerm' placeholder='Enter Search Term' />
-          <Button bsStyle="primary" onClick={this.imageSearch}>Search</Button>
+          <Button bsStyle="primary" onClick={this.search}>Search</Button>
         </form>
         <ol>
           { images.map(createImageItem) }
