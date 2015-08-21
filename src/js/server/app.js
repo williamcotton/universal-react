@@ -25,6 +25,8 @@ module.exports = function(options) {
   var cookieParser = require('cookie-parser');
   var serverSession = require('./session');
 
+  var formatTitle = require('../format-title');
+
   var serverApp = express();
   var publicDir = __dirname + '/../../../public';
   serverApp.set('port', port);
@@ -35,7 +37,7 @@ module.exports = function(options) {
   serverApp.use(express.static(publicDir));
   serverApp.use(function(req, res, next) {
     res.renderApp = function(content, opts) {
-      var title = defaultTitle + (opts ? " - " + opts.title : "");
+      var title = formatTitle(defaultTitle, opts.title);
       var HTML = React.renderToStaticMarkup(App({
         content: content,
         opts: opts,

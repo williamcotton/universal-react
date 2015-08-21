@@ -14,6 +14,8 @@ module.exports = function(options) {
     ---
     browser version
 
+    should this become the 'browser-express' module?
+
   */
 
   var React = require("react");
@@ -22,14 +24,14 @@ module.exports = function(options) {
   var prouter = require("prouter");
   var Router = prouter.Router;
 
+  var formatTitle = require('../format-title');  
+
   var browserApp = {
     get: function(route, handler) {
       Router.use(route, function(req) {
         var res = {
           renderApp: function(content, opts) {
-            if (opts.title) {
-              options.document.title = browserEnv.defaultTitle + " - " + opts.title;
-            }
+            options.document.title = formatTitle(browserEnv.defaultTitle, opts.title);
             React.initializeTouchEvents(true);
             React.render(App({
               navigate: Router.navigate,
