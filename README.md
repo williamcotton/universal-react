@@ -2,13 +2,19 @@
 
 ## Getting Started
 
-This application is designed to work with Heroku-style deployments including Deis.
+Make sure you have the [Heroku Toolbelt](https://toolbelt.heroku.com/) installed as this application is designed to work with Heroku-style deployments including Deis.
 
-Start by running ```npm install```.
+Start by running:
 
-While developing it is useful to use watchify and enable source maps with ```npm run build-dev```
+```npm install```.
 
-And to run a development server with ```npm run start-dev```. Make sure you have the [Heroku Toolbelt](https://toolbelt.heroku.com/) installed.
+While developing it is useful to use watchify and enable source maps with:
+
+```npm run build-dev```
+
+And to run a development server with:
+
+```npm run start-dev```. 
 
 ## universalApp
 
