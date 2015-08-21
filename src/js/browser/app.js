@@ -8,25 +8,6 @@ module.exports = function(options) {
     document: options.document
   });
 
-
-  /*
-
-    Google Image Search
-    -------------------
-    browser version
-
-  */
-
-  var imageSearch = function(searchTerm, callback) {
-    request('/data/images/' + searchTerm, function(err, res, body) {
-      if (err) {
-        return callback(true, []);
-      }
-      var images = JSON.parse(body);
-      callback(err, images);
-    });
-  }
-
   /*
 
     app
@@ -81,6 +62,24 @@ module.exports = function(options) {
       session: browserSession
     }), options.document.getElementById('universal-app-container'));
   };
+
+  /*
+
+    Google Image Search
+    -------------------
+    browser version
+
+  */
+
+  var imageSearch = function(searchTerm, callback) {
+    request('/data/images/' + searchTerm, function(err, res, body) {
+      if (err) {
+        return callback(true, []);
+      }
+      var images = JSON.parse(body);
+      callback(err, images);
+    });
+  }
 
   /*
 
