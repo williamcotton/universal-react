@@ -77,7 +77,7 @@ module.exports = function(options) {
 
   */
 
-  var universalServerApp = require("../universal-app")({
+  var universalServerApp = require("../../jsx/universal-app.jsx")({
     app: serverApp,
     imageSearch: imageSearch
   });

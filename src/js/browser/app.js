@@ -80,7 +80,7 @@ module.exports = function(options) {
 
   */
 
-  var universalApp = require("../universal-app")({
+  var universalApp = require("../../jsx/universal-app.jsx")({
     app: browserApp,
     imageSearch: imageSearch
   });
