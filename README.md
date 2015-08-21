@@ -77,6 +77,22 @@ module.exports = universalApp;
 
 The server app is instantiated in [```src/js/server/index.js```](https://github.com/williamcotton/universal-react/blob/master/src/js/server/index.js).
 
+```js
+var nodeEnv = process.env.NODE_ENV;
+var defaultTitle = process.env.DEFAULT_TITLE;
+var port = process.env.PORT || 5000;
+
+var serverApp = require('./app')({
+  port: port,
+  defaultTitle: defaultTitle,
+  nodeEnv: nodeEnv
+});
+
+serverApp.listen(serverApp.port, function() {
+  console.log('Universal React serverApp is running in %s mode on port %s', nodeEnv, port);
+});
+```
+
 And is run, as shown in the Procfiles:
 
 ```node src/js/server/index.js```
@@ -169,6 +185,22 @@ var universalApp = require("../../jsx/universal-app.jsx")({
 ## browserApp
 
 Like the serverApp, the browserApp is instantiated in [```src/js/browser/index.js```](https://github.com/williamcotton/universal-react/blob/master/src/js/browser/index.js).
+
+```js
+var request = require('request');
+
+var browserApp = require('./app')({
+  localStorage: window.localStorage,
+  document: document,
+  window: window,
+  browserEnv: window.browserEnv,
+  request: request
+});
+
+browserApp.listen(function() {
+  console.log("%cUniversal React browserApp is running in %s mode on %s", "color:blue; font-size: 6pt", window.browserEnv.nodeEnv, window.location.host);
+});
+```
 
 It is bundled up in to a single JavaScript file in the ```public/``` directory:
 
