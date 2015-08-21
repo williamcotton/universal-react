@@ -5,7 +5,8 @@ module.exports = function(options) {
   var port = options.port;
 
   var browserEnv = {
-    nodeEnv: nodeEnv
+    nodeEnv: nodeEnv,
+    defaultTitle: defaultTitle
   };
 
   /*
