@@ -160,7 +160,7 @@ serverApp.get("/data/images/:searchTerm", function(req, res) {
 These two objects are passed in as options to ```universalApp```:
 
 ```js
-var universalApp = require("../universal-app")({
+var universalApp = require("../../jsx/universal-app.jsx")({
   app: serverApp,
   imageSearch: imageSearch
 });
@@ -253,7 +253,7 @@ var imageSearch = function(searchTerm, callback) {
 And like with the server, these two objects are passed in as options to ```universalApp```:
 
 ```js
-var universalApp = require("../universal-app")({
+var universalApp = require("../../jsx/universal-app.jsx")({
   app: browserApp,
   imageSearch: imageSearch
 });
