@@ -24,6 +24,10 @@ The main routing logic is in [```src/js/universal-app.js```](https://github.com/
 
 It connects HTTP pathnames to React components that are injected in to the root App component.
 
+This ```universalApp``` module is executed in both the server and the browser environment.
+
+This means that the  ```app```, ```renderApp``` and ```imageSearch``` objects are very different between the browser and server environments, yet all present the same interface.
+
 ```js
 var React = require("react");
 
@@ -67,10 +71,6 @@ var universalApp = function(options) {
 
 module.exports = universalApp;
 ```
-
-This ```universalApp``` module is executed in both the server and the browser environment.
-
-This means that the  ```app```, ```renderApp``` and ```imageSearch``` objects are very different between the browser and server environments, yet all present the same interface.
 
 ## serverApp
 
