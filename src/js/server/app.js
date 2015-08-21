@@ -1,5 +1,7 @@
 module.exports = function(options) {
 
+
+
   var defaultTitle = options.defaultTitle;
   var nodeEnv = options.nodeEnv;
   var port = options.port;
@@ -16,6 +18,10 @@ module.exports = function(options) {
     
   */
 
+  var React = require("react");
+  require('node-jsx').install({extension: '.jsx'});
+  var App = React.createFactory(require('../../jsx/app.jsx'));
+
   var express = require('express');
   var cookieParser = require('cookie-parser');
   var serverSession = require('./session');
@@ -28,29 +34,19 @@ module.exports = function(options) {
   serverApp.use(cookieParser());
   serverApp.use(serverSession);
   serverApp.use(express.static(publicDir));
-
-  /*
-
-    renderApp
-    ---------
-    server version
-
-  */
-
-  var React = require("react");
-  require('node-jsx').install({extension: '.jsx'});
-
-  var renderServerApp = function(content, req, res, opts) {
-    var App = React.createFactory(require('../../jsx/app.jsx'));
-    var title = defaultTitle + (opts ? " - " + opts.title : "");
-    var HTML = React.renderToStaticMarkup(App({
-      content: content,
-      opts: opts,
-      browserEnv: browserEnv,
-      session: req.session
-    }));
-    res.render('index', { HTML: HTML, title: title, browserEnv: browserEnv });
-  };
+  serverApp.use(function(req, res, next) {
+    res.renderApp = function(content, opts) {
+      var title = defaultTitle + (opts ? " - " + opts.title : "");
+      var HTML = React.renderToStaticMarkup(App({
+        content: content,
+        opts: opts,
+        browserEnv: browserEnv,
+        session: req.session
+      }));
+      res.render('index', { HTML: HTML, title: title, browserEnv: browserEnv });
+    };
+    next();
+  });
 
   /*
 
@@ -82,7 +78,6 @@ module.exports = function(options) {
   */
 
   var universalServerApp = require("../universal-app")({
-    renderApp: renderServerApp,
     app: serverApp,
     imageSearch: imageSearch
   });

@@ -16,6 +16,9 @@ module.exports = function(options) {
 
   */
 
+  var React = require("react");
+  var App = React.createFactory(require('../../jsx/app.jsx'));
+  
   var prouter = require("prouter");
   var Router = prouter.Router;
 
@@ -23,6 +26,16 @@ module.exports = function(options) {
     get: function(route, handler) {
       Router.use(route, function(req) {
         var res = {
+          renderApp: renderBrowserApp = function(content, opts) {
+            React.initializeTouchEvents(true);
+            React.render(App({
+              navigate: Router.navigate,
+              content: content,
+              opts: opts,
+              browserEnv: browserEnv,
+              session: browserSession
+            }), options.document.getElementById('universal-app-container'));
+          },
           setHeader: function() {}
         };
         handler(req, res)
@@ -40,28 +53,6 @@ module.exports = function(options) {
       }
     }
   }
-
-  /*
-
-    renderApp
-    ---------
-    browser version
-
-  */
-
-  var React = require("react");
-  var App = React.createFactory(require('../../jsx/app.jsx'));
-
-  var renderBrowserApp = function(content, req, res, opts) {
-    React.initializeTouchEvents(true);
-    React.render(App({
-      navigate: Router.navigate,
-      content: content,
-      opts: opts,
-      browserEnv: browserEnv,
-      session: browserSession
-    }), options.document.getElementById('universal-app-container'));
-  };
 
   /*
 
@@ -90,7 +81,6 @@ module.exports = function(options) {
   */
 
   var universalApp = require("../universal-app")({
-    renderApp: renderBrowserApp,
     app: browserApp,
     imageSearch: imageSearch
   });
