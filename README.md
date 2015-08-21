@@ -28,7 +28,7 @@ It connects HTTP pathnames to React components that are injected in to the root 
 
 This ```universalApp``` module is executed in both the server and the browser environment.
 
-This means that the  ```app``` and ```imageSearch``` objects are very different between the browser and server environments, yet all present the same interface.
+This means that while the  ```app``` and ```imageSearch``` objects are very different between the browser and server environments, they still present the same interface.
 
 ```js
 var React = require("react");
