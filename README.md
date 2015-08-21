@@ -457,6 +457,17 @@ module.exports = function(t, domRoute, defaultTitle) {
       t.equal(title, defaultTitle, "created proper title");
     });
   });
+  
+  t.test('should have routes mapped for all of the defined routes', function(t) {
+    var routes = Object.keys(routesMap);
+    var diff = arr_diff(routes, definedRoutes);
+    var message = "has same number of mapped routes as defined routes"
+    if (diff) {
+      message += " - missing: " + diff;
+    }
+    t.equal(routes.length, definedRoutes.length, message);
+    t.end();
+  });
 
   t.test('should load all the routes specified in the routes map and find the expected DOM elements', function (t) {
     var routes = Object.keys(routesMap);
@@ -483,10 +494,12 @@ var TestUtils = React.addons.TestUtils;
 var Router = require('router');
 var router = new Router();
 ...
+var definedRoutes = [];
 var routesMap = {};
 
 var mockApp = {
   get: function(route, handler) {
+    definedRoutes.push(route);
     router.get(route, function(req, res) {
       handler(req, res);
     });
@@ -500,6 +513,7 @@ var mockApp = {
         shallowRenderer.render(content);
         var renderedOutput = shallowRenderer.getRenderOutput();
         routesMap[route] = renderedOutput.props.className;
+        // routesMap['/login'] = 'login-container';
       }
     }
     router.handle(req, res, function() {});
