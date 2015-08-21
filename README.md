@@ -1,5 +1,7 @@
 # Universal React
 
+Universal React is an example of a web application that renders HTML both statically on the server as well as dynamically in the browser using the same React components and express-style routing engine.
+
 ## Getting Started
 
 Make sure you have the [Heroku Toolbelt](https://toolbelt.heroku.com/) installed as this application is designed to work with Heroku-style deployments including Deis.
