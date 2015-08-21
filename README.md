@@ -28,7 +28,7 @@ It connects HTTP pathnames to React components that are injected in to the root 
 
 This ```universalApp``` module is executed in both the server and the browser environment.
 
-This means that the  ```app```, ```renderApp``` and ```imageSearch``` objects are very different between the browser and server environments, yet all present the same interface.
+This means that the  ```app``` and ```imageSearch``` objects are very different between the browser and server environments, yet all present the same interface.
 
 ```js
 var React = require("react");
@@ -39,31 +39,30 @@ var Images = React.createFactory(require('../jsx/images.jsx'));
 
 var universalApp = function(options) {
 
-  var renderApp = options.renderApp;
   var app = options.app;
 
   var imageSearch = options.imageSearch;
 
   app.get('/', function(req, res) {
     var content = FrontPage();
-    renderApp(content, req, res);
+    res.renderApp(content);
   });
 
   app.get('/login', function(req, res) {
     var content = Login();
-    renderApp(content, req, res, {title: "Login"});
+    res.renderApp(content, {title: "Login"});
   });
 
   app.get('/images', function(req, res) {
     var content = Images();
-    renderApp(content, req, res, {title: "Images"});
+    res.renderApp(content, {title: "Images"});
   });
 
   app.get('/images/:searchTerm', function(req, res) {
     var searchTerm = req.params.searchTerm;
     imageSearch(searchTerm, function(err, images) {
       var content = Images({images: images, searchTerm: searchTerm});
-      renderApp(content, req, res, {title: "Images - " + searchTerm});
+      res.renderApp(content, {title: "Images - " + searchTerm});
     });
   });
 
@@ -101,10 +100,14 @@ var browserEnv = {
 The server environment instantiates a standard [express](http://expressjs.com/) app.
 
 ```js
+var React = require("react");
+require('node-jsx').install({extension: '.jsx'});
+var App = React.createFactory(require('../../jsx/app.jsx'));
+
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var serverSession = require('./session');
-  
+
 var serverApp = express();
 var publicDir = __dirname + '/../../../public';
 serverApp.set('port', port);
@@ -113,32 +116,27 @@ serverApp.set('views', __dirname + '/../../ejs');
 serverApp.use(cookieParser());
 serverApp.use(serverSession);
 serverApp.use(express.static(publicDir));
+serverApp.use(function(req, res, next) {
+  res.renderApp = function(content, opts) {
+    var title = defaultTitle + (opts ? " - " + opts.title : "");
+    var HTML = React.renderToStaticMarkup(App({
+      content: content,
+      opts: opts,
+      browserEnv: browserEnv,
+      session: req.session
+    }));
+    res.render('index', { HTML: HTML, title: title, browserEnv: browserEnv });
+  };
+  next();
+});
 ```
 
 It uses the ```cookie-parser``` and a custom ```serverSession``` middleware to attach a very simple session store that is controlled from the browser.
 
 It loads static resources like ```build.js``` and ```build.css``` from the the ```public/``` directory.
 
-#### ```renderApp```
+The server also uses a custom middleware to create a ```res.renderApp``` function that renders React components to static HTML before injecting them in to a simple EJS view that is sent as a response.
 
-The server creates a function that renders React components to static HTML before injecting them in to a simple EJS view that is sent as a response.
-
-```js
-var React = require("react");
-require('node-jsx').install({extension: '.jsx'});
-
-var renderServerApp = function(content, req, res, opts) {
-  var App = React.createFactory(require('../../jsx/app.jsx'));
-  var title = defaultTitle + (opts ? " - " + opts.title : "");
-  var HTML = React.renderToStaticMarkup(App({
-    content: content,
-    opts: opts,
-    browserEnv: browserEnv,
-    session: req.session
-  }));
-  res.render('index', { HTML: HTML, title: title, browserEnv: browserEnv });
-};
-```
 
 #### ```imageSearch```
 
@@ -196,6 +194,9 @@ var browserSession = require('./session')({
 In the browser, the ```app``` is a custom function built with ```prouter```, a pushState routing engine that uses the same routing system as ```express```.
 
 ```js
+var React = require("react");
+var App = React.createFactory(require('../../jsx/app.jsx'));
+
 var prouter = require("prouter");
 var Router = prouter.Router;
 
@@ -203,6 +204,16 @@ var browserApp = {
   get: function(route, handler) {
     Router.use(route, function(req) {
       var res = {
+        renderApp: renderBrowserApp = function(content, opts) {
+          React.initializeTouchEvents(true);
+          React.render(App({
+            navigate: Router.navigate,
+            content: content,
+            opts: opts,
+            browserEnv: browserEnv,
+            session: browserSession
+          }), options.document.getElementById('universal-app-container'));
+        },
         setHeader: function() {}
       };
       handler(req, res)
@@ -222,25 +233,7 @@ var browserApp = {
 }
 ```
 
-#### renderApp
-
-In the browser the renderApp function uses the standard ```React.render``` to inject the App in the the DOM.
-
-```js
-var React = require("react");
-var App = React.createFactory(require('../../jsx/app.jsx'));
-
-var renderBrowserApp = function(content, req, res, opts) {
-  React.initializeTouchEvents(true);
-  React.render(App({
-    navigate: Router.navigate,
-    content: content,
-    opts: opts,
-    browserEnv: browserEnv,
-    session: browserSession
-  }), options.document.getElementById('universal-app-container'));
-};
-```
+Like the server, the client also creates a ```res.renderApp``` function, but one that uses the standard React.render to inject the App dynamically in to the DOM..
 
 #### imageSearch
 
