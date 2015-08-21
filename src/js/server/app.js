@@ -24,6 +24,7 @@ module.exports = function(options) {
   var express = require('express');
   var cookieParser = require('cookie-parser');
   var serverSession = require('./session');
+  var compression = require('compression');
 
   var formatTitle = require('../format-title');
 
@@ -32,6 +33,7 @@ module.exports = function(options) {
   serverApp.set('port', port);
   serverApp.set('view engine', 'ejs');
   serverApp.set('views', __dirname + '/../../ejs');
+  serverApp.use(compression());
   serverApp.use(cookieParser());
   serverApp.use(serverSession);
   serverApp.use(express.static(publicDir));
