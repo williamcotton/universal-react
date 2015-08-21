@@ -12,10 +12,24 @@ module.exports = function(t, domRoute, defaultTitle) {
     callback(false, []);
   }
 
+  var arr_diff = function (a1, a2) {
+    var a=[], diff=[];
+    for(var i=0;i<a1.length;i++)
+      a[a1[i]]=true;
+    for(var i=0;i<a2.length;i++)
+      if(a[a2[i]]) delete a[a2[i]];
+      else a[a2[i]]=true;
+    for(var k in a)
+      diff.push(k);
+    return diff;
+  }
+
+  var definedRoutes = [];
   var routesMap = {};
   
   var mockApp = {
     get: function(route, handler) {
+      definedRoutes.push(route);
       router.get(route, function(req, res) {
         handler(req, res);
       });
@@ -55,6 +69,17 @@ module.exports = function(t, domRoute, defaultTitle) {
       var title = $('title').html();
       t.equal(title, defaultTitle, "created proper title");
     });
+  });
+
+  t.test('should have routes mapped for all of the defined routes', function(t) {
+    var routes = Object.keys(routesMap);
+    var diff = arr_diff(routes, definedRoutes);
+    var message = "has same number of mapped routes as defined routes"
+    if (diff) {
+      message += " - missing: " + diff;
+    }
+    t.equal(routes.length, definedRoutes.length, message);
+    t.end();
   });
 
   t.test('should load all the routes specified in the routes map and find the expected DOM elements', function (t) {
