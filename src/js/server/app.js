@@ -37,7 +37,7 @@ module.exports = function(options) {
   serverApp.use(express.static(publicDir));
   serverApp.use(function(req, res, next) {
     res.renderApp = function(content, opts) {
-      var title = formatTitle(defaultTitle, opts.title);
+      var title = formatTitle(defaultTitle, opts ? opts.title : false);
       var HTML = React.renderToStaticMarkup(App({
         content: content,
         opts: opts,

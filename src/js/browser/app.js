@@ -31,7 +31,7 @@ module.exports = function(options) {
       Router.use(route, function(req) {
         var res = {
           renderApp: function(content, opts) {
-            options.document.title = formatTitle(browserEnv.defaultTitle, opts.title);
+            options.document.title = formatTitle(browserEnv.defaultTitle, opts ? opts.title : false);
             React.initializeTouchEvents(true);
             React.render(App({
               navigate: Router.navigate,
