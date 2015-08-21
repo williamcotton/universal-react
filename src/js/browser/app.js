@@ -16,6 +16,8 @@ module.exports = function(options) {
 
     should this become the 'browser-express' module?
 
+    should it call React.render every time, or should it update the content and opts with setState?
+
   */
 
   var React = require("react");
