@@ -28,7 +28,7 @@ It connects HTTP pathnames to React components that are injected in to the root 
 
 This ```universalApp``` module is executed in both the server and the browser environment.
 
-This means that the  ```app``` and ```imageSearch``` objects are very different between the browser and server environments, yet all present the same interface.
+This means that while the  ```app``` and ```imageSearch``` objects are very different between the browser and server environments, they still present the same interface.
 
 ```js
 var React = require("react");
@@ -274,7 +274,7 @@ Like the server, the client also creates a ```res.renderApp``` function, but one
 
 #### imageSearch
 
-In the browser, imageSearch makes an HTTP request to the previously server endpoint.
+In the browser, imageSearch makes an HTTP request to the previously defined server endpoint.
 
 ```js
 var imageSearch = function(searchTerm, callback) {
@@ -418,9 +418,11 @@ var FrontPage = require("../../src/jsx/front-page.jsx");
 test('FrontPage component', function (t) {
 
   t.test('should create the component', function (t) {
+    var className = "front-page-container";
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(FrontPage, {}));
-    var frontPageContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, "front-page-container").getDOMNode();
-    t.ok(frontPageContainer, "created FrontPage DOM element");
+    var elements = TestUtils.scryRenderedDOMComponentsWithClass(renderedComponent, className);
+    var element = elements.length ? elements[0].getDOMNode() : false;
+    t.ok(element, "has className " + className);
     t.end();
   });
 
@@ -456,7 +458,7 @@ module.exports = function(t, domRoute, defaultTitle) {
     });
   });
 
-  t.test('browser should load all the routes specified in the routes map', function (t) {
+  t.test('should load all the routes specified in the routes map and find the expected DOM elements', function (t) {
     var routes = Object.keys(routesMap);
     t.plan(routes.length);
     async.each(routes, function(route, callback) {
