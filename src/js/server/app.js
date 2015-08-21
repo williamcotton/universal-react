@@ -1,7 +1,5 @@
 module.exports = function(options) {
 
-
-
   var defaultTitle = options.defaultTitle;
   var nodeEnv = options.nodeEnv;
   var port = options.port;
