@@ -29,6 +29,7 @@ module.exports = function(t, domRoute, defaultTitle) {
           shallowRenderer.render(content);
           var renderedOutput = shallowRenderer.getRenderOutput();
           routesMap[route] = renderedOutput.props.className;
+          // routesMap['/login'] = 'login-container';
         }
       }
       router.handle(req, res, function() {});
@@ -56,7 +57,7 @@ module.exports = function(t, domRoute, defaultTitle) {
     });
   });
 
-  t.test('browser should load all the routes specified in the routes map', function (t) {
+  t.test('should load all the routes specified in the routes map and find the expected DOM elements', function (t) {
     var routes = Object.keys(routesMap);
     t.plan(routes.length);
     async.each(routes, function(route, callback) {
