@@ -8,13 +8,6 @@ module.exports = function(options) {
     nodeEnv: nodeEnv
   };
 
-  var React = require("react");
-  require('node-jsx').install({extension: '.jsx'});
-
-  var express = require('express');
-  var cookieParser = require('cookie-parser');
-  var serverSession = require('./session');
-
   /*
 
     app
@@ -22,6 +15,10 @@ module.exports = function(options) {
     server version
     
   */
+
+  var express = require('express');
+  var cookieParser = require('cookie-parser');
+  var serverSession = require('./session');
 
   var serverApp = express();
   var publicDir = __dirname + '/../../../public';
@@ -39,6 +36,9 @@ module.exports = function(options) {
     server version
 
   */
+
+  var React = require("react");
+  require('node-jsx').install({extension: '.jsx'});
 
   var renderServerApp = function(content, req, res, opts) {
     var App = React.createFactory(require('../../jsx/app.jsx'));
