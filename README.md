@@ -157,11 +157,10 @@ serverApp.get("/data/images/:searchTerm", function(req, res) {
 }); 
 ```
 
-These three objects are passed in as options to ```universalApp```:
+These two objects are passed in as options to ```universalApp```:
 
 ```js
 var universalApp = require("../universal-app")({
-  renderApp: renderServerApp,
   app: serverApp,
   imageSearch: imageSearch
 });
@@ -204,7 +203,7 @@ var browserApp = {
   get: function(route, handler) {
     Router.use(route, function(req) {
       var res = {
-        renderApp: renderBrowserApp = function(content, opts) {
+        renderApp: function(content, opts) {
           React.initializeTouchEvents(true);
           React.render(App({
             navigate: Router.navigate,
@@ -251,11 +250,10 @@ var imageSearch = function(searchTerm, callback) {
 }
 ```
 
-And like with the server, these three objects are passed in as options to ```universalApp```:
+And like with the server, these two objects are passed in as options to ```universalApp```:
 
 ```js
 var universalApp = require("../universal-app")({
-  renderApp: renderBrowserApp,
   app: browserApp,
   imageSearch: imageSearch
 });
