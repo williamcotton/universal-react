@@ -433,11 +433,50 @@ test('FrontPage component', function (t) {
 });
 ```
 
-#### routesMap
+#### universalAppSpec
 
-The specs for [```serverApp```](https://github.com/williamcotton/universal-react/blob/master/test/js/server/app-spec.js) and [```browserApp```](https://github.com/williamcotton/universal-react/blob/master/test/js/browser/app-spec.js) load a small JSON file that maps some routes to some expected DOM elements.
+The specs for [```serverApp```](https://github.com/williamcotton/universal-react/blob/master/test/js/server/app-spec.js) and [```browserApp```](https://github.com/williamcotton/universal-react/blob/master/test/js/browser/app-spec.js) both load [```universalAppSpec```](https://github.com/williamcotton/universal-react/blob/master/test/js/universal-app-spec.js).
 
 This is used as to make sure that both the server and the browser are rendering the same basic HTML given the same route.
+
+```js
+module.exports = function(t, domRoute, defaultTitle) {
+
+  ...
+
+  t.test('should create the App component', function (t) {
+    t.plan(1);
+    domRoute("/", function($) {
+      var container = $('.app-container').html();
+      t.ok(container, "created App component");
+    });
+  });
+
+  t.test('should have the defaultTitle', function (t) {
+    t.plan(1);
+    domRoute("/", function($) {
+      var title = $('title').html();
+      t.equal(title, defaultTitle, "created proper title");
+    });
+  });
+
+  t.test('browser should load all the routes specified in the routes map', function (t) {
+    var routes = Object.keys(routesMap);
+    t.plan(routes.length);
+    async.each(routes, function(route, callback) {
+      var className = routesMap[route];
+      domRoute(route, function($) {
+        var container = $('.' + className).html();
+        t.ok(container, route + " has " + className);
+        callback();
+      });
+    });    
+  });
+
+};
+```  
+
+The ```routesMap``` is auto-generated using a ```mockApp``` pass through an testing instance of ```universalApp``` and end up in this structure:
 
 ```js
 {
@@ -449,32 +488,37 @@ This is used as to make sure that both the server and the browser are rendering 
 ```
 
 ```js
-t.test('server should load all the routes specified in the routes map', function (t) {
-  var routes = Object.keys(routesMap);
-  t.plan(routes.length);
-  async.each(routes, function(route, callback) {
-    var className = routesMap[route];
-    request(baseUrl + route, function(err, res, body) {
-      var $ = cheerio.load(body, {xmlMode: true});
-      var container = $('.' + className).html();
-      t.ok(container, route + " has " + className);
-      callback();
+var React = require('react/addons');
+var TestUtils = React.addons.TestUtils;
+...
+var Router = require('router');
+var router = new Router();
+...
+var routesMap = {};
+
+var mockApp = {
+  get: function(route, handler) {
+    router.get(route, function(req, res) {
+      handler(req, res);
     });
-  });    
+    var req = {
+      url: route,
+      method: "GET"
+    };
+    var res = {
+      renderApp: function(content, opts) {
+        var shallowRenderer = TestUtils.createRenderer();
+        shallowRenderer.render(content);
+        var renderedOutput = shallowRenderer.getRenderOutput();
+        routesMap[route] = renderedOutput.props.className;
+      }
+    }
+    router.handle(req, res, function() {});
+  },
+};
+
+var universalTestApp = require('../../src/jsx/universal-app.jsx')({
+  app: mockApp,
+  ...
 });
 ```
-
-```js
-t.test('browser should load all the routes specified in the routes map', function (t) {
-  var routes = Object.keys(routesMap);
-  t.plan(routes.length);
-  async.each(routes, function(route, callback) {
-    var className = routesMap[route];
-    browserApp.navigate(route);
-    var element = global.document.querySelector("." + className);
-    var container = element ? element.innerHTML : false;
-    t.ok(container, route + " has " + className);
-    callback();
-  });    
-});
-```  
