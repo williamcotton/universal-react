@@ -2,7 +2,6 @@ var test = require('tapes');
 var jsdom = require('jsdom');
 var request = require('request');
 var cheerio = require('cheerio');
-var async = require('async');
 
 var nodeEnv = "test";
 var defaultTitle = "Test";
