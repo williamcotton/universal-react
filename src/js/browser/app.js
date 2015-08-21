@@ -18,7 +18,7 @@ module.exports = function(options) {
 
   var React = require("react");
   var App = React.createFactory(require('../../jsx/app.jsx'));
-  
+
   var prouter = require("prouter");
   var Router = prouter.Router;
 
@@ -26,7 +26,7 @@ module.exports = function(options) {
     get: function(route, handler) {
       Router.use(route, function(req) {
         var res = {
-          renderApp: renderBrowserApp = function(content, opts) {
+          renderApp: function(content, opts) {
             React.initializeTouchEvents(true);
             React.render(App({
               navigate: Router.navigate,
