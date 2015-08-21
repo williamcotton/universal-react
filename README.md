@@ -107,7 +107,8 @@ var nodeEnv = options.nodeEnv;
 var port = options.port;
 
 var browserEnv = {
-  nodeEnv: nodeEnv
+  nodeEnv: nodeEnv,
+  defaultTitle: defaultTitle
 };
 ```
 
@@ -236,6 +237,9 @@ var browserApp = {
     Router.use(route, function(req) {
       var res = {
         renderApp: function(content, opts) {
+          if (opts.title) {
+            options.document.title = browserEnv.defaultTitle + " - " + opts.title;
+          }
           React.initializeTouchEvents(true);
           React.render(App({
             navigate: Router.navigate,
