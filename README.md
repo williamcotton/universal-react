@@ -418,9 +418,11 @@ var FrontPage = require("../../src/jsx/front-page.jsx");
 test('FrontPage component', function (t) {
 
   t.test('should create the component', function (t) {
+    var className = "front-page-container";
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(FrontPage, {}));
-    var frontPageContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, "front-page-container").getDOMNode();
-    t.ok(frontPageContainer, "created FrontPage DOM element");
+    var elements = TestUtils.scryRenderedDOMComponentsWithClass(renderedComponent, className);
+    var element = elements.length ? elements[0].getDOMNode() : false;
+    t.ok(element, "has className " + className);
     t.end();
   });
 
