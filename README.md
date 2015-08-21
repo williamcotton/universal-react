@@ -274,7 +274,7 @@ Like the server, the client also creates a ```res.renderApp``` function, but one
 
 #### imageSearch
 
-In the browser, imageSearch makes an HTTP request to the previously server endpoint.
+In the browser, imageSearch makes an HTTP request to the previously defined server endpoint.
 
 ```js
 var imageSearch = function(searchTerm, callback) {
