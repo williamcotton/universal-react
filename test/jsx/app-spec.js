@@ -22,25 +22,30 @@ var browserSession = require("../../src/js/browser/session")({
   document: global.document
 });
 
+var testContentClassName = 'test-container';
+
 var TestContent = React.createClass({
   render: function() {
-    return React.createElement('div', {className: 'test-container'}, this.props.username)
+    return React.createElement('div', {className: testContentClassName}, this.props.username)
   }
 });
 
 test('App component', function (t) {
 
   t.test('should create the component', function (t) {
+    var className = "app-container";
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(App, { session: browserSession, content: TestContent }));
-    var appContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, 'app-container').getDOMNode();
-    t.ok(appContainer, "created App DOM element");
+    var elements = TestUtils.scryRenderedDOMComponentsWithClass(renderedComponent, className);
+    var element = elements.length ? elements[0].getDOMNode() : false;
+    t.ok(element, "has className " + className);
     t.end();
   });
 
   t.test('should render the content component', function (t) {
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(App, { session: browserSession, content: TestContent }));
-    var testContent = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, 'test-container').getDOMNode();
-    t.ok(testContent, "created TestContent DOM element");
+    var elements = TestUtils.scryRenderedDOMComponentsWithClass(renderedComponent, testContentClassName);
+    var element = elements.length ? elements[0].getDOMNode() : false;
+    t.ok(element, "has TestContent with className " + testContentClassName);
     t.end();
   });
 

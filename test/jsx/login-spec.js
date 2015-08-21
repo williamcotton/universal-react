@@ -18,9 +18,11 @@ var Login = require("../../src/jsx/login.jsx");
 test('Login component', function (t) {
 
   t.test('should create the component', function (t) {
+    var className = "login-container";
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(Login, { }));
-    var loginContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, "login-container").getDOMNode();
-    t.ok(loginContainer, "created Login DOM element");
+    var elements = TestUtils.scryRenderedDOMComponentsWithClass(renderedComponent, className);
+    var element = elements.length ? elements[0].getDOMNode() : false;
+    t.ok(element, "has className " + className);
     t.end();
   });
 

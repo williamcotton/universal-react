@@ -18,9 +18,11 @@ var Images = require("../../src/jsx/images.jsx");
 test('Images component', function (t) {
 
   t.test('should create the component', function (t) {
+    var className = "images-container";
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(Images, {}));
-    var frontPageContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, "images-container").getDOMNode();
-    t.ok(frontPageContainer, "created Images DOM element");
+    var elements = TestUtils.scryRenderedDOMComponentsWithClass(renderedComponent, className);
+    var element = elements.length ? elements[0].getDOMNode() : false;
+    t.ok(element, "has className " + className);
     t.end();
   });
 
