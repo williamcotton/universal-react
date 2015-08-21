@@ -82,7 +82,7 @@ And is run, as shown in the Procfiles:
 
 ```node src/js/server/index.js```
 
-The app has options for a ```defaultTitle```, ```port```, and node environmental variables passed in as ```nodeEnv```.
+The app has options for a ```defaultTitle```, ```port```, and the NODE_ENV variable passed in as ```nodeEnv```.
 
 It also creates a ```browserEnv``` object that is passed up through to the browser.
 
