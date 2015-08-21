@@ -8,7 +8,7 @@ Make sure you have the [Heroku Toolbelt](https://toolbelt.heroku.com/) installed
 
 Start by running:
 
-```npm install```.
+```npm install```
 
 While developing it is useful to use watchify and enable source maps with:
 
@@ -16,7 +16,7 @@ While developing it is useful to use watchify and enable source maps with:
 
 And to run a development server with:
 
-```npm run start-dev```. 
+```npm run start-dev```
 
 ## universalApp
 
