@@ -24,11 +24,14 @@ require('node-jsx').install({extension: '.jsx'});
 
 var localStorage = require('localStorage');
 
+var defaultTitle = "Test";
+
 var browserApp = require("../../../src/js/browser/app.js")({
   document: global.document,
   window: global.window,
   browserEnv: {
-    nodeEnv: "test"
+    nodeEnv: "test",
+    defaultTitle: defaultTitle
   },
   localStorage: localStorage,
   request: request
@@ -41,6 +44,12 @@ test('browserApp', function (t) {
   t.test('should create the App component', function (t) {
     var appContainer = global.document.getElementsByClassName("app-container")[0].innerHTML;
     t.ok(appContainer, "created App DOM element");
+    t.end();
+  });
+
+  t.test('should have the defaultTitle', function (t) {
+    var title = global.document.title;
+    t.equal(title, defaultTitle, "created proper title");
     t.end();
   });
 
