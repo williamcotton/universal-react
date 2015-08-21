@@ -476,16 +476,7 @@ module.exports = function(t, domRoute, defaultTitle) {
 };
 ```  
 
-The ```routesMap``` is auto-generated using a ```mockApp``` pass through an testing instance of ```universalApp``` and end up in this structure:
-
-```js
-{
-  "/": "front-page-container",
-  "/login": "login-container",
-  "/images": "images-container",
-  "/images/cat": "images-container"
-}
-```
+The ```routesMap``` is auto-generated using a ```mockApp``` passed through a testing instance of ```universalApp```.
 
 ```js
 var React = require('react/addons');
