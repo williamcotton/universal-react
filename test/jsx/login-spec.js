@@ -1,8 +1,6 @@
 var test = require('tapes');
 var jsdom = require('jsdom');
 
-var routesMap = require('../json/routes-map.json');
-
 if (!global.document) {
   global.document = jsdom.jsdom('<!doctype html><html><body><div id="universal-app-container"></div></body></html>');
   global.window = global.document.parentWindow;
@@ -20,10 +18,8 @@ var Login = require("../../src/jsx/login.jsx");
 test('Login component', function (t) {
 
   t.test('should create the component', function (t) {
-    var route = "/login";
-    var className = routesMap[route];
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(Login, { }));
-    var loginContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, className).getDOMNode();
+    var loginContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, "login-container").getDOMNode();
     t.ok(loginContainer, "created Login DOM element");
     t.end();
   });

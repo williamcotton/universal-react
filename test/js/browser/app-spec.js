@@ -1,9 +1,8 @@
 var test = require('tapes');
 var jsdom = require('jsdom');
-var async = require('async');
 var request = require('request');
 
-var routesMap = require('../../json/routes-map.json');
+var universalAppSpec = require('../universal-app-spec');
 
 if (!global.document) {
   global.document = jsdom.jsdom('<!doctype html><html><body><div id="universal-app-container"></div></body></html>');
@@ -39,33 +38,20 @@ var browserApp = require("../../../src/js/browser/app.js")({
 
 browserApp.listen();
 
-test('browserApp', function (t) {
+jsdom.jQueryify(global.window, "http://code.jquery.com/jquery-2.1.1.js", function () {
 
-  t.test('should create the App component', function (t) {
-    var appContainer = global.document.getElementsByClassName("app-container")[0].innerHTML;
-    t.ok(appContainer, "created App DOM element");
-    t.end();
-  });
+  test('browserApp', function (t) {
 
-  t.test('should have the defaultTitle', function (t) {
-    var title = global.document.title;
-    t.equal(title, defaultTitle, "created proper title");
-    t.end();
-  });
-
-  t.test('browser should load all the routes specified in the routes map', function (t) {
-    var routes = Object.keys(routesMap);
-    t.plan(routes.length);
-    async.each(routes, function(route, callback) {
-      var className = routesMap[route];
+    var domRoute = function(route, callback) {
       browserApp.navigate(route);
-      var element = global.document.querySelector("." + className);
-      var container = element ? element.innerHTML : false;
-      t.ok(container, route + " has " + className);
-      callback();
-    });    
-  });
+      callback(global.window.$);
+    }
 
-  t.end();
+    universalAppSpec(t, domRoute, defaultTitle);
+
+    t.end();
+
+  });
 
 });
+

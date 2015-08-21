@@ -5,19 +5,11 @@ var cheerio = require('cheerio');
 var async = require('async');
 
 var nodeEnv = "test";
-var defaultTitle = "test title";
+var defaultTitle = "Test";
 var port = 12345;
 var baseUrl = 'http://localhost:' + port;
 
-var routesMap = require('../../json/routes-map.json');
-
-if (!global.document) {
-  global.document = jsdom.jsdom('<!doctype html><html><body><div id="universal-app-container"></div></body></html>');
-  global.window = global.document.parentWindow;
-  global.navigator = {
-    userAgent: 'node.js'
-  };
-}
+var universalAppSpec = require('../universal-app-spec');
 
 test('serverApp', function (t) {
 
@@ -39,28 +31,14 @@ test('serverApp', function (t) {
     t.end();
   });
 
-  t.test('should have the defaultTitle', function (t) {
-    t.plan(1);
-    request(baseUrl, function(err, res, body) {
+  var domRoute = function(route, callback) {
+    request(baseUrl + route, function(err, res, body) {
       var $ = cheerio.load(body, {xmlMode: true});
-      var title = $('title').html();
-      t.equal(title, defaultTitle, "created proper title");
+      callback($);
     });
-  });
+  };
 
-  t.test('server should load all the routes specified in the routes map', function (t) {
-    var routes = Object.keys(routesMap);
-    t.plan(routes.length);
-    async.each(routes, function(route, callback) {
-      var className = routesMap[route];
-      request(baseUrl + route, function(err, res, body) {
-        var $ = cheerio.load(body, {xmlMode: true});
-        var container = $('.' + className).html();
-        t.ok(container, route + " has " + className);
-        callback();
-      });
-    });    
-  });
+  universalAppSpec(t, domRoute, defaultTitle);
 
   t.end();
 

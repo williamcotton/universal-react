@@ -1,8 +1,6 @@
 var test = require('tapes');
 var jsdom = require('jsdom');
 
-var routesMap = require('../json/routes-map.json');
-
 if (!global.document) {
   global.document = jsdom.jsdom('<!doctype html><html><body><div id="universal-app-container"></div></body></html>');
   global.window = global.document.parentWindow;
@@ -20,16 +18,14 @@ var Images = require("../../src/jsx/images.jsx");
 test('Images component', function (t) {
 
   t.test('should create the component', function (t) {
-    var route = "/images";
-    var className = routesMap[route];
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(Images, {}));
-    var frontPageContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, className).getDOMNode();
+    var frontPageContainer = TestUtils.findRenderedDOMComponentWithClass(renderedComponent, "images-container").getDOMNode();
     t.ok(frontPageContainer, "created Images DOM element");
     t.end();
   });
 
   t.test('should load some images', function (t) {
-    var images = [{url:"http://test.com/1.png"},{url:"http://test.com/2.png"}]
+    var images = [{url:"http://test.com/1.png"},{url:"http://test.com/2.png"}];
     var renderedComponent = TestUtils.renderIntoDocument(React.createElement(Images, {images: images}));
     var imagesList = TestUtils.scryRenderedDOMComponentsWithTag(renderedComponent, "img");
     t.equal(imagesList.length, images.length, "created correct number of images");
