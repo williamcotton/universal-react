@@ -14,6 +14,7 @@ if (!global.document) {
 
 // prouter needs these globals
 global.addEventListener = global.window.addEventListener;
+global.removeEventListener = global.window.removeEventListener;
 global.location = global.window.location;
 global.history = global.window.history;
 
@@ -25,22 +26,31 @@ var localStorage = require('localStorage');
 
 var defaultTitle = "Test";
 
-var browserApp = require("../../../src/js/browser/app.js")({
-  document: global.document,
-  window: global.window,
-  browserEnv: {
-    nodeEnv: "test",
-    defaultTitle: defaultTitle
-  },
-  localStorage: localStorage,
-  request: request
-});
-
-browserApp.listen();
-
 jsdom.jQueryify(global.window, "http://code.jquery.com/jquery-2.1.1.js", function () {
 
   test('browserApp', function (t) {
+
+    var browserApp, server;
+
+    t.beforeEach(function(t) {
+      browserApp = require("../../../src/js/browser/app.js")({
+        document: global.document,
+        window: global.window,
+        browserEnv: {
+          nodeEnv: "test",
+          defaultTitle: defaultTitle
+        },
+        localStorage: localStorage,
+        request: request
+      });
+      server = browserApp.listen();
+      t.end();
+    });
+
+    t.afterEach(function(t) {
+      server.close()
+      t.end();
+    });
 
     var domRoute = function(route, callback) {
       browserApp.navigate(route);
