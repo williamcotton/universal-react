@@ -46,6 +46,7 @@ var App = React.createClass({
     if (this.state.username) {
       sessionItem = <NavItem className="session-container">{this.state.username}</NavItem>;
     }
+    // https://gist.github.com/williamcotton/48a42b58e413804343a2
     return (
       <div className="app-container">
         <Navbar brand={<a href="/">Universal React</a>} inverse>

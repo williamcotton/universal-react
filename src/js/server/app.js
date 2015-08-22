@@ -33,6 +33,9 @@ module.exports = function(options) {
   serverApp.set('port', port);
   serverApp.set('view engine', 'ejs');
   serverApp.set('views', __dirname + '/../../ejs');
+  // serverApp.set('view engine', 'jsx');
+  // serverApp.set('views', __dirname + '/../../jsx');
+  // serverApp.engine('jsx', require('express-react-views').createEngine());
   serverApp.use(compression());
   serverApp.use(cookieParser());
   serverApp.use(serverSession);
