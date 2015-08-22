@@ -67,17 +67,12 @@ module.exports = function(options) {
 
   */
 
-  var universalApp = require("../../jsx/universal-app.jsx")({
+  var universalBrowserApp = require("../../jsx/universal-app.jsx")({
     app: browserApp,
     imageSearch: imageSearch
   });
 
-  return {
-    listen: function(callback) {
-      universalApp.listen(callback);
-    },
-    navigate: browserApp.navigate
-  }
+  return universalBrowserApp;
 
 }
 

@@ -85,16 +85,6 @@ module.exports = function(options) {
     imageSearch: imageSearch
   });
 
-  var server;
-
-  return {
-    port: serverApp.get("port"),
-    listen: function(port, callback) {
-      server = serverApp.listen(port, callback);
-    },
-    close: function() {
-      server.close();
-    }
-  };
+  return universalServerApp;
 
 }

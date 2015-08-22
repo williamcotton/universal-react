@@ -12,7 +12,7 @@ var universalAppSpec = require('../universal-app-spec');
 
 test('serverApp', function (t) {
 
-  var serverApp;
+  var serverApp, server;
 
   t.beforeEach(function(t) {
     serverApp = require("../../../src/js/server/app")({
@@ -20,13 +20,13 @@ test('serverApp', function (t) {
       nodeEnv: nodeEnv,
       port: port
     });
-    serverApp.listen(port, function() {
+    server = serverApp.listen(port, function() {
       t.end();
     })
   });
 
   t.afterEach(function(t) {
-    serverApp.close();
+    server.close();
     t.end();
   });
 
