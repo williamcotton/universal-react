@@ -14,8 +14,6 @@ module.exports = function(options) {
     ---
     browser version
 
-    should this become the 'browser-express' module?
-
     should it call React.render every time, or should it update the content and opts with setState?
 
   */
@@ -23,43 +21,25 @@ module.exports = function(options) {
   var React = require("react");
   var App = React.createFactory(require('../../jsx/app.jsx'));
 
-  var prouter = require("prouter");
-  var Router = prouter.Router;
+  var browserExpress = require('browser-express');
+  var browserApp = browserExpress();
 
   var formatTitle = require('../format-title');  
 
-  var browserApp = {
-    get: function(route, handler) {
-      Router.use(route, function(req) {
-        var res = {
-          renderApp: function(content, opts) {
-            options.document.title = formatTitle(browserEnv.defaultTitle, opts ? opts.title : false);
-            React.initializeTouchEvents(true);
-            React.render(App({
-              navigate: Router.navigate,
-              content: content,
-              opts: opts,
-              browserEnv: browserEnv,
-              session: browserSession
-            }), options.document.getElementById('universal-app-container'));
-          },
-          setHeader: function() {}
-        };
-        handler(req, res)
-      });
-    },
-    listen: function(callback) {
-      var router = Router.listen({
-        root: "/", // base path for the handlers.
-        usePushState: true, // is pushState of history API desired?
-        hashChange: true, // is hashChange desired?
-        silent: false // don't try to load handlers for the current path?
-      });
-      if (callback) {
-        callback(router);
-      }
-    }
-  }
+  browserApp.use(function(req, res, next) {
+    res.renderApp = function(content, opts) {
+      options.document.title = formatTitle(browserEnv.defaultTitle, opts ? opts.title : false);
+      React.initializeTouchEvents(true);
+      React.render(App({
+        navigate: browserApp.navigate,
+        content: content,
+        opts: opts,
+        browserEnv: browserEnv,
+        session: browserSession
+      }), options.document.getElementById('universal-app-container'));
+    };
+    next();
+  });
 
   /*
 
@@ -96,7 +76,7 @@ module.exports = function(options) {
     listen: function(callback) {
       universalApp.listen(callback);
     },
-    navigate: Router.navigate
+    navigate: browserApp.navigate
   }
 
 }
