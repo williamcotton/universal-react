@@ -225,52 +225,34 @@ var browserSession = require('./session')({
 
 #### ```app```
 
-In the browser, the ```app``` is a custom function built with ```prouter```, a pushState routing engine that uses the same routing system as ```express```.
+In the browser, the ```app``` uses an instance of [```browser-express```](https://github.com/williamcotton/browser-express), a pushState routing engine that uses the same routing system as ```express```.
 
 ```js
 var React = require("react");
 var App = React.createFactory(require('../../jsx/app.jsx'));
 
-var prouter = require("prouter");
-var Router = prouter.Router;
+var browserExpress = require('browser-express');
+var browserApp = browserExpress();
 
-var formatTitle = require('../format-title');
+var formatTitle = require('../format-title');  
 
-var browserApp = {
-  get: function(route, handler) {
-    Router.use(route, function(req) {
-      var res = {
-        renderApp: function(content, opts) {
-          options.document.title = formatTitle(browserEnv.defaultTitle, opts.title);
-          React.initializeTouchEvents(true);
-          React.render(App({
-            navigate: Router.navigate,
-            content: content,
-            opts: opts,
-            browserEnv: browserEnv,
-            session: browserSession
-          }), options.document.getElementById('universal-app-container'));
-        },
-        setHeader: function() {}
-      };
-      handler(req, res)
-    });
-  },
-  listen: function(callback) {
-    var router = Router.listen({
-      root: "/", // base path for the handlers.
-      usePushState: true, // is pushState of history API desired?
-      hashChange: true, // is hashChange desired?
-      silent: false // don't try to load handlers for the current path?
-    });
-    if (callback) {
-      callback(router);
-    }
-  }
-}
+browserApp.use(function(req, res, next) {
+  res.renderApp = function(content, opts) {
+    options.document.title = formatTitle(browserEnv.defaultTitle, opts ? opts.title : false);
+    React.initializeTouchEvents(true);
+    React.render(App({
+      navigate: browserApp.navigate,
+      content: content,
+      opts: opts,
+      browserEnv: browserEnv,
+      session: browserSession
+    }), options.document.getElementById('universal-app-container'));
+  };
+  next();
+});
 ```
 
-Like the server, the client also creates a ```res.renderApp``` function, but one that uses the standard React.render to inject the App dynamically in to the DOM..
+Like the server, the browserApp also uses custom middleware that creates a ```res.renderApp``` function, but one that uses the standard React.render to inject the App dynamically in to the DOM..
 
 #### imageSearch
 
