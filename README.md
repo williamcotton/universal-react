@@ -225,7 +225,7 @@ var browserSession = require('./session')({
 
 #### ```app```
 
-In the browser, the ```app``` uses an instance of [```browser-express```](https://github.com/williamcotton/browser-express), a pushState routing engine that uses the same routing system as ```express```.
+In the browser, the ```app``` uses an instance of [```browser-express```](https://github.com/williamcotton/browser-express), a pushState routing engine that exposes the same interface for routes and middleware as ```express```.
 
 ```js
 var React = require("react");
