@@ -1,6 +1,6 @@
 var request = require('request');
 
-var browserApp = require('./app')({
+var universalBrowserApp = require('./app')({
   localStorage: window.localStorage,
   document: document,
   window: window,
@@ -8,6 +8,6 @@ var browserApp = require('./app')({
   request: request
 });
 
-browserApp.listen(function() {
-  console.log("%cUniversal React browserApp is running in %s mode on %s", "color:blue; font-size: 6pt", window.browserEnv.nodeEnv, window.location.host);
+universalBrowserApp.listen(function() {
+  console.log("%cuniversalBrowserApp is running in %s mode on %s", "color:blue; font-size: 6pt", window.browserEnv.nodeEnv, window.location.host);
 });

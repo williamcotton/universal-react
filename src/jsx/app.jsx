@@ -33,7 +33,11 @@ var App = React.createClass({
     this.props.session.removeAll();
   },
   render: function() {
-    var content = React.cloneElement(this.props.content, { login: this.login, username: this.state.username, navigate: this.props.navigate });
+    var content = React.cloneElement(this.props.content, {
+      navigate: this.props.navigate,
+      login: this.login, 
+      username: this.state.username
+    });
     var sessionItem;
     var dropdownMenu = (
       <DropdownButton title='Menu'>
@@ -43,16 +47,12 @@ var App = React.createClass({
         <MenuItem onSelect={this.logout}>Logout</MenuItem>
       </DropdownButton>
     );
-    if (this.state.username) {
-      sessionItem = <NavItem className="session-container">{this.state.username}</NavItem>;
-    }
-    // https://gist.github.com/williamcotton/48a42b58e413804343a2
     return (
       <div className="app-container">
         <Navbar brand={<a href="/">Universal React</a>} inverse>
           <Nav right>
-            {sessionItem}
-            {this.state.username ? dropdownMenu : <NavItem href="/login">Login</NavItem> }
+            { this.state.username ? <NavItem className="session-container">{this.state.username}</NavItem> : false }
+            { this.state.username ? dropdownMenu : <NavItem href="/login">Login</NavItem> }
           </Nav>
         </Navbar>
         <div className="content">

@@ -38,7 +38,8 @@ jsdom.jQueryify(global.window, "http://code.jquery.com/jquery-2.1.1.js", functio
         window: global.window,
         browserEnv: {
           nodeEnv: "test",
-          defaultTitle: defaultTitle
+          defaultTitle: defaultTitle,
+          rootId: 'universal-app-container'
         },
         localStorage: localStorage,
         request: request

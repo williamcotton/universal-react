@@ -3,43 +3,29 @@ module.exports = function(options) {
   var browserEnv = options.browserEnv;
   var request = options.request;
 
-  var browserSession = require('./session')({
-    localStorage: options.localStorage,
-    document: options.document
-  });
-
   /*
 
     app
     ---
     browser version
 
-    should it call React.render every time, or should it update the content and opts with setState?
-
   */
 
-  var React = require("react");
-  var App = React.createFactory(require('../../jsx/app.jsx'));
+  var React = require('react');
+  var App = require('../../jsx/app.jsx');
 
-  var browserExpress = require('browser-express');
-  var browserApp = browserExpress();
+  var express = require('browser-express');
+  var app = express();
 
-  var formatTitle = require('../format-title');  
+  var reactRenderApp = require('./react-render-app');
 
-  browserApp.use(function(req, res, next) {
-    res.renderApp = function(content, opts) {
-      options.document.title = formatTitle(browserEnv.defaultTitle, opts ? opts.title : false);
-      React.initializeTouchEvents(true);
-      React.render(App({
-        navigate: browserApp.navigate,
-        content: content,
-        opts: opts,
-        browserEnv: browserEnv,
-        session: browserSession
-      }), options.document.getElementById('universal-app-container'));
-    };
-    next();
-  });
+  app.use(reactRenderApp({
+    RootComponent: App,
+    app: app,
+    browserEnv: browserEnv,
+    document: options.document,
+    localStorage: options.localStorage
+  }));
 
   /*
 
@@ -68,11 +54,10 @@ module.exports = function(options) {
   */
 
   var universalBrowserApp = require("../../jsx/universal-app.jsx")({
-    app: browserApp,
+    app: app,
     imageSearch: imageSearch
   });
 
   return universalBrowserApp;
 
 }
-
