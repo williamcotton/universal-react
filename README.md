@@ -344,7 +344,7 @@ var App = React.createClass({
 
 ## index.ejs
 
-This is the basic template that is rendered by the serverApp and used to load the browserApp that was bundled in to ```public/build.js```.
+This is the basic template that is rendered by the ```reactRenderApp``` middleware in the ```serverApp``` and used to load the ```browserApp``` that was bundled in to ```public/build.js```.
 
 Importantly, it prerenders the React App on the server in to the browserEnv.rootID (```universal-app-container```) DOM element.
 
