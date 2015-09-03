@@ -365,7 +365,7 @@ var Images = React.createClass({
 module.exports = Images;
 ```
 
-Here, when a user searches, the ```navigate()``` function is called with a new path to be rendered. This does not trigger a full page reload, rather it rebuilds the view in the browser based on browser history pushState.
+Here, when a user searches, the ```navigate()``` function is called with a new path to be rendered. This does not trigger a full page reload, rather it uses browser history pushState to dynamically call the route handler and rebuild the view in the browser, saving a full round trip call to the server.
 
 ## index.ejs
 
