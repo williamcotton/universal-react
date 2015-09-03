@@ -133,15 +133,11 @@ app.use(reactRenderApp({
 
 #### reactRenderApp
 
-The server also uses a custom middleware to create a ```res.renderApp``` function that renders React components to static HTML before injecting them in to a simple EJS view that is sent as a response.
+The server also uses a custom middleware to create a ```res.renderApp``` function that renders React components to static HTML before injecting them in to a simple EJS view that is sent as a response. 
 
 It uses the ```cookie-parser``` and a custom ```session``` middleware to attach a very simple session store that is controlled from the browser.
 
-It loads static resources like ```build.js``` and ```build.css``` from the the ```public/``` directory.
-
-The ```browserEnv``` object is passed up through to the browser as a global variable.
-
-The EJS view will create an HTML DIV element with the id  ```rootId```,  in this case ```universal-app-container```.
+The EJS view loads static resources like ```build.js``` and ```build.css``` from the the ```public/``` directory, passes the browserEnv object to the browser as a global variable, and renders an HTML DIV element with the id ```rootId```, which in this case is ```universal-app-container```.
 
 ```js
 ...
@@ -213,6 +209,8 @@ browserApp.listen(function() {
 It is bundled up in to a single JavaScript file in the ```public/``` directory:
 
 ```browserify src/js/browser/index.js -t babelify > public/build.js```
+
+This ```build.js``` file is rendered statically by the EJS view in the server-side express ```reactRenderApp``` middleware.
 
 To help with testing, browser specific global objects like ```document```, ```window``` and ```localStorage``` are passed in as options, along with the ```browserEnv``` and an instance of the universal ```browser-request```.
 
