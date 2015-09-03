@@ -487,6 +487,28 @@ The specs for [```serverApp```](https://github.com/williamcotton/universal-react
 
 This is used as to make sure that both the server and the browser are rendering the same basic HTML given the same route.
 
+Amongst other environmental specifics, the [```serverApp``` tests](https://github.com/williamcotton/universal-react/blob/master/test/js/server/app-spec.js) define a ```domRoute``` function based on [```request```](https://github.com/request/request) and [```cheerio```](https://github.com/cheeriojs/cheerio).
+
+```js
+var domRoute = function(route, callback) {
+  request(baseUrl + route, function(err, res, body) {
+    var $ = cheerio.load(body, {xmlMode: true});
+    callback($);
+  });
+};
+```
+
+While the [```browserApp``` tests](https://github.com/williamcotton/universal-react/blob/master/test/js/browser/app-spec.js) define a domRoute based on jQuery and the ```navigate()``` function inherited by ```browser-express``` from ```prouter```. See the tests themselves for more details.
+
+```js
+var domRoute = function(route, callback) {
+  browserApp.navigate(route);
+  callback(global.window.$);
+}
+```
+
+This means the ```domRoute``` function is defined in **two different environments** and passed in as options to a **single test suite**, similar to modules like  [```abstract-blob-store```](https://github.com/maxogden/abstract-blob-store), suggesting some deeper relationships between environmental abstractions and test suites as modules.
+
 ```js
 module.exports = function(t, domRoute, defaultTitle) {
 
@@ -536,6 +558,10 @@ module.exports = function(t, domRoute, defaultTitle) {
 ```  
 
 The ```routesMap``` is auto-generated using a ```mockApp``` passed through a testing instance of ```universalApp```.
+
+This means we can test each and every route we've defined in our ```universalApp``` to make sure it renders on both the client and the server, without coupling our tests to our implementation and needing to manually maintain a ```routesMap```.
+
+This is not meant to test the functionality of the React components, rather just that the routes are rendering properly in both environments.
 
 ```js
 var React = require('react/addons');
