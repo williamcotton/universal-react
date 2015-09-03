@@ -141,7 +141,7 @@ It loads static resources like ```build.js``` and ```build.css``` from the the `
 
 The ```browserEnv``` object is passed up through to the browser as a global variable.
 
-React will create an HTML DIV element with the id  ```rootId```,  in this case ```universal-app-container```.
+The EJS view will create an HTML DIV element with the id  ```rootId```,  in this case ```universal-app-container```.
 
 ```js
 ...
