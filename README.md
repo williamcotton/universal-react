@@ -299,9 +299,11 @@ var universalApp = require("../../jsx/universal-app.jsx")({
 
 This is the root React component and is used much like an application layout in a framework like Ruby on Rails. HTTP requests are mapped to specific React modules that are passed in as the ```content``` options.
 
-Before the ```content``` component is rendered, it is cloned and given some new properties that pertain to the app, the ```login``` function as well as a ```username```.
+Before the ```content``` component is rendered, it is cloned and given some new properties that pertain to the app, the ```login()``` function, a ```username``` and a ```navigate()``` function.
 
-The ```login``` function sets the ```username``` to both the component's state as well as the custom cookie-based ```session```. This means that when the server is rendering the necessary components it will make sure that it also includes the ```username```.
+The ```login()``` function sets the ```username``` to both the component's state as well as the custom cookie-based ```session```. This means that when the server is rendering the necessary components it will make sure that it also includes the ```username```.
+
+The ```navigate(path)``` function triggers the ```browserApp``` to navigate to the provided path argument. See the [```prouter```](https://github.com/rogerpadilla/prouter) documentation for more information.
 
 ```js
 var App = React.createClass({
@@ -341,6 +343,29 @@ var App = React.createClass({
   }
 });
 ```
+
+## Content components
+
+Components like [```images.jsx```](https://github.com/williamcotton/universal-react/blob/master/src/jsx/images.jsx) will be rendered inside of the root App component.
+
+```js
+var React = require('react');
+...
+var Images = React.createClass({
+  search: function(event) {
+    event.preventDefault();
+    var searchTerm = this.refs.searchTerm.getValue();
+    this.props.navigate("/images/" + searchTerm);
+  },
+  render: function() {
+    ...
+  }
+});
+
+module.exports = Images;
+```
+
+Here, when a user searches, the ```navigate()``` function is called with a new path to be rendered. This does not trigger a full page reload, rather it rebuilds the view in the browser based on browser history pushState.
 
 ## index.ejs
 
