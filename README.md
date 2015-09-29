@@ -26,7 +26,7 @@ The main routing logic is in [```src/jsx/universal-app.jsx```](https://github.co
 
 It connects HTTP pathnames to React components that are injected in to the root App component.
 
-This ```universalApp``` module is executed in both the server and the browser environment.
+This ```universalApp``` module is executed in **both the server and the browser environment**.
 
 This means that while the  ```app``` and ```imageSearch``` objects are very different between the browser and server environments, they still present the same interface.
 
@@ -99,63 +99,64 @@ And is run, as shown in the Procfiles:
 
 The app has options for a ```defaultTitle```, ```port```, and the NODE_ENV variable passed in as ```nodeEnv```.
 
-It also creates a ```browserEnv``` object that is passed up through to the browser.
-
-```js
-var defaultTitle = options.defaultTitle;
-var nodeEnv = options.nodeEnv;
-var port = options.port;
-
-var browserEnv = {
-  nodeEnv: nodeEnv,
-  defaultTitle: defaultTitle
-};
-```
-
 #### ```app```
+
+Found  in [```src/js/server/app.js```](https://github.com/williamcotton/universal-react/blob/master/src/js/server/app.js).
 
 The server environment instantiates a standard [express](http://expressjs.com/) app.
 
 ```js
 var React = require("react");
 require('node-jsx').install({extension: '.jsx'});
-var App = React.createFactory(require('../../jsx/app.jsx'));
+var App = require('../../jsx/app.jsx');
 
 var express = require('express');
-var cookieParser = require('cookie-parser');
-var serverSession = require('./session');
+var app = express();
 
-var formatTitle = require('../format-title');
+var compression = require('compression');
+app.use(compression());
 
-var serverApp = express();
 var publicDir = __dirname + '/../../../public';
-serverApp.set('port', port);
-serverApp.set('view engine', 'ejs');
-serverApp.set('views', __dirname + '/../../ejs');
-serverApp.use(cookieParser());
-serverApp.use(serverSession);
-serverApp.use(express.static(publicDir));
-serverApp.use(function(req, res, next) {
+app.use(express.static(publicDir));
+
+var reactRenderApp = require('./react-render-app');
+app.use(reactRenderApp({
+  app: app,
+  RootComponent: App,
+  browserEnv: {
+    nodeEnv: nodeEnv,
+    defaultTitle: defaultTitle,
+    rootId: 'universal-app-container'
+  }
+}));
+```
+
+#### reactRenderApp
+
+The server also uses a custom middleware to create a ```res.renderApp``` function that renders React components to static HTML before injecting them in to a simple EJS view that is sent as a response. 
+
+It uses the ```cookie-parser``` and a custom ```session``` middleware to attach a very simple session store that is controlled from the browser.
+
+The EJS view loads static resources like ```build.js``` and ```build.css``` from the the ```public/``` directory, passes the browserEnv object to the browser as a global variable, and renders an HTML DIV element with the id ```rootId```, which in this case is ```universal-app-container```.
+
+```js
+...
+return function(req, res, next) {
   res.renderApp = function(content, opts) {
-    var title = formatTitle(defaultTitle, opts.title);
-    var HTML = React.renderToStaticMarkup(App({
+    var title = formatTitle(defaultTitle, opts ? opts.title : false);
+    var HTML = React.renderToStaticMarkup(RootComponent({
       content: content,
       opts: opts,
       browserEnv: browserEnv,
       session: req.session
     }));
-    res.render('index', { HTML: HTML, title: title, browserEnv: browserEnv });
+    var content = ejs.render(template, { HTML: HTML, title: title, browserEnv: browserEnv }, {});
+    res.send(content);
   };
   next();
-});
-```
-
-It uses the ```cookie-parser``` and a custom ```serverSession``` middleware to attach a very simple session store that is controlled from the browser.
-
-It loads static resources like ```build.js``` and ```build.css``` from the the ```public/``` directory.
-
-The server also uses a custom middleware to create a ```res.renderApp``` function that renders React components to static HTML before injecting them in to a simple EJS view that is sent as a response.
-
+}
+...
+```  
 
 #### ```imageSearch```
 
@@ -209,50 +210,63 @@ It is bundled up in to a single JavaScript file in the ```public/``` directory:
 
 ```browserify src/js/browser/index.js -t babelify > public/build.js```
 
+This ```build.js``` file is rendered statically by the EJS view in the server-side express ```reactRenderApp``` middleware.
+
 To help with testing, browser specific global objects like ```document```, ```window``` and ```localStorage``` are passed in as options, along with the ```browserEnv``` and an instance of the universal ```browser-request```.
-
-A custom ```browserSession``` object is created, built on top of localStorage and using cookies to communicate with the server.
-
-```js
-var browserEnv = options.browserEnv;
-var request = options.request;
-
-var browserSession = require('./session')({
-  localStorage: options.localStorage,
-  document: options.document
-});
-```
 
 #### ```app```
 
 In the browser, the ```app``` uses an instance of [```browser-express```](https://github.com/williamcotton/browser-express), a pushState routing engine that exposes the same interface for routes and middleware as ```express```.
 
 ```js
-var React = require("react");
-var App = React.createFactory(require('../../jsx/app.jsx'));
+var React = require('react');
+var App = require('../../jsx/app.jsx');
 
-var browserExpress = require('browser-express');
-var browserApp = browserExpress();
+var express = require('browser-express');
+var app = express();
 
-var formatTitle = require('../format-title');  
+var reactRenderApp = require('./react-render-app');
 
-browserApp.use(function(req, res, next) {
-  res.renderApp = function(content, opts) {
-    options.document.title = formatTitle(browserEnv.defaultTitle, opts ? opts.title : false);
-    React.initializeTouchEvents(true);
-    React.render(App({
-      navigate: browserApp.navigate,
-      content: content,
-      opts: opts,
-      browserEnv: browserEnv,
-      session: browserSession
-    }), options.document.getElementById('universal-app-container'));
-  };
-  next();
+app.use(reactRenderApp({
+  RootComponent: App,
+  app: app,
+  browserEnv: browserEnv,
+  document: options.document,
+  localStorage: options.localStorage
+}));
+```
+
+#### reactRenderApp
+
+A custom ```session``` object is created, built on top of localStorage and using cookies to communicate with the server.
+
+```js
+var session = require('./session')({
+  localStorage: options.localStorage,
+  document: options.document
 });
 ```
 
-Like the server, the browserApp also uses custom middleware that creates a ```res.renderApp``` function, but one that uses the standard React.render to inject the App dynamically in to the DOM..
+Like the server, the browserApp also uses custom middleware that creates a ```res.renderApp``` function, but one that uses the standard React.render to inject the App dynamically in to the DOM.
+
+```js
+...
+return function(req, res, next) {
+  res.renderApp = function(content, opts) {
+    options.document.title = formatTitle(browserEnv.defaultTitle, opts ? opts.title : false);
+    React.initializeTouchEvents(true);
+    React.render(RootComponent({
+      navigate: app.navigate,
+      content: content,
+      opts: opts,
+      browserEnv: browserEnv,
+      session: session
+    }), options.document.getElementById(browserEnv.rootId));
+  };
+  next();
+}
+...
+```
 
 #### imageSearch
 
@@ -283,9 +297,11 @@ var universalApp = require("../../jsx/universal-app.jsx")({
 
 This is the root React component and is used much like an application layout in a framework like Ruby on Rails. HTTP requests are mapped to specific React modules that are passed in as the ```content``` options.
 
-Before the ```content``` component is rendered, it is cloned and given some new properties that pertain to the app, the ```login``` function as well as a ```username```.
+Before the ```content``` component is rendered, it is cloned and given some new properties that pertain to the app, the ```login()``` function, a ```username``` and a ```navigate()``` function.
 
-The ```login``` function sets the ```username``` to both the component's state as well as the custom cookie-based ```session```. This means that when the server is rendering the necessary components it will make sure that it also includes the ```username```.
+The ```login()``` function sets the ```username``` to both the component's state as well as the custom cookie-based ```session```. This means that when the server is rendering the necessary components it will make sure that it also includes the ```username```.
+
+The ```navigate(path)``` function triggers the ```browserApp``` to navigate to the provided path argument. See the [```prouter```](https://github.com/rogerpadilla/prouter) documentation for more information.
 
 ```js
 var App = React.createClass({
@@ -308,7 +324,11 @@ var App = React.createClass({
   },
   ...
   render: function() {
-    var content = React.cloneElement(this.props.content, { login: this.login, username: this.state.username, navigate: this.props.navigate });
+    var content = React.cloneElement(this.props.content, {
+      navigate: this.props.navigate,
+      login: this.login, 
+      username: this.state.username
+    });
     ...
     return (
       <div className="app-container">
@@ -322,11 +342,59 @@ var App = React.createClass({
 });
 ```
 
+## Content components
+
+Components like [```images.jsx```](https://github.com/williamcotton/universal-react/blob/master/src/jsx/images.jsx) will be rendered inside of the root App component.
+
+```js
+var React = require('react');
+
+var ReactBootstrap = require('react-bootstrap');
+
+var Input = ReactBootstrap.Input;
+var Button = ReactBootstrap.Button;
+
+var Images = React.createClass({
+  search: function(event) {
+    event.preventDefault();
+    var searchTerm = this.refs.searchTerm.getValue();
+    this.props.navigate("/images/" + searchTerm);
+  },
+  render: function() {
+    var searchTerm = this.props.searchTerm;
+    var images = this.props.images || [];
+    var createImageItem = function(image, i) {
+      return <li key={i}><img src={image.url} /></li>
+    }
+    var header = "Images";
+    if (searchTerm) {
+      header += " - " + searchTerm
+    }
+    return (
+      <div className="images-container">
+        <h3>{header}</h3>
+        <form className="panel panel-default" onSubmit={this.search} >
+          <Input type='text' label='Search Term' ref='searchTerm' placeholder='Enter Search Term' />
+          <Button bsStyle="primary" onClick={this.search}>Search</Button>
+        </form>
+        <ol>
+          { images.map(createImageItem) }
+        </ol>
+      </div>
+    );
+  }
+});
+
+module.exports = Images;
+```
+
+Here, when a user searches, the ```navigate()``` function is called with a new path to be rendered. This does not trigger a full page reload, rather it uses browser history pushState to dynamically call the route handler and rebuild the view in the browser, saving a full round trip call to the server.
+
 ## index.ejs
 
-This is the basic template that is rendered by the serverApp and used to load the browserApp that was bundled in to ```public/build.js```.
+This is the basic template that is rendered by the ```reactRenderApp``` middleware in the ```serverApp``` and used to load the ```browserApp``` that was bundled in to ```public/build.js```.
 
-Importantly, it prerenders the React App on the server in to the ```universal-app-container``` DOM element.
+Importantly, it prerenders the React App on the server in to the browserEnv.rootID (```universal-app-container```) DOM element.
 
 It also injects the ```browserEnv``` in to the global window object and dynamically sets the ```title```.
 
@@ -345,7 +413,7 @@ It also injects the ```browserEnv``` in to the global window object and dynamica
   </script>
 </head>
 <body>
-  <div id="universal-app-container"><%- HTML %></div>
+  <div id="<%- browserEnv.rootId %>"><%- HTML %></div>
   <script src="/build.js" type="text/javascript" charset="utf-8"></script>
 </body>
 </html>
@@ -419,6 +487,28 @@ The specs for [```serverApp```](https://github.com/williamcotton/universal-react
 
 This is used as to make sure that both the server and the browser are rendering the same basic HTML given the same route.
 
+Amongst other environmental specifics, the [```serverApp``` tests](https://github.com/williamcotton/universal-react/blob/master/test/js/server/app-spec.js) define a ```domRoute``` function based on [```request```](https://github.com/request/request) and [```cheerio```](https://github.com/cheeriojs/cheerio).
+
+```js
+var domRoute = function(route, callback) {
+  request(baseUrl + route, function(err, res, body) {
+    var $ = cheerio.load(body, {xmlMode: true});
+    callback($);
+  });
+};
+```
+
+While the [```browserApp``` tests](https://github.com/williamcotton/universal-react/blob/master/test/js/browser/app-spec.js) define a domRoute based on jQuery and the ```navigate()``` function inherited by ```browser-express``` from ```prouter```. See the tests themselves for more details.
+
+```js
+var domRoute = function(route, callback) {
+  browserApp.navigate(route);
+  callback(global.window.$);
+}
+```
+
+This means the ```domRoute``` function is defined in **two different environments** and passed in as options to a **single test suite**, similar to modules like  [```abstract-blob-store```](https://github.com/maxogden/abstract-blob-store), suggesting some deeper relationships between environmental abstractions and test suites as modules.
+
 ```js
 module.exports = function(t, domRoute, defaultTitle) {
 
@@ -468,6 +558,10 @@ module.exports = function(t, domRoute, defaultTitle) {
 ```  
 
 The ```routesMap``` is auto-generated using a ```mockApp``` passed through a testing instance of ```universalApp```.
+
+This means we can test each and every route we've defined in our ```universalApp``` to make sure it renders on both the client and the server, without coupling our tests to our implementation and needing to manually maintain a ```routesMap```.
+
+This is not meant to test the functionality of the React components, rather just that the routes are rendering properly in both environments.
 
 ```js
 var React = require('react/addons');
