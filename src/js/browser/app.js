@@ -15,7 +15,11 @@ module.exports = function(options) {
   var App = require('../../jsx/app.jsx');
 
   var express = require('browser-express');
-  var app = express();
+  var app = express({
+    interceptLinks: true,
+    document: document,
+    window: window
+  });
 
   var reactRenderApp = require('./react-render-app');
 
