@@ -4,10 +4,10 @@ var universalBrowserApp = require('./app')({
   localStorage: window.localStorage,
   document: document,
   window: window,
-  browserEnv: window.browserEnv,
   request: request
 })
 
 universalBrowserApp.listen(function () {
-  console.log('%cuniversalBrowserApp is running in %s mode on %s', 'color:blue; font-size: 6pt', window.browserEnv.nodeEnv, window.location.host)
+  console.log('%cuniversalBrowserApp is running in %s mode on %s', 'color:blue; font-size: 6pt', 'development', window.location.host)
+  universalBrowserApp.navigate('/')
 })

@@ -1,68 +1,65 @@
-var test = require('tapes');
-var jsdom = require('jsdom');
-var request = require('request');
+var test = require('tapes')
+var jsdom = require('jsdom')
+var request = require('request')
 
-var universalAppSpec = require('../universal-app-spec');
+var universalAppSpec = require('../universal-app-spec')
 
 if (!global.document) {
-  global.document = jsdom.jsdom('<!doctype html><html><body><div id="universal-app-container"></div></body></html>');
-  global.window = global.document.parentWindow;
+  global.document = jsdom.jsdom('<!doctype html><html><body><div id="universal-app-container"></div></body></html>')
+  global.window = global.document.parentWindow
   global.navigator = {
     userAgent: 'node.js'
-  };
+  }
 }
 
 // prouter needs these globals
-global.addEventListener = global.window.addEventListener;
-global.removeEventListener = global.window.removeEventListener;
-global.location = global.window.location;
-global.history = global.window.history;
+global.addEventListener = global.window.addEventListener
+global.removeEventListener = global.window.removeEventListener
+global.location = global.window.location
+global.history = global.window.history
 
-var React = require('react/addons');
-var TestUtils = React.addons.TestUtils;
-require('node-jsx').install({extension: '.jsx'});
+var React = require('react/addons')
+var TestUtils = React.addons.TestUtils
+require('node-jsx').install({extension: '.jsx'})
 
-var localStorage = require('localStorage');
+var localStorage = require('localStorage')
 
-var defaultTitle = "Test";
+var defaultTitle = 'Test'
 
-jsdom.jQueryify(global.window, "http://code.jquery.com/jquery-2.1.1.js", function () {
-
+jsdom.jQueryify(global.window, 'http://code.jquery.com/jquery-2.1.1.js', function () {
   test('browserApp', function (t) {
+    var browserApp, server
 
-    var browserApp, server;
-
-    t.beforeEach(function(t) {
-      browserApp = require("../../../src/js/browser/app.js")({
+    t.beforeEach(function (t) {
+      browserApp = require('../../../src/js/browser/app.js')({
         document: global.document,
         window: global.window,
         browserEnv: {
-          nodeEnv: "test",
+          nodeEnv: 'test',
           defaultTitle: defaultTitle,
           rootId: 'universal-app-container'
         },
         localStorage: localStorage,
         request: request
-      });
-      server = browserApp.listen();
-      t.end();
-    });
+      })
+      server = browserApp.listen()
+      t.end()
+    })
 
-    t.afterEach(function(t) {
+    t.afterEach(function (t) {
       server.close()
-      t.end();
-    });
+      t.end()
+    })
 
-    var domRoute = function(route, callback) {
-      browserApp.navigate(route);
-      callback(global.window.$);
+    var domRoute = function (route, callback) {
+      browserApp.navigate(route)
+      callback(global.window.$)
     }
 
-    universalAppSpec(t, domRoute, defaultTitle);
+    universalAppSpec(t, domRoute, defaultTitle)
 
-    t.end();
+    t.end()
 
-  });
+  })
 
-});
-
+})

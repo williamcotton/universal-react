@@ -1,32 +1,37 @@
-module.exports = function(options) {
+module.exports = function (options) {
+  var defaultTitle = options.defaultTitle
+  var nodeEnv = options.nodeEnv
+  var port = options.port
 
-  var defaultTitle = options.defaultTitle;
-  var nodeEnv = options.nodeEnv;
-  var port = options.port;
+  /*
+
+    view template
+  */
+
+  var fs = require('fs')
+  var template = fs.readFileSync(__dirname + '/../../ejs/index.ejs', 'utf8')
 
   /*
 
     app
     ---
     server version
-    
+
   */
 
-  var React = require("react");
-  require('node-jsx').install({extension: '.jsx'});
-  var App = require('../../jsx/app.jsx');
+  var React = require('react')
+  require('node-jsx').install({extension: '.jsx'})
+  var App = require('../../jsx/app.jsx')
 
-  var express = require('express');
-  var app = express();
+  var express = require('express')
+  var app = express()
 
-  var compression = require('compression');
-  app.use(compression());
+  var compression = require('compression')
+  app.use(compression())
 
-  var publicDir = __dirname + '/../../../public';
-  app.use(express.static(publicDir));
-
-  var reactRenderApp = require('./react-render-app');
+  var reactRenderApp = require('./react-render-app')
   app.use(reactRenderApp({
+    template: template,
     app: app,
     RootComponent: App,
     browserEnv: {
@@ -34,30 +39,7 @@ module.exports = function(options) {
       defaultTitle: defaultTitle,
       rootId: 'universal-app-container'
     }
-  }));
-
-
-
-  /*
-
-    Google Image Search
-    -------------------
-    server version
-
-  */
-
-  var googleImages = require("google-images");
-
-  var imageSearch = function(searchTerm, callback) {
-    googleImages.search(searchTerm, callback);
-  };
-
-  app.get("/data/images/:searchTerm", function(req, res) {
-    var searchTerm = req.params.searchTerm;
-    imageSearch(searchTerm, function(err, images) {
-      res.send(images);
-    });
-  }); 
+  }))
 
   /*
 
@@ -67,11 +49,13 @@ module.exports = function(options) {
 
   */
 
-  var universalServerApp = require("../../jsx/universal-app.jsx")({
-    app: app,
-    imageSearch: imageSearch
-  });
+  var universalServerApp = require('../../jsx/universal-app.jsx')({
+    app: app
+  })
 
-  return universalServerApp;
+  var publicDir = __dirname + '/../../../public'
+  app.use(express.static(publicDir))
+
+  return universalServerApp
 
 }

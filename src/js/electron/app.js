@@ -1,5 +1,6 @@
 module.exports = function (options) {
   var browserEnv = options.browserEnv
+  var request = options.request
 
   /*
 
@@ -9,17 +10,17 @@ module.exports = function (options) {
 
   */
 
-  var React = require('react')
   var App = require('../../jsx/app.jsx')
 
   var express = require('browser-express')
   var app = express({
     interceptLinks: true,
+    abstractNavigation: true,
     document: document,
     window: window
   })
 
-  var reactRenderApp = require('./react-render-app')
+  var reactRenderApp = require('../browser/react-render-app')
 
   app.use(reactRenderApp({
     RootComponent: App,
@@ -46,5 +47,4 @@ module.exports = function (options) {
   })
 
   return universalBrowserApp
-
 }
