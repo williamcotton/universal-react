@@ -15,7 +15,7 @@ build_debug_css: clean_css
 	./node_modules/.bin/node-sass src/scss/index.scss public/build.css --source-map public/build.css.map
 
 build_debug_js: clean_js
-	./node_modules/.bin/browserify src/js/browser/index.js -d -t babelify > public/build.js 
+	./node_modules/.bin/browserify src/js/browser/index.js -d -t [ babelify --presets [ es2015 react ] ] > public/build.js 
 
 clean: clean_css clean_js
 
@@ -33,7 +33,7 @@ public/build.css:
 
 public/build.browserify.js:
 	mkdir -p public
-	./node_modules/.bin/browserify src/js/browser/index.js -t babelify > $@
+	./node_modules/.bin/browserify src/js/browser/index.js -t [ babelify --presets [ es2015 react ] ] > $@
 
 public/build.js: public/build.browserify.js
 	mkdir -p public

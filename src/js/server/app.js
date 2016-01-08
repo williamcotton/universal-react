@@ -19,7 +19,6 @@ module.exports = function (options) {
 
   */
 
-  var React = require('react')
   require('node-jsx').install({extension: '.jsx'})
   var App = require('../../jsx/app.jsx')
 
@@ -29,16 +28,19 @@ module.exports = function (options) {
   var compression = require('compression')
   app.use(compression())
 
+  var bodyParser = require('body-parser')
+  app.use(bodyParser.urlencoded({ extended: false }))
+
   var reactRenderApp = require('./react-render-app')
   app.use(reactRenderApp({
     template: template,
     app: app,
     RootComponent: App,
     browserEnv: {
-      nodeEnv: nodeEnv,
-      defaultTitle: defaultTitle,
-      rootId: 'universal-app-container'
-    }
+      nodeEnv: nodeEnv
+    },
+    defaultTitle: defaultTitle,
+    rootDOMId: 'universal-app-container'
   }))
 
   /*

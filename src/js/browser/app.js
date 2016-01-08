@@ -15,6 +15,7 @@ module.exports = function (options) {
   var express = require('browser-express')
   var app = express({
     interceptLinks: true,
+    interceptFormSubmit: true,
     document: document,
     window: window
   })
