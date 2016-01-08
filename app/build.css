@@ -1,1 +1,30 @@
-html{-ms-touch-action:manipulation;touch-action:manipulation}*{margin:0;padding:0}*,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}ol,ul{list-style:none}html,body{height:100%}.app-container .navbar{border-radius:0px}.app-container .content{margin:0 auto;width:600px}.images-container form.panel{padding:20px}.images-container ol li{float:left}.images-container ol li img{width:300px}
+/*
+
+  RESETS
+
+*/
+html {
+  -ms-touch-action: manipulation;
+  touch-action: manipulation; }
+
+* {
+  margin: 0;
+  padding: 0; }
+
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+ol, ul {
+  list-style: none; }
+
+html, body {
+  height: 100%; }
+
+.app-container .navbar-container {
+  -webkit-app-region: drag;
+  border-radius: 0px; }
+.app-container .content {
+  margin: 0 auto;
+  width: 600px; }
