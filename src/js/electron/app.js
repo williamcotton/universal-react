@@ -1,6 +1,5 @@
 module.exports = function (options) {
   var browserEnv = options.browserEnv
-  var request = options.request
 
   /*
 

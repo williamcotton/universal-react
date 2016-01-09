@@ -9,7 +9,6 @@ module.exports = function (options) {
 
   */
 
-  var React = require('react')
   var App = require('../../jsx/app.jsx')
 
   var express = require('browser-express')
@@ -47,5 +46,4 @@ module.exports = function (options) {
   })
 
   return universalBrowserApp
-
 }

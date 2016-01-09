@@ -1,7 +1,6 @@
 module.exports = function (options) {
   var defaultTitle = options.defaultTitle
   var nodeEnv = options.nodeEnv
-  var port = options.port
 
   /*
 
@@ -59,5 +58,4 @@ module.exports = function (options) {
   app.use(express.static(publicDir))
 
   return universalServerApp
-
 }
