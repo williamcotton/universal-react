@@ -1,7 +1,8 @@
 var test = require('tapes')
-var jsdom = require('jsdom')
 var request = require('request')
 var cheerio = require('cheerio')
+
+require('node-jsx').install({extension: '.jsx'})
 
 var nodeEnv = 'test'
 var defaultTitle = 'Test'
@@ -31,6 +32,7 @@ test('serverApp', function (t) {
 
   var domRoute = function (route, callback) {
     request(baseUrl + route, function (err, res, body) {
+      if (err) {} // TODO
       var $ = cheerio.load(body, {xmlMode: true})
       callback($)
     })
@@ -39,5 +41,4 @@ test('serverApp', function (t) {
   universalAppSpec(t, domRoute, defaultTitle)
 
   t.end()
-
 })

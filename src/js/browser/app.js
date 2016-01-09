@@ -29,7 +29,7 @@ module.exports = function (options) {
       browserEnv: browserEnv
     },
     rootDOMId: 'universal-app-container',
-    defaultTitle: 'Universal App',
+    defaultTitle: options.defaultTitle || 'Universal App',
     document: options.document,
     localStorage: options.localStorage
   }))

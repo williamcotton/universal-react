@@ -1,23 +1,21 @@
 module.exports = function (t, domRoute, defaultTitle) {
-  var React = require('react/addons')
-  var TestUtils = React.addons.TestUtils
+  var TestUtils = require('react-addons-test-utils')
 
   var async = require('async')
 
   var Router = require('router')
   var router = new Router()
 
-  var mockImageSearch = function (searchTerm, callback) {
-    callback(false, [])
-  }
-
   var arr_diff = function (a1, a2) {
-    var a = [], diff = []
-    for (var i = 0;i < a1.length;i++)
+    var a = []
+    var diff = []
+    for (var i = 0; i < a1.length; i++) {
       a[a1[i]] = true
-    for (var i = 0;i < a2.length;i++)
-      if (a[a2[i]]) delete a[a2[i]]
-      else a[a2[i]] = true
+    }
+    for (var j = 0; i < a2.length; i++) {
+      if (a[a2[j]]) delete a[a2[j]]
+      else a[a2[j]] = true
+    }
     for (var k in a)
       diff.push(k)
     return diff
@@ -47,11 +45,11 @@ module.exports = function (t, domRoute, defaultTitle) {
       }
       router.handle(req, res, function () {})
     },
+    post: function (route, handler) {}
   }
 
-  var universalTestApp = require('../../src/jsx/universal-app.jsx')({
-    app: mockApp,
-    imageSearch: mockImageSearch
+  require('../../src/jsx/universal-app.jsx')({
+    app: mockApp
   })
 
   t.test('should create the App component', function (t) {
@@ -93,5 +91,4 @@ module.exports = function (t, domRoute, defaultTitle) {
       })
     })
   })
-
 }

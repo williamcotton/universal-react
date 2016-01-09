@@ -11,10 +11,9 @@ var Calculator = React.createClass({
     operation: React.PropTypes.string
   },
   render: function () {
-    var stringCalculationWithResult = this.props.result ? this.props.firstNumber + ' ' + this.props.operation + ' ' + this.props.secondNumber + ' = ' + this.props.result : false
     return <div className='calculator-container'>
       <h1>Calculator</h1>
-      <form action='/calculate' method='post'>
+      <form action='/calculator' method='post'>
         <Input name='firstNumber' type='number' defaultValue={this.props.firstNumber} />
         <Input name='operation' type='select' defaultValue={this.props.operation} placeholder='+'>
           <option value='+'>+</option>
@@ -22,7 +21,7 @@ var Calculator = React.createClass({
         </Input>
         <Input name='secondNumber' type='number' defaultValue={this.props.secondNumber} />
         <ButtonInput type='submit' value='Calculate' />
-        { stringCalculationWithResult }
+        { this.props.result ? this.props.firstNumber + ' ' + this.props.operation + ' ' + this.props.secondNumber + ' = ' + this.props.result : false }
       </form>
     </div>
   }

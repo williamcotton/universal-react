@@ -18,16 +18,14 @@ global.removeEventListener = global.window.removeEventListener
 global.location = global.window.location
 global.history = global.window.history
 
-var React = require('react/addons')
-var TestUtils = React.addons.TestUtils
 require('node-jsx').install({extension: '.jsx'})
 
 var localStorage = require('localStorage')
 
 var defaultTitle = 'Test'
 
-jsdom.jQueryify(global.window, 'http://code.jquery.com/jquery-2.1.1.js', function () {
-  test('browserApp', function (t) {
+test('browserApp', function (t) {
+  jsdom.jQueryify(global.window, 'http://code.jquery.com/jquery-2.1.1.js', function () {
     var browserApp, server
 
     t.beforeEach(function (t) {
@@ -38,7 +36,7 @@ jsdom.jQueryify(global.window, 'http://code.jquery.com/jquery-2.1.1.js', functio
           nodeEnv: 'test'
         },
         rootDOMId: 'universal-app-container',
-        defaultTitle: 'Universal App',
+        defaultTitle: defaultTitle,
         localStorage: localStorage,
         request: request
       })
@@ -59,7 +57,5 @@ jsdom.jQueryify(global.window, 'http://code.jquery.com/jquery-2.1.1.js', functio
     universalAppSpec(t, domRoute, defaultTitle)
 
     t.end()
-
   })
-
 })

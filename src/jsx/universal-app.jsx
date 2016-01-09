@@ -22,7 +22,7 @@ var universalApp = function (options) {
     res.renderApp(content, {title: 'Calculator'})
   })
 
-  app.post('/calculate', function (req, res) {
+  app.post('/calculator', function (req, res) {
     var firstNumber = parseFloat(req.body.firstNumber)
     var secondNumber = parseFloat(req.body.secondNumber)
     var operation = req.body.operation
