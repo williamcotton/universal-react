@@ -13,7 +13,7 @@ var React = require('react')
 var TestUtils = require('react-addons-test-utils')
 require('node-jsx').install({extension: '.jsx'})
 
-var App = require('../../src/jsx/app.jsx')
+var RootComponent = require('../../src/jsx/root-component.jsx')
 
 var testContentClassName = 'test-container'
 
@@ -23,24 +23,24 @@ var TestContent = React.createClass({
   }
 })
 
-test('App component', function (t) {
-  t.afterEach(function (t) {
-    t.end()
-  })
+test('Root Component', function (t) {
+  // expect.rootComponentToBeRendered(t)
 
-  t.test('should create the component', function (t) {
-    var className = 'app-container'
+  t.test('should render the root component in the DOM', function (t) {
+    var className = 'root-component-container'
     var contentElement = React.createElement(TestContent)
-    var renderedComponent = TestUtils.renderIntoDocument(React.createElement(App, { content: contentElement }))
+    var renderedComponent = TestUtils.renderIntoDocument(React.createElement(RootComponent, { content: contentElement }))
     var elements = TestUtils.scryRenderedDOMComponentsWithClass(renderedComponent, className)
     var elementClassName = elements.length ? elements[0].className : false
     t.equal(elementClassName, className, 'has className ' + className)
     t.end()
   })
 
-  t.test('should render the content component', function (t) {
+  // expect.contentToBeRenderedIntoRoot(t)
+
+  t.test('should render the content component in the DOM', function (t) {
     var contentElement = React.createElement(TestContent)
-    var renderedComponent = TestUtils.renderIntoDocument(React.createElement(App, { content: contentElement }))
+    var renderedComponent = TestUtils.renderIntoDocument(React.createElement(RootComponent, { content: contentElement }))
     var elements = TestUtils.scryRenderedDOMComponentsWithClass(renderedComponent, testContentClassName)
     var elementClassName = elements.length ? elements[0].className : false
     t.equal(elementClassName, testContentClassName, 'has className ' + testContentClassName)

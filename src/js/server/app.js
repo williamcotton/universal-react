@@ -4,14 +4,6 @@ module.exports = function (options) {
 
   /*
 
-    view template
-  */
-
-  var fs = require('fs')
-  var template = fs.readFileSync(__dirname + '/../../ejs/index.ejs', 'utf8')
-
-  /*
-
     app
     ---
     server version
@@ -19,7 +11,7 @@ module.exports = function (options) {
   */
 
   require('node-jsx').install({extension: '.jsx'})
-  var App = require('../../jsx/app.jsx')
+  var RootComponent = require('../../jsx/root-component.jsx')
 
   var express = require('express')
   var app = express()
@@ -30,11 +22,14 @@ module.exports = function (options) {
   var bodyParser = require('body-parser')
   app.use(bodyParser.urlencoded({ extended: false }))
 
-  var reactRenderApp = require('./react-render-app')
+  var fs = require('fs')
+  var template = fs.readFileSync(__dirname + '/../../ejs/index.ejs', 'utf8')
+
+  var reactRenderApp = require('./react-render-app') // require('expect-server-render-app')
   app.use(reactRenderApp({
     template: template,
     app: app,
-    RootComponent: App,
+    RootComponent: RootComponent,
     browserEnv: {
       nodeEnv: nodeEnv
     },

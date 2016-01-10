@@ -7,13 +7,13 @@ var Nav = ReactBootstrap.Nav
 var NavDropdown = ReactBootstrap.NavDropdown
 var MenuItem = ReactBootstrap.MenuItem
 
-var App = React.createClass({
+var RootComponent = React.createClass({
   propTypes: {
     content: React.PropTypes.element
   },
   render: function () {
     var content = this.props.content
-    return <div className='app-container'>
+    return <div className='root-component-container'>
       <Navbar inverse className='navbar-container'>
         <Navbar.Header>
           <Navbar.Brand>
@@ -36,4 +36,4 @@ var App = React.createClass({
   }
 })
 
-module.exports = App
+module.exports = RootComponent

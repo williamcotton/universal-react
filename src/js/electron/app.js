@@ -9,21 +9,21 @@ module.exports = function (options) {
 
   */
 
-  var App = require('../../jsx/app.jsx')
+  var RootComponent = require('../../jsx/root-component.jsx')
 
   var express = require('browser-express')
   var app = express({
     interceptLinks: true,
     interceptFormSubmit: true,
     abstractNavigation: true, // abstract navigation means it does not use browser history and page navigation, which is fine because desktop apps don't need to affect or be affected by the UI related to URLs
-    document: document,
-    window: window
+    document: options.document,
+    window: options.window
   })
 
   var reactRenderApp = require('../browser/react-render-app')
 
   app.use(reactRenderApp({
-    RootComponent: App,
+    RootComponent: RootComponent,
     app: app,
     contentProps: {
       browserEnv: browserEnv
@@ -33,6 +33,9 @@ module.exports = function (options) {
     document: options.document,
     localStorage: options.localStorage
   }))
+
+  // expect-server-render-app
+  // expect-browser-render-app
 
   /*
 

@@ -21,7 +21,9 @@ var Calculator = React.createClass({
         </Input>
         <Input name='secondNumber' type='number' defaultValue={this.props.secondNumber} />
         <ButtonInput type='submit' value='Calculate' />
-        { this.props.result ? this.props.firstNumber + ' ' + this.props.operation + ' ' + this.props.secondNumber + ' = ' + this.props.result : false }
+        <div className='result'>
+          { this.props.result ? this.props.firstNumber + ' ' + this.props.operation + ' ' + this.props.secondNumber + ' = ' + this.props.result : false }
+        </div>
       </form>
     </div>
   }

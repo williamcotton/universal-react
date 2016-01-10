@@ -9,20 +9,20 @@ module.exports = function (options) {
 
   */
 
-  var App = require('../../jsx/app.jsx')
+  var RootComponent = require('../../jsx/root-component.jsx')
 
   var express = require('browser-express')
   var app = express({
     interceptLinks: true,
     interceptFormSubmit: true,
-    document: document,
-    window: window
+    document: options.document,
+    window: options.window
   })
 
   var reactRenderApp = require('./react-render-app')
 
   app.use(reactRenderApp({
-    RootComponent: App,
+    RootComponent: RootComponent,
     app: app,
     contentProps: {
       browserEnv: browserEnv

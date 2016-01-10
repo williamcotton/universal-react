@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm run build && tapes test/**/*.js test/**/**/*.js | tap-spec",
     "build": "make",
+    "watch": "nodemon -q -x 'npm test'",
     "build-dev": "watchify src/js/browser/index.js -o public/build.js -t [ babelify --presets [ es2015 react ] ] -v -d",
     "start-dev": "export NODE_ENV=development && foreman start -f Procfile_dev",
     "build-electron-dev": "watchify src/js/electron/index.js -o app/build.js -t [ babelify --presets [ es2015 react ] ] -v -d",

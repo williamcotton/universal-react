@@ -49,12 +49,18 @@ test('browserApp', function (t) {
       t.end()
     })
 
-    var domRoute = function (route, callback) {
-      browserApp.navigate(route)
+    // var rq = require('expect-browser-rq')({browserApp: browserApp})
+
+    var rq = function (options, callback) {
+      if (options.method && options.method.toLowerCase() === 'post') {
+        browserApp.submit(options.url, options.form)
+      } else {
+        browserApp.navigate(options.url)
+      }
       callback(global.window.$)
     }
 
-    universalAppSpec(t, domRoute, defaultTitle)
+    universalAppSpec(t, rq, defaultTitle)
 
     t.end()
   })

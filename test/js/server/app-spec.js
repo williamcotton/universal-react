@@ -30,15 +30,18 @@ test('serverApp', function (t) {
     t.end()
   })
 
-  var domRoute = function (route, callback) {
-    request(baseUrl + route, function (err, res, body) {
+  // var rq = require('expect-server-rq')({serverApp: serverApp, t: t})
+
+  var rq = function (options, callback) {
+    options.url = baseUrl + options.url
+    request(options, function (err, res, body) {
       if (err) {} // TODO
       var $ = cheerio.load(body, {xmlMode: true})
       callback($)
     })
   }
 
-  universalAppSpec(t, domRoute, defaultTitle)
+  universalAppSpec(t, rq, defaultTitle)
 
   t.end()
 })
