@@ -4,7 +4,7 @@
   "description": "Universal React",
   "main": "src/js/electron/main.js",
   "scripts": {
-    "test": "npm run build && tapes test/**/*.js test/**/**/*.js | tap-spec",
+    "test": "npm run build && tapes test/**/*.js test/**/**/*-spec.js | tap-spec",
     "build": "make",
     "watch": "nodemon -q -x 'npm test'",
     "build-dev": "watchify src/js/browser/index.js -o public/build.js -t [ babelify --presets [ es2015 react ] ] -v -d",

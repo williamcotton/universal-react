@@ -1,7 +1,7 @@
 module.exports = function (options) {
   var React = require('react')
   var ReactDOM = require('react-dom')
-  var RootComponent = React.createFactory(options.RootComponent)
+  var RootComponent = options.RootComponent ? React.createFactory(options.RootComponent) : React.createClass({propTypes: { content: React.PropTypes.element }, render: function () { return React.DOM.div({ className: 'universal-app-container' }, this.props.content) }})
   var app = options.app
   var formatTitle = options.formatTitle || function (defaultTitle, title) { return defaultTitle + (title ? ' - ' + title : '') }
   var contentProps = options.contentProps || {}

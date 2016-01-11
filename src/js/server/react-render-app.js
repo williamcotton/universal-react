@@ -5,7 +5,7 @@ module.exports = function (options) {
   var template = options.template
   var contentProps = options.contentProps || {}
   var rootProps = options.rootProps || {}
-  var RootComponent = React.createFactory(options.RootComponent)
+  var RootComponent = options.RootComponent ? React.createFactory(options.RootComponent) : React.createClass({propTypes: { content: React.PropTypes.element }, render: function () { return React.DOM.div({ className: 'universal-app-container' }, this.props.content) }})
   var formatTitle = options.formatTitle || function (defaultTitle, title) { return defaultTitle + (title ? ' - ' + title : '') }
   return function (req, res, next) {
     var navigate = function (pathname) {
