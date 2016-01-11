@@ -15,6 +15,7 @@ var Calculator = React.createClass({
     return <div className='calculator-container'>
       <h1>Calculator</h1>
       <form action='/calculator' method='post'>
+        <input type='hidden' name='_csrf' value={this.props.csrf} />
         <Input name='firstNumber' type='number' defaultValue={this.props.firstNumber} />
         <Input name='operation' type='select' defaultValue={this.props.operation} placeholder='+'>
           <option value='+'>+</option>

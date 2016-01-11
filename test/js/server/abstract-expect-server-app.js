@@ -11,9 +11,11 @@ module.exports = function (options, callback) {
   var port = 12345
   var baseUrl = 'http://localhost:' + port
 
-  var server, serverAppInstance
+  var server, serverAppInstance, cookieJar, csrf
 
   t.beforeEach(function (t) {
+    csrf = null
+    cookieJar = request.jar()
     serverAppInstance = serverApp({
       defaultTitle: defaultTitle,
       nodeEnv: nodeEnv,
@@ -31,9 +33,15 @@ module.exports = function (options, callback) {
 
   var rq = function (options, callback) {
     options.url = baseUrl + options.url
+    options.jar = cookieJar // remember cookies between test instances
+    if (options.form && csrf) {
+      options.form._csrf = csrf
+    }
     request(options, function (err, res, body) {
       if (err) {} // TODO
       var $ = cheerio.load(body, {xmlMode: true})
+      csrf = $('input[name="_csrf"]').val()
+      // if there's a hidden HTML input element with a name "_csrf", set the variable, and then it'll attach to the form post on the next rq
       callback($)
     })
   }

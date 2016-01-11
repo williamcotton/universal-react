@@ -1,4 +1,5 @@
 var jsdom = require('jsdom')
+var request = require('request')
 
 module.exports = function (options, callback) {
   var defaultTitle = options.defaultTitle
@@ -36,7 +37,8 @@ module.exports = function (options, callback) {
         },
         rootDOMId: 'universal-app-container',
         defaultTitle: defaultTitle,
-        localStorage: localStorage
+        localStorage: localStorage,
+        request: request
       })
       server = browserAppInstance.listen()
       t.end()
