@@ -3,6 +3,8 @@ var React = require('react')
 var FrontPage = require('./front-page.jsx')
 var About = require('./about.jsx')
 var Calculator = require('./calculator.jsx')
+var Login = require('./login.jsx')
+var LoginSuccess = require('./login-success.jsx')
 
 var universalApp = function (options) {
   var app = options.app
@@ -20,6 +22,34 @@ var universalApp = function (options) {
   app.get('/calculator', function (req, res) {
     var content = <Calculator />
     res.renderApp(content, {title: 'Calculator'})
+  })
+
+  app.get('/login', function (req, res) {
+    var content = <Login />
+    res.renderApp(content, {title: 'Login'})
+  })
+
+  app.post('/login', function (req, res) {
+    var username = req.body.username
+    var password = req.body.password
+    req.login(username, password, function (err) {
+      var content
+      var title
+      if (!err) {
+        content = <LoginSuccess />
+        title = 'Login Success'
+      } else {
+        content = <Login loggedIn={false} username={username} />
+        title = 'Login Failure'
+      }
+      res.renderApp(content, {title: title})
+    })
+  })
+
+  app.get('/logout', function (req, res) {
+    req.logout(function () {
+      res.redirect('/')
+    })
   })
 
   app.post('/calculator', function (req, res) {

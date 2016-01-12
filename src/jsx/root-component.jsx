@@ -5,6 +5,7 @@ var ReactBootstrap = require('react-bootstrap')
 var Navbar = ReactBootstrap.Navbar
 var Nav = ReactBootstrap.Nav
 var NavDropdown = ReactBootstrap.NavDropdown
+var NavItem = ReactBootstrap.NavItem
 var MenuItem = ReactBootstrap.MenuItem
 
 var RootComponent = React.createClass({
@@ -21,12 +22,13 @@ var RootComponent = React.createClass({
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
+        <Nav pullLeft>
+          <NavItem href='/about'>About</NavItem>
+          <NavItem href='/calculator'>Calculator</NavItem>
+        </Nav>
         <Nav pullRight>
-          <NavDropdown title='Menu' id='main'>
-            <MenuItem href='/'>Front Page</MenuItem>
-            <MenuItem href='/about'>About</MenuItem>
-            <MenuItem href='/calculator'>Calculator</MenuItem>
-          </NavDropdown>
+          { this.props.user ? <Navbar.Text>{this.props.user.uuid}</Navbar.Text> : false }
+          { this.props.user ? <NavItem href='/logout'>Logout</NavItem> : <NavItem href='/login'>Login</NavItem> }
         </Nav>
       </Navbar>
       <div className='content'>

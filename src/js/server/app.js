@@ -11,9 +11,12 @@ module.exports = function (options) {
   */
 
   var cookieKeys = ['SECRET']
+  var authTokenKey = 'SECRET'
 
   require('node-jsx').install({extension: '.jsx'})
   var RootComponent = require('../../jsx/root-component.jsx')
+
+  var jwt = require('jsonwebtoken')
 
   var express = require('express')
   var app = express()
@@ -46,14 +49,36 @@ module.exports = function (options) {
   // https://github.com/expressjs/csurf
 
   app.use(function (req, res, next) {
-    req.user = {name: 'steve'}
     req.csrf = req.csrfToken()
-    next()
+    req.login = function (uuid, password, callback) {
+      var userData = { uuid: uuid }
+      jwt.sign(userData, authTokenKey, {}, function (token) {
+        req.user = userData
+        req.session = {
+          userToken: token
+        }
+        callback(false)
+      })
+    }
+    req.logout = function (callback) {
+      req.user = null
+      delete req.session.userToken
+      callback()
+    }
+    if (req.session && req.session.userToken) {
+      jwt.verify(req.session.userToken, authTokenKey, function (err, userData) {
+        req.user = userData
+        next()
+      })
+    } else {
+      next()
+    }
   })
 
   reactRenderApp.use(function (req, res, contentProps, rootProps, browserEnv, next) {
-    contentProps.user = req.user
     contentProps.csrf = req.csrf
+    contentProps.user = req.user
+    rootProps.user = req.user
     next()
   })
 
