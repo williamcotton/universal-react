@@ -1,23 +1,33 @@
-/*
-
-  this module acts as middleware for both an express app instance and an expectRenderer instance
-
-  req.create()
-  req.login()
-  req.logout()
-  req.destroy()
-
-  req.user
-  contentProps.user
-  rootProps.user
-
-  it uses json web tokens stored in an httpOnly cookie-based session
-
-  it consumes a userAuthenticationService
-
-*/
-
 var validator = require('validator')
+
+var validateCredentials = function (credentials) {
+  var errors = []
+  var valid = false
+  if (credentials.type === 'email') {
+    var email = credentials.uuid
+    var password = credentials.password
+    var repeatPassword = credentials.repeatPassword
+    if (!validator.isEmail(email)) {
+      errors.push('EMAIL_INVALID')
+    }
+    if (password.length < 8) {
+      errors.push('PASSWORD_TOOSHORT')
+    }
+    if (password !== repeatPassword) {
+      errors.push('PASSWORD_MISMATCH')
+    }
+  } else {
+    errors.push('TYPE_INVALID')
+  }
+  if (errors.length === 0) {
+    errors = false
+    valid = true
+  }
+  return {
+    errors: errors,
+    valid: valid
+  }
+}
 
 module.exports = function (options) {
   var userAuthenticationService = options.userAuthenticationService
@@ -30,27 +40,21 @@ module.exports = function (options) {
   })
 
   return function (req, res, next) { // this can be a plugin
-    req.signup = function (email, password, repeat_password, callback) {
-      var signupError
-      if (!validator.isEmail(email)) {
-        signupError = 'EMAIL_INVALID'
-      } else if (password.length < 8) {
-        signupError = 'PASSWORD_TOOSHORT'
-      } else if (password !== repeat_password) {
-        signupError = 'PASSWORD_MISMATCH'
+    req.signup = function (credentials, callback) {
+      var credentialStatus = validateCredentials(credentials)
+      if (credentialStatus.errors) {
+        return callback(credentialStatus.errors)
       }
-      if (signupError) {
-        return callback(signupError)
-      }
-      userAuthenticationService.createUser(email, password, function (err, user) {
+      userAuthenticationService.createUser(credentials, function (err, user) {
         if (err || !user) {
-          return callback(err)
+          var errors = [err]
+          return callback(errors)
         }
-        req.login(email, password, callback)
+        req.login(credentials, callback)
       })
     }
-    req.login = function (email, password, callback) {
-      userAuthenticationService.loginServerSessionUserToken(email, password, function (err, user, token) {
+    req.login = function (credentials, callback) {
+      userAuthenticationService.loginServerSessionUserToken(credentials, function (err, user, token) {
         if (err || !token || !user) {
           return callback(err)
         }

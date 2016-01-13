@@ -33,17 +33,20 @@ var universalApp = function (options) {
   })
 
   app.post('/signup', function (req, res) {
-    var email = req.body.email
-    var password = req.body.password
-    var repeat_password = req.body.repeat_password
-    req.signup(email, password, repeat_password, function (err) {
+    var credentials = {
+      type: req.body.type,
+      uuid: req.body.email,
+      password: req.body.password,
+      repeatPassword: req.body.repeat_password
+    }
+    req.signup(credentials, function (credentialErrors) {
       var content
       var title
-      if (!err) {
+      if (!credentialErrors) {
         content = <SignupSuccess />
         title = 'Signup Success'
       } else {
-        content = <Signup error={err} email={email} password={password} />
+        content = <Signup errors={credentialErrors} email={credentials.uuid} password={credentials.password} />
         title = 'Signup Failure'
       }
       res.renderApp(content, {title: title})
@@ -56,16 +59,19 @@ var universalApp = function (options) {
   })
 
   app.post('/login', function (req, res) {
-    var email = req.body.email
-    var password = req.body.password
-    req.login(email, password, function (err) {
+    var credentials = {
+      type: req.body.type,
+      uuid: req.body.email,
+      password: req.body.password
+    }
+    req.login(credentials, function (err) {
       var content
       var title
       if (!err) {
         content = <LoginSuccess />
         title = 'Login Success'
       } else {
-        content = <Login loggedIn={false} email={email} />
+        content = <Login loggedIn={false} email={credentials.email} />
         title = 'Login Failure'
       }
       res.renderApp(content, {title: title})

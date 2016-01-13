@@ -7,11 +7,11 @@ module.exports = function (options) {
   var userAuthenticationDataStore = options.userAuthenticationDataStore
   var userTokenExpiresIn = options.userTokenExpiresIn
   return { // interface with user credential data store
-    loginServerSessionUserToken: function (email, password, callback) { // verify that email and hash(password) match, issue token for existing account
-      userAuthenticationDataStore.getHash(email, function (errHashLookup, hash) {
-        bcrypt.compare(password, hash, function (errHashCompare, res) {
+    loginServerSessionUserToken: function (credentials, callback) { // verify that email and hash(password) match, issue token for existing account
+      userAuthenticationDataStore.getHash(credentials, function (errHashLookup, hash) {
+        bcrypt.compare(credentials.password, hash, function (errHashCompare, res) {
           if (!errHashCompare && !errHashLookup && res) {
-            var user = { email: email }
+            var user = { uuid: credentials.uuid, type: credentials.type }
             jwt.sign(user, userTokenSecret, {expiresIn: userTokenExpiresIn, issuer: 'expect-user-auth', audience: 'expect-server-session-user'}, function (serverSessionUserToken) {
               callback(false, user, serverSessionUserToken)
             })
@@ -36,14 +36,14 @@ module.exports = function (options) {
         })
       })
     },
-    createUser: function (email, password, callback) { // issue token and create new account, storing email and hash(password)
-      userAuthenticationDataStore.getHash(email, function (errHashLookup, hash) {
+    createUser: function (credentials, callback) { // issue token and create new account, storing email and hash(password)
+      userAuthenticationDataStore.getHash(credentials, function (errHashLookup, hash) {
         if (hash) {
-          return callback('EMAIL_EXISTS')
+          return callback('UUID_FOR_TYPE_EXISTS')
         }
         bcrypt.genSalt(10, function (errGetSalt, salt) {
-          bcrypt.hash(password, salt, function (errGetHash, hash) {
-            userAuthenticationDataStore.create(email, hash, function (err, newUser) {
+          bcrypt.hash(credentials.password, salt, function (errGetHash, hash) {
+            userAuthenticationDataStore.create(credentials, hash, function (err, newUser) {
               if (err) {
                 callback('CREATE_ERROR')
               } else {
@@ -54,11 +54,11 @@ module.exports = function (options) {
         })
       })
     },
-    destroyUser: function (email, password, callback) {
-      userAuthenticationDataStore.getHash(email, function (errHashLookup, hash) {
-        bcrypt.compare(password, hash, function (errHashCompare, res) {
+    destroyUser: function (credentials, callback) {
+      userAuthenticationDataStore.getHash(credentials, function (errHashLookup, hash) {
+        bcrypt.compare(credentials.password, hash, function (errHashCompare, res) {
           if (!errHashCompare && !errHashLookup && res) {
-            userAuthenticationDataStore.destroy(email, callback)
+            userAuthenticationDataStore.destroy(credentials, callback)
           } else {
             callback(true)
           }

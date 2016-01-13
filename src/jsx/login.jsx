@@ -16,6 +16,7 @@ var Login = React.createClass({
       <h1>Login</h1>
       <form action='/login' method='post'>
         <input type='hidden' name='_csrf' value={this.props.csrf} />
+        <input type='hidden' name='type' value='email' />
         <Input name='email' type='text' label='Email Address' />
         <Input name='password' type='password' label='Password' />
         <ButtonInput type='submit' value='Login' />
