@@ -3,17 +3,16 @@ module.exports = function (options) {
   var rq = options.rq
   var t = options.t
 
-  var expect = require('./abstract-expect-universal-app')({
+  var expectUniversalApp = require('./abstract-expect-universal-app')({
+    t: t, rq: rq,
     defaultTitle: defaultTitle,
-    t: t,
-    rq: rq,
     universalApp: require('../../src/jsx/universal-app.jsx')
   })
 
-  expect.rootComponentToBeRendered(t)
-  expect.defaultTitleToBeRendered(t)
-  expect.allGetRoutesToBeRendered(t)
-  expect.getRouteClasses(t)
+  expectUniversalApp.rootComponentToBeRendered(t)
+  expectUniversalApp.defaultTitleToBeRendered(t)
+  expectUniversalApp.allGetRoutesToBeRendered(t, {ignore: ['/logout']})
+  expectUniversalApp.getRouteClasses(t)
 
   t.test('should POST /calculate and get the correct result', function (t) {
     // we get '/calculator' first, to make sure we get a csrf token

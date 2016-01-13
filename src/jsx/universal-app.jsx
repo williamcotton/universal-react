@@ -3,6 +3,8 @@ var React = require('react')
 var FrontPage = require('./front-page.jsx')
 var About = require('./about.jsx')
 var Calculator = require('./calculator.jsx')
+var Signup = require('./signup.jsx')
+var SignupSuccess = require('./signup-success.jsx')
 var Login = require('./login.jsx')
 var LoginSuccess = require('./login-success.jsx')
 
@@ -12,6 +14,7 @@ var universalApp = function (options) {
   app.get('/', function (req, res) {
     var content = <FrontPage />
     res.renderApp(content)
+  // res.reactRender(content)
   })
 
   app.get('/about', function (req, res) {
@@ -24,22 +27,45 @@ var universalApp = function (options) {
     res.renderApp(content, {title: 'Calculator'})
   })
 
+  app.get('/signup', function (req, res) {
+    var content = <Signup />
+    res.renderApp(content, {title: 'Login'})
+  })
+
+  app.post('/signup', function (req, res) {
+    var email = req.body.email
+    var password = req.body.password
+    var repeat_password = req.body.repeat_password
+    req.signup(email, password, repeat_password, function (err) {
+      var content
+      var title
+      if (!err) {
+        content = <SignupSuccess />
+        title = 'Signup Success'
+      } else {
+        content = <Signup error={err} email={email} password={password} />
+        title = 'Signup Failure'
+      }
+      res.renderApp(content, {title: title})
+    })
+  })
+
   app.get('/login', function (req, res) {
     var content = <Login />
     res.renderApp(content, {title: 'Login'})
   })
 
   app.post('/login', function (req, res) {
-    var username = req.body.username
+    var email = req.body.email
     var password = req.body.password
-    req.login(username, password, function (err) {
+    req.login(email, password, function (err) {
       var content
       var title
       if (!err) {
         content = <LoginSuccess />
         title = 'Login Success'
       } else {
-        content = <Login loggedIn={false} username={username} />
+        content = <Login loggedIn={false} email={email} />
         title = 'Login Failure'
       }
       res.renderApp(content, {title: title})

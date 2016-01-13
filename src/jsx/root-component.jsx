@@ -27,8 +27,8 @@ var RootComponent = React.createClass({
           <NavItem href='/calculator'>Calculator</NavItem>
         </Nav>
         <Nav pullRight>
-          { this.props.user ? <Navbar.Text>{this.props.user.uuid}</Navbar.Text> : false }
-          { this.props.user ? <NavItem href='/logout'>Logout</NavItem> : <NavItem href='/login'>Login</NavItem> }
+          { this.props.user ? <Navbar.Text>{this.props.user.email}</Navbar.Text> : <NavItem href='/login'>Login</NavItem> }
+          { this.props.user ? <NavItem href='/logout'>Logout</NavItem> : <NavItem href='/signup'>Signup</NavItem> }
         </Nav>
       </Navbar>
       <div className='content'>

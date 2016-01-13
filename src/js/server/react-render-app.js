@@ -27,7 +27,7 @@ var reactRenderApp = function (options) {
         rootProps.opts = opts
         var HTML = ReactDOMServer.renderToStaticMarkup(RootComponent(rootProps))
         // if template was optional, or dynamic... a module could pass in the template...
-        var renderedTemplate = ejs.render(template, { HTML: HTML, title: title, rootDOMId: options.rootDOMId, browserEnv: browserEnv }, {})
+        var renderedTemplate = ejs.render(template, { HTML: HTML, title: title, rootDOMId: options.rootDOMId, browserEnv: browserEnv, dontLoadJS: true }, {})
         res.send(renderedTemplate)
       })
     }

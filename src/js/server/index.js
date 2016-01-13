@@ -2,10 +2,13 @@ var nodeEnv = process.env.NODE_ENV
 var defaultTitle = process.env.DEFAULT_TITLE
 var port = process.env.PORT || 5000
 
+var userAuthenticationDataStore = require('./user-authentication-data-store')({})
+
 var universalServerApp = require('./app')({
   port: port,
   defaultTitle: defaultTitle,
-  nodeEnv: nodeEnv
+  nodeEnv: nodeEnv,
+  userAuthenticationDataStore: userAuthenticationDataStore
 })
 
 universalServerApp.listen(port, function () {

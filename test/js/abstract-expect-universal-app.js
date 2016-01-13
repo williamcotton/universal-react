@@ -75,15 +75,21 @@ module.exports = function (options) {
     })
   }
 
-  var allGetRoutesToBeRendered = function (t) {
+  var allGetRoutesToBeRendered = function (t, options) {
+    var ignore = options.ignore
     t.test('should have GET routes mapped for all of the defined app.get() routes', function (t) {
       var routes = Object.keys(routesGETMap)
       var diff = arr_diff(routes, definedRoutes)
+      ignore.forEach(function (routeToIgnore) {
+        if (diff.indexOf(routeToIgnore) > -1) {
+          diff.splice(diff.indexOf(routeToIgnore), 1)
+        }
+      })
       var message = 'has same number of mapped routes as defined routes'
       if (diff.length > 0) {
         message += ' - missing: ' + diff
       }
-      t.equal(routes.length, definedRoutes.length, message)
+      t.equal(diff.length, 0, message)
       t.end()
     })
   }
