@@ -5,6 +5,7 @@ var universalBrowserApp = require('./app')({
   document: document,
   window: window,
   browserEnv: window.browserEnv,
+  serverSession: window.serverSession,
   request: request
 })
 

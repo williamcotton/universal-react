@@ -1,5 +1,6 @@
 module.exports = function (options) {
   var browserEnv = options.browserEnv
+  var serverSession = options.serverSession
   var request = options.request
 
   /*
@@ -20,35 +21,24 @@ module.exports = function (options) {
     window: options.window
   })
 
-  /*
-    
-    CSRF can be kept completely away from browser-express...
+  var expectReactRenderer = require('./react-render-app') // require('expect-browser-render-app')
 
-    Because browser-express is intercepting all links and form submit events, we can just make sure that if we DO need to do remote requests,
-    we do so in a manner that makes sure to grab a CSRF token and attach it to a remote request
-
-    the same goes for the JWT stored in a cookie
-
-  */
-
-  app.use(function (req, res, next) {
-    req.user = {name: 'test'}
+  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
+    contentProps.csrf = serverSession.csrf
     next()
   })
 
-  var expectRenderApp = require('./react-render-app') // require('expect-browser-render-app')
+  app.use(require('./expect-browser-user-authentication')({
+    expectReactRenderer: expectReactRenderer
+  }))
 
-  expectRenderApp.use(function (req, res, contentProps, rootProps, next) {
-    contentProps.user = req.user
-    next()
-  })
-
-  app.use(expectRenderApp({
+  app.use(expectReactRenderer({
     RootComponent: RootComponent,
     app: app,
     rootDOMId: 'universal-app-container',
     defaultTitle: options.defaultTitle || 'Universal App',
     browserEnv: browserEnv,
+    serverSession: serverSession,
     document: options.document,
     localStorage: options.localStorage
   }))

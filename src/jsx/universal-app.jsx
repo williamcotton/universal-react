@@ -4,9 +4,8 @@ var FrontPage = require('./front-page.jsx')
 var About = require('./about.jsx')
 var Calculator = require('./calculator.jsx')
 var Signup = require('./signup.jsx')
-var SignupSuccess = require('./signup-success.jsx')
+var Welcome = require('./welcome.jsx')
 var Login = require('./login.jsx')
-var LoginSuccess = require('./login-success.jsx')
 
 var universalApp = function (options) {
   var app = options.app
@@ -27,14 +26,24 @@ var universalApp = function (options) {
     res.renderApp(content, {title: 'Calculator'})
   })
 
+  // maybe ??
+  // package /signup, /login, /logout, /forgotPassword in 'expect-universal-user-authentication'
+  // pass in <Signup> <SignupSuccess> <Login> <LoginSuccess> <ForgotPassword> React modules
+  // have default React modules
+
   app.get('/signup', function (req, res) {
     var content = <Signup />
     res.renderApp(content, {title: 'Login'})
   })
 
+  app.get('/welcome', function (req, res) {
+    var content = <Welcome />
+    res.renderApp(content, {title: 'Welcome'})
+  })
+
   app.post('/signup', function (req, res) {
     var credentials = {
-      type: req.body.type,
+      type: 'email',
       uuid: req.body.email,
       password: req.body.password,
       repeatPassword: req.body.repeat_password
@@ -43,8 +52,7 @@ var universalApp = function (options) {
       var content
       var title
       if (!credentialErrors) {
-        content = <SignupSuccess />
-        title = 'Signup Success'
+        return res.redirect('/welcome')
       } else {
         content = <Signup errors={credentialErrors} email={credentials.uuid} password={credentials.password} />
         title = 'Signup Failure'
@@ -60,7 +68,7 @@ var universalApp = function (options) {
 
   app.post('/login', function (req, res) {
     var credentials = {
-      type: req.body.type,
+      type: 'email',
       uuid: req.body.email,
       password: req.body.password
     }
@@ -68,8 +76,7 @@ var universalApp = function (options) {
       var content
       var title
       if (!err) {
-        content = <LoginSuccess />
-        title = 'Login Success'
+        return res.redirect('/')
       } else {
         content = <Login loggedIn={false} email={credentials.email} />
         title = 'Login Failure'

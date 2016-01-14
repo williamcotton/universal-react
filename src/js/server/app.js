@@ -47,8 +47,9 @@ module.exports = function (options) {
     next()
   })
 
-  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, next) { // this can be a plugin
+  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
     contentProps.csrf = req.csrf
+    serverSession.csrf = req.csrf
     next()
   })
 
@@ -62,7 +63,7 @@ module.exports = function (options) {
     userTokenExpiresIn: '7d'
   })
 
-  app.use(require('./expect-user-authentication-service')({
+  app.use(require('./expect-server-user-authentication')({
     userAuthenticationService: userAuthenticationService,
     expectReactRenderer: expectReactRenderer
   }))

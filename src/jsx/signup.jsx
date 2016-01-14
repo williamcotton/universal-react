@@ -19,7 +19,6 @@ var Signup = React.createClass({
       <h1>Signup</h1>
       <form action='/signup' method='post'>
         <input type='hidden' name='_csrf' value={this.props.csrf} />
-        <input type='hidden' name='type' value='email' />
         <Input bsStyle={ emailInvalid || emailAlreadyExists ? 'error' : ''} name='email' type='text' label='Email Address' defaultValue={ emailInvalid || emailAlreadyExists ? '' : this.props.email} />
         <Input bsStyle={ passwordTooShort ? 'error' : ''} name='password' type='password' label='Password' defaultValue={ passwordTooShort ? '' : this.props.password} />
         <Input bsStyle={ passwordMismatch ? 'error' : ''} name='repeat_password' type='password' label='Repeat Password' autoFocus />

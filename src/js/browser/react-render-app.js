@@ -8,6 +8,7 @@ var reactRenderApp = function (options) {
   var RootComponent = options.RootComponent ? React.createFactory(options.RootComponent) : React.createClass({propTypes: { content: React.PropTypes.element }, render: function () { return React.DOM.div({ className: 'universal-app-container' }, this.props.content) }})
   var app = options.app
   var browserEnv = options.browserEnv
+  var serverSession = options.serverSession
   var formatTitle = options.formatTitle || function (defaultTitle, title) { return defaultTitle + (title ? ' - ' + title : '') }
   var contentProps = {}
   var rootProps = {}
@@ -17,7 +18,7 @@ var reactRenderApp = function (options) {
     res.renderApp = function (content, opts) {
       options.document.title = formatTitle(options.defaultTitle, opts ? opts.title : false)
       async.each(middlewareStack, function (middlewareFunction, callback) {
-        middlewareFunction(req, res, contentProps, rootProps, callback)
+        middlewareFunction(req, res, contentProps, rootProps, browserEnv, serverSession, callback)
       }, function () {
         var contentWithProps = React.cloneElement(content, contentProps)
         rootProps.content = contentWithProps

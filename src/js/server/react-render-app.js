@@ -17,17 +17,18 @@ var reactRenderApp = function (options) {
       res.redirect(pathname)
     }
     res.renderApp = function (content, opts) {
+      var serverSession = {}
       var title = formatTitle(options.defaultTitle, opts ? opts.title : false)
       contentProps.navigate = navigate
       async.each(middlewareStack, function (middlewareFunction, callback) {
-        middlewareFunction(req, res, contentProps, rootProps, browserEnv, callback)
+        middlewareFunction(req, res, contentProps, rootProps, browserEnv, serverSession, callback)
       }, function () {
         var contentWithProps = React.cloneElement(content, contentProps)
         rootProps.content = contentWithProps
         rootProps.opts = opts
         var HTML = ReactDOMServer.renderToStaticMarkup(RootComponent(rootProps))
         // if template was optional, or dynamic... a module could pass in the template...
-        var renderedTemplate = ejs.render(template, { HTML: HTML, title: title, rootDOMId: options.rootDOMId, browserEnv: browserEnv, dontLoadJS: true }, {})
+        var renderedTemplate = ejs.render(template, { HTML: HTML, title: title, rootDOMId: options.rootDOMId, browserEnv: browserEnv, serverSession: serverSession, dontLoadJS: false }, {})
         res.send(renderedTemplate)
       })
     }

@@ -13,14 +13,16 @@ module.exports = function (options, callback) {
 
   var server, serverAppInstance, cookieJar, csrf
 
+  var serverAppConfig = options.serverAppConfig || {}
+
+  serverAppConfig.defaultTitle = defaultTitle
+  serverAppConfig.nodeEnv = nodeEnv
+  serverAppConfig.port = port
+
   t.beforeEach(function (t) {
     csrf = null
     cookieJar = request.jar()
-    serverAppInstance = serverApp({
-      defaultTitle: defaultTitle,
-      nodeEnv: nodeEnv,
-      port: port
-    })
+    serverAppInstance = serverApp(serverAppConfig)
     server = serverAppInstance.listen(port, function () {
       t.end()
     })
@@ -38,11 +40,12 @@ module.exports = function (options, callback) {
       options.form._csrf = csrf
     }
     request(options, function (err, res, body) {
+      // console.log('request', options, err, body)
       if (err) {} // TODO
       var $ = cheerio.load(body, {xmlMode: true})
       csrf = $('input[name="_csrf"]').val()
       // if there's a hidden HTML input element with a name "_csrf", set the variable, and then it'll attach to the form post on the next rq
-      callback($)
+      callback($, res)
     })
   }
 
@@ -58,5 +61,5 @@ module.exports = function (options, callback) {
     universalAppSpecsToPass: universalAppSpecsToPass
   }
 
-  callback(expect)
+  callback(expect, t, rq)
 }

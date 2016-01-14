@@ -26,19 +26,34 @@ module.exports = function (options, callback) {
   var localStorage = require('localStorage')
 
   jsdom.jQueryify(global.window, 'http://code.jquery.com/jquery-2.1.1.js', function () {
-    var browserAppInstance, server
+    var browserAppInstance, server, rqResponse, followRedirect
 
     t.beforeEach(function (t) {
+      rqResponse = {}
+      followRedirect = true
       browserAppInstance = browserApp({
         document: global.document,
         window: global.window,
         browserEnv: {
           nodeEnv: 'test'
         },
+        serverSession: {},
         rootDOMId: 'universal-app-container',
         defaultTitle: defaultTitle,
         localStorage: localStorage,
         request: request
+      })
+      browserAppInstance.use(function (req, res, next) {
+        if (!followRedirect) {
+          res.headers = res.headers || {}
+          rqResponse = res
+          res.redirect = function (path) {
+            res.headers.location = path
+          }
+        } else {
+          res.redirect = browserAppInstance.navigate
+        }
+        next()
       })
       server = browserAppInstance.listen()
       t.end()
@@ -50,12 +65,15 @@ module.exports = function (options, callback) {
     })
 
     var rq = function (options, callback) {
+      if (typeof (options.followRedirect) !== 'undefined') {
+        followRedirect = options.followRedirect
+      }
       if (options.method && options.method.toLowerCase() === 'post') {
         browserAppInstance.submit(options.url, options.form)
       } else {
         browserAppInstance.navigate(options.url)
       }
-      callback(global.window.$)
+      callback(global.window.$, rqResponse)
     }
 
     var universalAppSpecsToPass = function (t) {

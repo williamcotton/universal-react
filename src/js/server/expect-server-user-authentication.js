@@ -33,9 +33,16 @@ module.exports = function (options) {
   var userAuthenticationService = options.userAuthenticationService
   var expectReactRenderer = options.expectReactRenderer
 
-  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, next) { // this can be a plugin
-    contentProps.user = req.user
-    rootProps.user = req.user
+  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
+    if (req.user) {
+      var user = {
+        type: req.user.type,
+        uuid: req.user.uuid
+      }
+      contentProps.user = user
+      rootProps.user = user
+      serverSession.user = user
+    }
     next()
   })
 

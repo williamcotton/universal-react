@@ -26,6 +26,10 @@ module.exports = function (options) {
       db.remove({ uuid: credentials.uuid, type: credentials.type }, function (err, removedUser) {
         callback(err)
       })
+    },
+    setup: function (callback) {
+      // nothing to do!
+      callback(false, true)
     }
   }
 }

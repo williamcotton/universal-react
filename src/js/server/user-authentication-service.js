@@ -31,6 +31,7 @@ module.exports = function (options) {
         if (err) {
           return callback(err, false)
         }
+        // TODO: it should only sign a new token if the old one is older than 1 hour - we don't need to sign tokens on every request!
         jwt.sign(user, userTokenSecret, {expiresIn: userTokenExpiresIn, issuer: 'expect-user-auth', audience: 'expect-server-session-user'}, function (serverSessionUserToken) {
           callback(false, user, serverSessionUserToken)
         })
