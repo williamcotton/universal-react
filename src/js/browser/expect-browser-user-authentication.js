@@ -32,12 +32,9 @@ var validateCredentials = function (credentials) {
 module.exports = function (options) {
   var expectReactRenderer = options.expectReactRenderer
 
-  var _csrf
-
   expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
     contentProps.user = serverSession.user
     rootProps.user = serverSession.user
-    _csrf = serverSession.csrf
     next()
   })
 
@@ -49,62 +46,12 @@ module.exports = function (options) {
       }
       if (req.event) {
         req.event.target.submit()
-      } else {
-        var signupForm = document.createElement('form')
-        signupForm.action = req.path
-        signupForm.method = 'post'
-
-        var email = document.createElement('input')
-        email.name = 'email'
-        email.value = credentials.uuid
-
-        var password = document.createElement('input')
-        password.name = 'password'
-        password.value = credentials.password
-
-        var repeat_password = document.createElement('input')
-        repeat_password.name = 'repeat_password'
-        repeat_password.value = credentials.repeatPassword
-
-        var csrf = document.createElement('input')
-        csrf.name = '_csrf'
-        csrf.value = _csrf
-
-        signupForm.appendChild(email)
-        signupForm.appendChild(password)
-        signupForm.appendChild(repeat_password)
-        signupForm.appendChild(csrf)
-
-        signupForm.submit()
       }
     }
     req.login = function (credentials, callback) {
       if (req.event) {
         req.event.target.submit()
-      } else {
-        var loginForm = document.createElement('form')
-        loginForm.action = req.path
-        loginForm.method = 'post'
-
-        var email = document.createElement('input')
-        email.name = 'email'
-        email.value = credentials.uuid
-
-        var password = document.createElement('input')
-        password.name = 'password'
-        password.value = credentials.password
-
-        var csrf = document.createElement('input')
-        csrf.name = '_csrf'
-        csrf.value = _csrf
-
-        loginForm.appendChild(email)
-        loginForm.appendChild(password)
-        loginForm.appendChild(csrf)
-
-        loginForm.submit()
       }
-
     }
     req.logout = function (callback) {
       window.location = req.path

@@ -33,26 +33,4 @@ module.exports = function (options) {
       })
     })
   })
-
-  // t.test('should /signup (redirect disabled)', function (t) {
-  //   rq({url: '/signup'}, function () {
-  //     rq({followRedirect: false, method: 'post', url: '/signup', form: {email: 'steve@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
-  //       if (res) {
-  //         t.equal(res.headers.location, '/welcome', 'redirects to /welcome')
-  //       }
-  //       t.end()
-  //     })
-  //   })
-  // })
-
-  // t.test('should /signup', function (t) {
-  //   rq({url: '/signup'}, function () {
-  //     rq({method: 'post', url: '/signup', form: {email: 'steve@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
-  //       console.log($('body').html())
-  //       t.end()
-  //     })
-  //   })
-  // })
-
-//
 }
