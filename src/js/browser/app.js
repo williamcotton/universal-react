@@ -2,6 +2,7 @@ module.exports = function (options) {
   var browserEnv = options.browserEnv
   var serverSession = options.serverSession
   var request = options.request
+  var localStorage = options.localStorage
 
   /*
 
@@ -21,15 +22,20 @@ module.exports = function (options) {
     window: options.window
   })
 
-  var expectReactRenderer = require('./react-render-app') // require('expect-browser-render-app')
+  app.use(require('../lib/expect-browser-session')({
+    localStorage: localStorage
+  }))
+
+  var expectReactRenderer = require('../lib/expect-browser-react-renderer') // require('expect-browser-render-app')
 
   expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
     contentProps.csrf = serverSession.csrf
     next()
   })
 
-  app.use(require('./expect-browser-user-authentication')({
-    expectReactRenderer: expectReactRenderer
+  app.use(require('../lib/expect-browser-user-authentication')({
+    expectReactRenderer: expectReactRenderer,
+    request: request
   }))
 
   app.use(expectReactRenderer({

@@ -6,7 +6,7 @@ var ButtonInput = ReactBootstrap.ButtonInput
 
 var Signup = React.createClass({
   propTypes: {
-    email: React.PropTypes.string,
+    uuid: React.PropTypes.string,
     password: React.PropTypes.string,
     errors: React.PropTypes.array
   },
@@ -19,7 +19,8 @@ var Signup = React.createClass({
       <h1>Signup</h1>
       <form action='/signup' method='post'>
         <input type='hidden' name='_csrf' value={this.props.csrf} />
-        <Input bsStyle={ emailInvalid || emailAlreadyExists ? 'error' : ''} name='email' type='text' label='Email Address' defaultValue={ emailInvalid || emailAlreadyExists ? '' : this.props.email} />
+        <input type='hidden' name='type' value='email' />
+        <Input bsStyle={ emailInvalid || emailAlreadyExists ? 'error' : ''} name='uuid' type='text' label='Email Address' defaultValue={ emailInvalid || emailAlreadyExists ? '' : this.props.uuid} />
         <Input bsStyle={ passwordTooShort ? 'error' : ''} name='password' type='password' label='Password' defaultValue={ passwordTooShort ? '' : this.props.password} />
         <Input bsStyle={ passwordMismatch ? 'error' : ''} name='repeat_password' type='password' label='Repeat Password' autoFocus />
         <ButtonInput type='submit' value='Signup' />

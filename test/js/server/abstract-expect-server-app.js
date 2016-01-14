@@ -4,33 +4,25 @@ var cheerio = require('cheerio')
 module.exports = function (options, callback) {
   var t = options.t
   var defaultTitle = options.defaultTitle
-  var serverApp = options.serverApp
+  var testServerApp = options.testServerApp
   var universalAppSpec = options.universalAppSpec
 
-  var nodeEnv = 'test'
-  var port = 12345
-  var baseUrl = 'http://localhost:' + port
+  var baseUrl = testServerApp.baseUrl
 
-  var server, serverAppInstance, cookieJar, csrf
-
-  var serverAppConfig = options.serverAppConfig || {}
-
-  serverAppConfig.defaultTitle = defaultTitle
-  serverAppConfig.nodeEnv = nodeEnv
-  serverAppConfig.port = port
+  var cookieJar, csrf
 
   t.beforeEach(function (t) {
     csrf = null
     cookieJar = request.jar()
-    serverAppInstance = serverApp(serverAppConfig)
-    server = serverAppInstance.listen(port, function () {
+    testServerApp.setup(function () {
       t.end()
     })
   })
 
   t.afterEach(function (t) {
-    server.close()
-    t.end()
+    testServerApp.teardown(function () {
+      t.end()
+    })
   })
 
   var rq = function (options, callback) {

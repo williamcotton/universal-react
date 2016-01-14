@@ -5,7 +5,12 @@ module.exports = function (options, callback) {
   var defaultTitle = options.defaultTitle
   var t = options.t
   var browserApp = options.browserApp
+  var testServerApp = options.testServerApp
   var universalAppSpec = options.universalAppSpec
+
+  var baseRequest = request.defaults({
+    baseUrl: testServerApp.baseUrl
+  })
 
   if (!global.document) {
     global.document = jsdom.jsdom('<!doctype html><html><body><div id="universal-app-container"></div></body></html>')
@@ -26,11 +31,22 @@ module.exports = function (options, callback) {
   var localStorage = require('localStorage')
 
   jsdom.jQueryify(global.window, 'http://code.jquery.com/jquery-2.1.1.js', function () {
-    var browserAppInstance, server, rqResponse, followRedirect
+    var browserAppInstance, server, rqResponse, followRedirect, serverInstanceApp
+
+    var cookieJar = request.jar()
+
+    baseRequest = request.defaults({
+      baseUrl: testServerApp.baseUrl,
+      jar: cookieJar
+    })
 
     t.beforeEach(function (t) {
       rqResponse = {}
       followRedirect = true
+      baseRequest = request.defaults({
+        baseUrl: testServerApp.baseUrl,
+        jar: cookieJar
+      })
       browserAppInstance = browserApp({
         document: global.document,
         window: global.window,
@@ -41,7 +57,7 @@ module.exports = function (options, callback) {
         rootDOMId: 'universal-app-container',
         defaultTitle: defaultTitle,
         localStorage: localStorage,
-        request: request
+        request: baseRequest
       })
       browserAppInstance.use(function (req, res, next) {
         if (!followRedirect) {
@@ -56,15 +72,27 @@ module.exports = function (options, callback) {
         next()
       })
       server = browserAppInstance.listen()
-      t.end()
+      testServerApp.setup(function (_s) {
+        serverInstanceApp = _s
+        t.end()
+      })
     })
 
     t.afterEach(function (t) {
       server.close()
-      t.end()
+      testServerApp.teardown(function () {
+        t.end()
+      })
     })
 
     var rq = function (options, callback) {
+      var csrf = serverInstanceApp.getCsrf()
+      if (options.form && csrf) {
+        options.form._csrf = csrf
+      }
+      if (options.body && csrf) {
+        options.body._csrf = csrf
+      }
       if (typeof (options.followRedirect) !== 'undefined') {
         followRedirect = options.followRedirect
       }
@@ -80,7 +108,8 @@ module.exports = function (options, callback) {
       universalAppSpec({
         t: t,
         rq: rq,
-        defaultTitle: defaultTitle
+        defaultTitle: defaultTitle,
+        request: baseRequest
       })
     }
 
@@ -88,6 +117,6 @@ module.exports = function (options, callback) {
       universalAppSpecsToPass: universalAppSpecsToPass
     }
 
-    callback(expect)
+    callback(expect, t, rq, baseRequest, cookieJar)
   })
 }

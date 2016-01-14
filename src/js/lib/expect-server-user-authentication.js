@@ -32,6 +32,51 @@ var validateCredentials = function (credentials) {
 module.exports = function (options) {
   var userAuthenticationService = options.userAuthenticationService
   var expectReactRenderer = options.expectReactRenderer
+  var app = options.app
+
+  app.post('/signup.json', function (req, res) {
+    authMiddleware(req, res, function () {
+      var credentials = {
+        type: req.body.type,
+        uuid: req.body.uuid,
+        password: req.body.password,
+        repeatPassword: req.body.repeat_password
+      }
+      req.signup(credentials, function (err, user) {
+        if (err) {
+          return res.status(500).send(err)
+        }
+        res.send(user)
+      })
+    })
+  })
+
+  app.post('/login.json', function (req, res) {
+    authMiddleware(req, res, function () {
+      var credentials = {
+        type: req.body.type,
+        uuid: req.body.uuid,
+        password: req.body.password
+      }
+      req.login(credentials, function (err, user) {
+        if (err) {
+          return res.status(500).send(err)
+        }
+        res.send(user)
+      })
+    })
+  })
+
+  app.get('/logout.json', function (req, res) {
+    authMiddleware(req, res, function () {
+      req.logout(function (err, user) {
+        if (err) {
+          return res.status(500).send(err)
+        }
+        res.send(true)
+      })
+    })
+  })
 
   expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
     if (req.user) {
@@ -46,16 +91,19 @@ module.exports = function (options) {
     next()
   })
 
-  return function (req, res, next) { // this can be a plugin
+  var authMiddleware = function (req, res, next) { // this can be a plugin
+    if (req.signup) {
+      return next()
+    }
     req.signup = function (credentials, callback) {
       var credentialStatus = validateCredentials(credentials)
       if (credentialStatus.errors) {
-        return callback(credentialStatus.errors)
+        return callback(credentialStatus.errors, false)
       }
       userAuthenticationService.createUser(credentials, function (err, user) {
         if (err || !user) {
           var errors = [err]
-          return callback(errors)
+          return callback(errors, false)
         }
         req.login(credentials, callback)
       })
@@ -63,17 +111,17 @@ module.exports = function (options) {
     req.login = function (credentials, callback) {
       userAuthenticationService.loginServerSessionUserToken(credentials, function (err, user, token) {
         if (err || !token || !user) {
-          return callback(err)
+          return callback(err, false)
         }
         req.user = user
         req.session.userToken = token
-        callback(false)
+        callback(false, user)
       })
     }
     req.logout = function (callback) {
       delete req.user
       delete req.session.userToken
-      callback()
+      callback(false)
     }
     if (req.session && req.session.userToken) {
       userAuthenticationService.refreshServerSessionUserToken(req.session.userToken, function (err, user, token) {
@@ -87,4 +135,6 @@ module.exports = function (options) {
       next()
     }
   }
+
+  return authMiddleware
 }

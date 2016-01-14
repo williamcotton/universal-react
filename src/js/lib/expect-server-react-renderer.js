@@ -4,26 +4,32 @@ var middlewareStack = []
 
 var reactRenderApp = function (options) {
   var React = require('react')
-  var ReactDOM = require('react-dom')
+  var ReactDOMServer = require('react-dom/server')
+  var ejs = require('ejs')
+  var template = options.template
+  var browserEnv = options.browserEnv || {}
   var RootComponent = options.RootComponent ? React.createFactory(options.RootComponent) : React.createClass({propTypes: { content: React.PropTypes.element }, render: function () { return React.DOM.div({ className: 'universal-app-container' }, this.props.content) }})
-  var app = options.app
-  var browserEnv = options.browserEnv
-  var serverSession = options.serverSession
   var formatTitle = options.formatTitle || function (defaultTitle, title) { return defaultTitle + (title ? ' - ' + title : '') }
-  var contentProps = {}
-  var rootProps = {}
-  contentProps.navigate = app.navigate
-  contentProps.browserEnv = browserEnv
   return function (req, res, next) {
+    var navigate = function (pathname) {
+      res.redirect(pathname)
+    }
     res.renderApp = function (content, opts) {
-      options.document.title = formatTitle(options.defaultTitle, opts ? opts.title : false)
+      var serverSession = {}
+      var rootProps = {}
+      var contentProps = {}
+      var title = formatTitle(options.defaultTitle, opts ? opts.title : false)
+      contentProps.navigate = navigate
       async.each(middlewareStack, function (middlewareFunction, callback) {
         middlewareFunction(req, res, contentProps, rootProps, browserEnv, serverSession, callback)
       }, function () {
         var contentWithProps = React.cloneElement(content, contentProps)
         rootProps.content = contentWithProps
         rootProps.opts = opts
-        ReactDOM.render(RootComponent(rootProps), options.document.getElementById(options.rootDOMId))
+        var HTML = ReactDOMServer.renderToStaticMarkup(RootComponent(rootProps))
+        // if template was optional, or dynamic... a module could pass in the template...
+        var renderedTemplate = ejs.render(template, { HTML: HTML, title: title, rootDOMId: options.rootDOMId, browserEnv: browserEnv, serverSession: serverSession, dontLoadJS: false }, {})
+        res.send(renderedTemplate)
       })
     }
     next()

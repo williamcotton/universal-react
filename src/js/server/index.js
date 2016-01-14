@@ -8,7 +8,7 @@ var pg = require('pg')
 pg.connect(EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL, function (err, pgClient, done) {
   if (err) {}
 
-  var userAuthenticationDataStore = require('./expect-postgres-user-authentication-data-store')({
+  var userAuthenticationDataStore = require('../lib/expect-postgres-user-authentication-data-store')({
     pgClient: pgClient
   })
 

@@ -22,15 +22,6 @@ module.exports = function (options) {
   var fs = require('fs')
   var template = fs.readFileSync(__dirname + '/../../ejs/index.ejs', 'utf8')
 
-  var expectReactRenderer = require('./react-render-app') // require('expect-react-renderer/server')
-
-  // https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage/
-  // https://www.npmjs.com/package/bcrypt
-  // http://codahale.com/how-to-safely-store-a-password/
-  // https://github.com/expressjs/csurf
-
-  // csrf
-
   var cookieSession = require('cookie-session')
   app.use(cookieSession({
     keys: cookieKeys
@@ -38,32 +29,33 @@ module.exports = function (options) {
 
   var bodyParser = require('body-parser')
   app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(bodyParser.json())
 
   var csrf = require('csurf')
   app.use(csrf())
 
-  app.use(function (req, res, next) { // this can be a plugin
-    req.csrf = req.csrfToken()
-    next()
-  })
+  var expectReactRenderer = require('../lib/expect-server-react-renderer')
+
+  var csrfExternal
 
   expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
-    contentProps.csrf = req.csrf
-    serverSession.csrf = req.csrf
+    var csrf = req.csrfToken()
+    contentProps.csrf = csrf
+    serverSession.csrf = csrf
+    csrfExternal = csrf
     next()
   })
-
-  // userToken
 
   var userAuthenticationDataStore = options.userAuthenticationDataStore
 
-  var userAuthenticationService = require('./user-authentication-service')({
+  var userAuthenticationService = require('../lib/expect-user-authentication-service')({
     userAuthenticationDataStore: userAuthenticationDataStore,
     userTokenSecret: userTokenSecret,
     userTokenExpiresIn: '7d'
   })
 
-  app.use(require('./expect-server-user-authentication')({
+  app.use(require('../lib/expect-server-user-authentication')({
+    app: app,
     userAuthenticationService: userAuthenticationService,
     expectReactRenderer: expectReactRenderer
   }))
@@ -96,6 +88,10 @@ module.exports = function (options) {
 
   // var compression = require('compression')
   // app.use(compression())
+
+  universalServerApp.getCsrf = function() {
+    return csrfExternal
+  }
 
   return universalServerApp
 }

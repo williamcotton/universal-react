@@ -43,8 +43,8 @@ var universalApp = function (options) {
 
   app.post('/signup', function (req, res) {
     var credentials = {
-      type: 'email',
-      uuid: req.body.email,
+      type: req.body.type,
+      uuid: req.body.uuid,
       password: req.body.password,
       repeatPassword: req.body.repeat_password
     }
@@ -54,7 +54,7 @@ var universalApp = function (options) {
       if (!credentialErrors) {
         return res.redirect('/welcome')
       } else {
-        content = <Signup errors={credentialErrors} email={credentials.uuid} password={credentials.password} />
+        content = <Signup errors={credentialErrors} uuid={credentials.uuid} password={credentials.password} />
         title = 'Signup Failure'
       }
       res.renderApp(content, {title: title})
@@ -68,8 +68,8 @@ var universalApp = function (options) {
 
   app.post('/login', function (req, res) {
     var credentials = {
-      type: 'email',
-      uuid: req.body.email,
+      type: req.body.type,
+      uuid: req.body.uuid,
       password: req.body.password
     }
     req.login(credentials, function (err) {
@@ -78,7 +78,7 @@ var universalApp = function (options) {
       if (!err) {
         return res.redirect('/')
       } else {
-        content = <Login loggedIn={false} email={credentials.email} />
+        content = <Login loggedIn={false} uuid={credentials.uuid} />
         title = 'Login Failure'
       }
       res.renderApp(content, {title: title})
