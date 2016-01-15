@@ -1,6 +1,6 @@
 module.exports = function (options) {
-  return function (req, res, contentProps, rootProps, browserEnv, serverSession, next) {
-    contentProps.csrf = serverSession.csrf
+  return function (req, res, contentProps, rootProps, next) {
+    contentProps.csrf = req.csrf
     next()
   }
 }

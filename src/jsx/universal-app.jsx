@@ -53,7 +53,7 @@ var universalApp = function (options) {
 
   var userRequired = function (req, res, next) {
     if (!req.user) {
-      var content = <div>Login Required!</div>
+      var content = <h2>Login Required!</h2>
       return res.renderApp(content, {title: 'Login Required'})
     }
     next()

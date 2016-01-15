@@ -33,8 +33,8 @@ module.exports = function (options) {
   var expectReactRenderer = options.expectReactRenderer
   var request = options.request
 
-  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
-    var user = serverSession.user || req.session.user
+  expectReactRenderer.use(function (req, res, contentProps, rootProps, next) { // this can be a plugin
+    var user = req.user
     contentProps.user = user
     rootProps.user = user
     next()

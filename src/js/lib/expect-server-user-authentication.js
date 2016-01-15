@@ -78,7 +78,7 @@ module.exports = function (options) {
     })
   })
 
-  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
+  expectReactRenderer.use(function (req, res, contentProps, rootProps, outgoingMessage, next) { // this can be a plugin
     if (req.user) {
       var user = {
         type: req.user.type,
@@ -86,7 +86,7 @@ module.exports = function (options) {
       }
       contentProps.user = user
       rootProps.user = user
-      serverSession.user = user
+      outgoingMessage.user = user
     }
     next()
   })

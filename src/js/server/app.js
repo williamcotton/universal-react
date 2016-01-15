@@ -19,6 +19,11 @@ module.exports = function (options) {
 
   var expectReactRenderer = require('../lib/expect-server-react-renderer')
 
+  app.use(function (req, res, next) {
+    console.log(req.headers)
+    next()
+  })
+
   /*
 
     express app middleware
@@ -72,10 +77,7 @@ module.exports = function (options) {
     app: app,
     defaultTitle: defaultTitle,
     rootDOMId: 'universal-app-container',
-    template: template,
-    browserEnv: {
-      nodeEnv: nodeEnv
-    }
+    template: template
   }))
 
   /*

@@ -50,10 +50,6 @@ module.exports = function (options, callback) {
       browserAppInstance = browserApp({
         document: global.document,
         window: global.window,
-        browserEnv: {
-          nodeEnv: 'test'
-        },
-        serverSession: {},
         rootDOMId: 'universal-app-container',
         defaultTitle: defaultTitle,
         localStorage: localStorage,

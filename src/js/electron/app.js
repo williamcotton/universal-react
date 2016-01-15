@@ -1,5 +1,4 @@
 module.exports = function (options) {
-  var browserEnv = options.browserEnv
 
   /*
 
@@ -25,9 +24,7 @@ module.exports = function (options) {
   app.use(reactRenderApp({
     RootComponent: RootComponent,
     app: app,
-    contentProps: {
-      browserEnv: browserEnv
-    },
+    contentProps: {},
     rootDOMId: 'universal-app-container',
     defaultTitle: 'Universal App',
     document: options.document,

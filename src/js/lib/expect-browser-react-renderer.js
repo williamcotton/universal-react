@@ -7,8 +7,6 @@ var reactRenderApp = function (options) {
   var ReactDOM = require('react-dom')
   var RootComponent = options.RootComponent ? React.createFactory(options.RootComponent) : React.createClass({propTypes: { content: React.PropTypes.element }, render: function () { return React.DOM.div({ className: 'universal-app-container' }, this.props.content) }})
   var app = options.app
-  var browserEnv = options.browserEnv
-  var serverSession = options.serverSession
   var formatTitle = options.formatTitle || function (defaultTitle, title) { return defaultTitle + (title ? ' - ' + title : '') }
   return function (req, res, next) {
     res.redirect = app.navigate
@@ -17,10 +15,9 @@ var reactRenderApp = function (options) {
       var contentProps = {}
       rootProps.navigate = app.navigate
       contentProps.navigate = app.navigate
-      contentProps.browserEnv = browserEnv
       options.document.title = formatTitle(options.defaultTitle, opts ? opts.title : false)
       async.each(middlewareStack, function (middlewareFunction, callback) {
-        middlewareFunction(req, res, contentProps, rootProps, browserEnv, serverSession, callback)
+        middlewareFunction(req, res, contentProps, rootProps, callback)
       }, function () {
         var contentWithProps = React.cloneElement(content, contentProps)
         rootProps.content = contentWithProps
