@@ -49,6 +49,17 @@ test('serverApp', function (t) {
       })
     })
 
+    t.test('should NOT /signup.json with existing', function (t) {
+      rq({url: '/signup'}, function () {
+        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: 'steve1@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+          var user = JSON.parse(res.body)
+          t.equal(user.uuid, undefined)
+          t.equal(user.type, undefined)
+          t.end()
+        })
+      })
+    })
+
     expect.universalAppSpecsToPass(t)
 
     t.end()

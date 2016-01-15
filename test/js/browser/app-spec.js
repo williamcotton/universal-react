@@ -20,8 +20,26 @@ test('browserApp', function (t) {
   }, function (expect, t, rq, baseRequest, cookieJar) {
     t.test('should /signup', function (t) {
       baseRequest({url: '/signup'}, function (err, res, body) {
-        rq({followRedirect: true, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve3@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
           t.ok($('.front-page-container').html(), 'has front-page-container')
+          t.end()
+        })
+      })
+    })
+
+    t.test('should /login', function (t) {
+      baseRequest({url: '/login'}, function (err, res, body) {
+        rq({followRedirect: false, method: 'post', url: '/login', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234'}}, function ($, res) {
+          t.ok($('.front-page-container').html(), 'has front-page-container')
+          t.end()
+        })
+      })
+    })
+
+    t.test('should NOT /signup again', function (t) {
+      baseRequest({url: '/signup'}, function (err, res, body) {
+        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+          t.ok($('.signup-container').html(), 'has signup-container')
           t.end()
         })
       })

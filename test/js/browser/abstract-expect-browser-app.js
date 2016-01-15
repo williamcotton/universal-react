@@ -109,7 +109,7 @@ module.exports = function (options, callback) {
         t: t,
         rq: rq,
         defaultTitle: defaultTitle,
-        request: baseRequest
+        baseRequest: baseRequest
       })
     }
 
@@ -117,6 +117,6 @@ module.exports = function (options, callback) {
       universalAppSpecsToPass: universalAppSpecsToPass
     }
 
-    callback(expect, t, rq, baseRequest, cookieJar)
+    callback(expect, t, rq, baseRequest)
   })
 }

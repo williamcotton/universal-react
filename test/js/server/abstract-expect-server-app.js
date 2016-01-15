@@ -7,7 +7,9 @@ module.exports = function (options, callback) {
   var testServerApp = options.testServerApp
   var universalAppSpec = options.universalAppSpec
 
-  var baseUrl = testServerApp.baseUrl
+  var baseRequest = request.defaults({
+    baseUrl: testServerApp.baseUrl
+  })
 
   var cookieJar, csrf
 
@@ -26,18 +28,27 @@ module.exports = function (options, callback) {
   })
 
   var rq = function (options, callback) {
-    options.url = baseUrl + options.url
     options.jar = cookieJar // remember cookies between test instances
     if (options.form && csrf) {
       options.form._csrf = csrf
     }
-    request(options, function (err, res, body) {
-      // console.log('request', options, err, body)
+    baseRequest(options, function (err, res, body) {
       if (err) {} // TODO
       var $ = cheerio.load(body, {xmlMode: true})
       csrf = $('input[name="_csrf"]').val()
-      // if there's a hidden HTML input element with a name "_csrf", set the variable, and then it'll attach to the form post on the next rq
       callback($, res)
+    })
+  }
+
+  var exportBaseRequest = function (options, callback) {
+    options.jar = cookieJar
+    if (options.form && csrf) {
+      options.form._csrf = csrf
+    }
+    baseRequest(options, function(err, res, body) {
+      var $ = cheerio.load(body, {xmlMode: true})
+      csrf = $('input[name="_csrf"]').val()
+      callback(err, res, body)
     })
   }
 
@@ -45,7 +56,8 @@ module.exports = function (options, callback) {
     universalAppSpec({
       t: t,
       rq: rq,
-      defaultTitle: defaultTitle
+      defaultTitle: defaultTitle,
+      baseRequest: exportBaseRequest
     })
   }
 
@@ -53,5 +65,5 @@ module.exports = function (options, callback) {
     universalAppSpecsToPass: universalAppSpecsToPass
   }
 
-  callback(expect, t, rq)
+  callback(expect, t, rq, exportBaseRequest)
 }

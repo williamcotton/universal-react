@@ -56,6 +56,7 @@ module.exports = function (options) {
       // we use req.body instead of credential
       //console.log(req)
       request({method: 'post', url: req.path + '.json', body: req.body, form: req.body}, function (err, res, body) {
+        console.log('signup attempt', req.body, err, body)
         if (err || !res || !res.body) {
           var errors = [err]
           return callback(errors, false)
@@ -73,7 +74,11 @@ module.exports = function (options) {
       // return
 
       // option 2: use an XHR to post the form
-      request({method: 'post', url: req.path + '.json', json: req.body}, function (err, res, body) {
+      request({method: 'post', url: req.path + '.json', body: req.body, form: req.body}, function (err, res, body) {
+        if (err || !res || !res.body) {
+          var errors = [err]
+          return callback(errors, false)
+        }
         var user = res.body
         req.user = user
         req.session.user = user
