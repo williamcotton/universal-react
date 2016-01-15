@@ -24,7 +24,11 @@ var reactRenderApp = function (options) {
         var contentWithProps = React.cloneElement(content, contentProps)
         rootProps.content = contentWithProps
         rootProps.opts = opts
-        ReactDOM.render(RootComponent(rootProps), options.document.getElementById(options.rootDOMId))
+        ReactDOM.render(RootComponent(rootProps), options.document.getElementById(options.rootDOMId), function() {
+          if (res.onComplete) {
+            res.onComplete()
+          }
+        })
       })
     }
     next()

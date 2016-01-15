@@ -64,10 +64,18 @@ module.exports = function (options, callback) {
           res.headers = res.headers || {}
           rqResponse = res
           res.redirect = function (path) {
+            if (res.onComplete) {
+              res.onComplete()
+            }
             res.headers.location = path
           }
         } else {
-          res.redirect = browserAppInstance.navigate
+          res.redirect = function(path, callback) {
+            if (res.onComplete) {
+              res.onComplete()
+            }
+            browserAppInstance.navigate(path, callback)
+          }
         }
         next()
       })
@@ -97,11 +105,13 @@ module.exports = function (options, callback) {
         followRedirect = options.followRedirect
       }
       if (options.method && options.method.toLowerCase() === 'post') {
-        browserAppInstance.submit(options.url, options.form)
+        browserAppInstance.submit(options.url, options.form, function () {
+          callback(global.window.$, rqResponse)
+        })
       } else {
         browserAppInstance.navigate(options.url)
+        callback(global.window.$, rqResponse)
       }
-      callback(global.window.$, rqResponse)
     }
 
     var universalAppSpecsToPass = function (t) {
