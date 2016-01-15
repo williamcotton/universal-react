@@ -22,9 +22,9 @@ module.exports = function (options) {
       })
     },
     destroy: function (credentials, callback) {
-      db.remove({ uuid: credentials.uuid, type: credentials.type }, function (err, removedUser) {
-        callback(err)
-      })
+      // db.remove({ uuid: credentials.uuid, type: credentials.type }, function (err, removedUser) {
+      //   callback(err)
+      // })
     },
     setup: function (callback) {
       pgClient.query('CREATE TABLE users (id serial, type varchar(40), hash varchar(256), uuid varchar(256))', callback)

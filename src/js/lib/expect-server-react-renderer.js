@@ -19,6 +19,7 @@ var reactRenderApp = function (options) {
       var rootProps = {}
       var contentProps = {}
       var title = formatTitle(options.defaultTitle, opts ? opts.title : false)
+      rootProps.navigate = navigate
       contentProps.navigate = navigate
       async.each(middlewareStack, function (middlewareFunction, callback) {
         middlewareFunction(req, res, contentProps, rootProps, browserEnv, serverSession, callback)

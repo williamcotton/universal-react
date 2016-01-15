@@ -37,8 +37,20 @@ module.exports = function (options) {
     baseRequest({url: '/signup'}, function (err, res, body) {
       // console.log('body', body)
       rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve4@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
-        // console.log($('body').html())
-        // console.log(res.headers)
+        console.log($('body').html())
+        console.log(res.headers)
+        t.ok(true)
+        t.end()
+      })
+    })
+  })
+
+  t.test('should /login', function (t) {
+    baseRequest({url: '/login'}, function (err, res, body) {
+      // console.log('body', body)
+      rq({followRedirect: false, method: 'post', url: '/login', form: {type: 'email', uuid: 'steve4@test.com', password: 'test1234'}}, function ($, res) {
+        console.log($('body').html())
+        console.log(res.headers)
         t.ok(true)
         t.end()
       })

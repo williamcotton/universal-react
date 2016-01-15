@@ -1,43 +1,52 @@
+require('node-jsx').install({extension: '.jsx'})
+
 module.exports = function (options) {
   var defaultTitle = options.defaultTitle
   var nodeEnv = options.nodeEnv
 
   /*
 
-    app
-    ---
-    server version
+    express app
+    -----------
+
+    expect-server-react-renderer
+    ----------------------------
 
   */
-
-  var cookieKeys = ['SECRET']
-  var userTokenSecret = 'SECRET'
-
-  require('node-jsx').install({extension: '.jsx'})
-  var RootComponent = require('../../jsx/root-component.jsx')
 
   var express = require('express')
   var app = express()
 
-  var fs = require('fs')
-  var template = fs.readFileSync(__dirname + '/../../ejs/index.ejs', 'utf8')
+  var expectReactRenderer = require('../lib/expect-server-react-renderer')
 
+  /*
+
+    express app middleware
+    ----------------------
+
+    expect-server-react-renderer middleware
+    ---------------------------------------
+
+  */
+
+  // cookie-session
   var cookieSession = require('cookie-session')
+  var cookieKeys = ['SECRET']
   app.use(cookieSession({
     keys: cookieKeys
   }))
 
+  // body-parser
   var bodyParser = require('body-parser')
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json())
 
+  // csurf
   var csrf = require('csurf')
   app.use(csrf())
 
-  var expectReactRenderer = require('../lib/expect-server-react-renderer')
-
+  // expect-server-csrf
   var csrfExternal
-
   expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
     var csrf = req.csrfToken()
     contentProps.csrf = csrf
@@ -45,23 +54,29 @@ module.exports = function (options) {
     csrfExternal = csrf
     next()
   })
+  app.getCsrf = function() {
+    return csrfExternal
+  }
 
-  var userAuthenticationDataStore = options.userAuthenticationDataStore
-
+  // expect-server-user-authentication
   var userAuthenticationService = require('../lib/expect-user-authentication-service')({
-    userAuthenticationDataStore: userAuthenticationDataStore,
-    userTokenSecret: userTokenSecret,
+    userAuthenticationDataStore: options.userAuthenticationDataStore,
+    userTokenSecret: 'SECRET',
     userTokenExpiresIn: '7d'
   })
-
   app.use(require('../lib/expect-server-user-authentication')({
     app: app,
     userAuthenticationService: userAuthenticationService,
     expectReactRenderer: expectReactRenderer
   }))
 
+  // expect-base-template
+  var fs = require('fs')
+  var template = fs.readFileSync(__dirname + '/../../ejs/index.ejs', 'utf8')
+
+  // expect-server-react-renderer
   app.use(expectReactRenderer({
-    RootComponent: RootComponent,
+    RootComponent: require('../../jsx/root-component.jsx'),
     app: app,
     defaultTitle: defaultTitle,
     rootDOMId: 'universal-app-container',
@@ -83,15 +98,13 @@ module.exports = function (options) {
     app: app
   })
 
+  // static assets
   var publicDir = __dirname + '/../../../public'
   app.use(express.static(publicDir))
 
-  // var compression = require('compression')
-  // app.use(compression())
-
-  universalServerApp.getCsrf = function() {
-    return csrfExternal
-  }
+  // compression
+  var compression = require('compression')
+  app.use(compression())
 
   return universalServerApp
 }

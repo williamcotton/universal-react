@@ -46,31 +46,22 @@ module.exports = function (options) {
       if (credentialStatus.errors) {
         return callback(credentialStatus.errors, false)
       }
-      // option 1: bypass the client completely and just post the form to the server
-      // if (req.event) {
-      //   req.event.target.submit()
-      // }
-      // return
-
-      // option 2: use an XHR to post the form
       request({method: 'post', url: req.path + '.json', json: req.body}, function (err, res, body) {
         if (err || !res || !res.body) {
           var errors = [err]
           return callback(errors, false)
         }
+        if (res.statusCode >= 500) {
+          var errors = [res.body]
+          return callback(errors, false)
+        }
         var user = res.body
         req.user = user
+        req.session.user = user
         callback(err, user)
       })
     }
     req.login = function (credentials, callback) {
-      // option 1: bypass the client completely and just post the form to the server
-      // if (req.event) {
-      //   req.event.target.submit()
-      // }
-      // return
-
-      // option 2: use an XHR to post the form
       request({method: 'post', url: req.path + '.json', json: req.body}, function (err, res, body) {
         if (err || !res || !res.body) {
           var errors = [err]

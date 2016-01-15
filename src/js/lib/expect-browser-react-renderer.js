@@ -15,6 +15,7 @@ var reactRenderApp = function (options) {
     res.renderApp = function (content, opts) {
       var rootProps = {}
       var contentProps = {}
+      rootProps.navigate = app.navigate
       contentProps.navigate = app.navigate
       contentProps.browserEnv = browserEnv
       options.document.title = formatTitle(options.defaultTitle, opts ? opts.title : false)
@@ -24,7 +25,7 @@ var reactRenderApp = function (options) {
         var contentWithProps = React.cloneElement(content, contentProps)
         rootProps.content = contentWithProps
         rootProps.opts = opts
-        ReactDOM.render(RootComponent(rootProps), options.document.getElementById(options.rootDOMId), function() {
+        ReactDOM.render(RootComponent(rootProps), options.document.getElementById(options.rootDOMId), function () {
           if (res.onComplete) {
             res.onComplete()
           }

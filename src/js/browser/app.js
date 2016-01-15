@@ -6,13 +6,13 @@ module.exports = function (options) {
 
   /*
 
-    app
-    ---
-    browser version
+    browser-express app
+    -------------------
+
+    expect-browser-react-renderer
+    -----------------------------
 
   */
-
-  var RootComponent = require('../../jsx/root-component.jsx')
 
   var express = require('browser-express')
   var app = express({
@@ -22,24 +22,38 @@ module.exports = function (options) {
     window: options.window
   })
 
-  app.use(require('../lib/expect-browser-session')({
+  var expectReactRenderer = require('../lib/expect-browser-react-renderer') // require('expect-browser-render-app')
+
+  /*
+
+    browser-express app middleware
+    ------------------------------
+
+    expect-browser-react-renderer middleware
+    ----------------------------------------
+
+  */
+
+  // expect-browser-localstorage-session
+  app.use(require('../lib/expect-browser-localstorage-session')({
     localStorage: localStorage
   }))
 
-  var expectReactRenderer = require('../lib/expect-browser-react-renderer') // require('expect-browser-render-app')
-
+  // expect-browser-csrf
   expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
     contentProps.csrf = serverSession.csrf
     next()
   })
 
+  // expect-browser-user-authentication
   app.use(require('../lib/expect-browser-user-authentication')({
     expectReactRenderer: expectReactRenderer,
     request: request
   }))
 
+  // expect-browser-react-renderer
   app.use(expectReactRenderer({
-    RootComponent: RootComponent,
+    RootComponent: require('../../jsx/root-component.jsx'),
     app: app,
     rootDOMId: 'universal-app-container',
     defaultTitle: options.defaultTitle || 'Universal App',
