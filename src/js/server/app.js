@@ -2,7 +2,6 @@ require('node-jsx').install({extension: '.jsx'})
 
 module.exports = function (options) {
   var defaultTitle = options.defaultTitle
-  var nodeEnv = options.nodeEnv
 
   /*
 
@@ -18,11 +17,6 @@ module.exports = function (options) {
   var app = express()
 
   var expectReactRenderer = require('../lib/expect-server-react-renderer')
-
-  app.use(function (req, res, next) {
-    console.log(req.headers)
-    next()
-  })
 
   /*
 

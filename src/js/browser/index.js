@@ -1,10 +1,10 @@
 var request = require('request')
 
 var universalBrowserApp = require('./app')({
+  request: request,
   localStorage: window.localStorage,
   document: document,
-  window: window,
-  request: request
+  window: window
 })
 
 universalBrowserApp.listen(function () {

@@ -15,6 +15,7 @@ var reactRenderApp = function (options) {
     }
     res.renderApp = function (content, opts) {
       var outgoingMessage = {}
+      outgoingMessage.method = req.method
       var rootProps = {}
       var contentProps = {}
       var title = formatTitle(options.defaultTitle, opts ? opts.title : false)

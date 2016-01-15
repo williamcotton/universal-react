@@ -16,7 +16,7 @@ module.exports = function (options) {
 
   var signupSuccessRedirect = signup.successRedirect || '/'
   var loginSuccessRedirect = login.successRedirect || '/'
-  var logoutSuccessRedirect = login.successRedirect || '/'
+  var logoutSuccessRedirect = logout.successRedirect || '/'
 
   var signupTitle = signup.title || 'Signup'
   var loginTitle = login.title || 'Login'
