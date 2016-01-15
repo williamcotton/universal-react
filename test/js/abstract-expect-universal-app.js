@@ -28,7 +28,15 @@ module.exports = function (options) {
   var routesGETMap = {}
 
   var mockApp = {
-    get: function (route, handler) {
+    get: function () {
+      var route, handler
+      if (arguments.length === 3) {
+        route = arguments[0]
+        handler = arguments[2]
+      } else if (arguments.length === 2) {
+        route = arguments[0]
+        handler = arguments[1]
+      }
       definedRoutes.push(route)
       router.get(route, function (req, res) {
         handler(req, res)

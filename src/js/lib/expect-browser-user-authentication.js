@@ -47,12 +47,13 @@ module.exports = function (options) {
         return callback(credentialStatus.errors, false)
       }
       request({method: 'post', url: req.path + '.json', json: req.body}, function (err, res, body) {
+        var errors
         if (err || !res || !res.body) {
-          var errors = [err]
+          errors = [err]
           return callback(errors, false)
         }
         if (res.statusCode >= 500) {
-          var errors = [res.body]
+          errors = [res.body]
           return callback(errors, false)
         }
         var user = res.body
@@ -77,6 +78,9 @@ module.exports = function (options) {
       delete req.user
       delete req.session.user
       res.loadPage(req.path)
+    }
+    if (req.session && req.session.user) {
+      req.user = req.session.user
     }
     next()
   }

@@ -22,7 +22,7 @@ module.exports = function (options) {
     window: options.window
   })
 
-  var expectReactRenderer = require('../lib/expect-browser-react-renderer') // require('expect-browser-render-app')
+  var expectReactRenderer = require('../lib/expect-browser-react-renderer')
 
   /*
 
