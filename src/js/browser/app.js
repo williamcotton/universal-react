@@ -1,6 +1,4 @@
 module.exports = function (options) {
-  var browserEnv = options.browserEnv
-  var serverSession = options.serverSession
   var request = options.request
   var localStorage = options.localStorage
 
@@ -54,8 +52,6 @@ module.exports = function (options) {
     app: app,
     rootDOMId: 'universal-app-container',
     defaultTitle: options.defaultTitle || 'Universal App',
-    browserEnv: browserEnv,
-    serverSession: serverSession,
     document: options.document,
     localStorage: options.localStorage
   }))
