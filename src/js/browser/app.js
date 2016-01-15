@@ -40,10 +40,7 @@ module.exports = function (options) {
   }))
 
   // expect-browser-csrf
-  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
-    contentProps.csrf = serverSession.csrf
-    next()
-  })
+  expectReactRenderer.use(require('../lib/expect-browser-csrf')())
 
   // expect-browser-user-authentication
   app.use(require('../lib/expect-browser-user-authentication')({

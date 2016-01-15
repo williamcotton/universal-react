@@ -46,17 +46,9 @@ module.exports = function (options) {
   app.use(csrf())
 
   // expect-server-csrf
-  var csrfExternal
-  expectReactRenderer.use(function (req, res, contentProps, rootProps, browserEnv, serverSession, next) { // this can be a plugin
-    var csrf = req.csrfToken()
-    contentProps.csrf = csrf
-    serverSession.csrf = csrf
-    csrfExternal = csrf
-    next()
-  })
-  app.getCsrf = function() {
-    return csrfExternal
-  }
+  expectReactRenderer.use(require('../lib/expect-server-csrf')({
+    app: app
+  }))
 
   // expect-server-user-authentication
   var userAuthenticationService = require('../lib/expect-user-authentication-service')({
