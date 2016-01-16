@@ -1,5 +1,3 @@
-require('node-jsx').install({extension: '.jsx'})
-
 module.exports = function (options) {
   var defaultTitle = options.defaultTitle
 
@@ -30,9 +28,8 @@ module.exports = function (options) {
 
   // cookie-session
   var cookieSession = require('cookie-session')
-  var cookieKeys = ['SECRET']
   app.use(cookieSession({
-    keys: cookieKeys
+    keys: ['SECRET']
   }))
 
   // body-parser
@@ -43,6 +40,13 @@ module.exports = function (options) {
   // csurf
   var csrf = require('csurf')
   app.use(csrf())
+
+  // expect-server-outgoing-message
+  app.use(function (req, res, next) {
+    res.outgoingMessage = {}
+    res.outgoingMessage.method = req.method
+    next()
+  })
 
   // expect-server-csrf
   expectReactRenderer.use(require('../lib/expect-server-csrf')({
@@ -61,7 +65,7 @@ module.exports = function (options) {
     expectReactRenderer: expectReactRenderer
   }))
 
-  // expect-base-template
+  // expect-server-template
   var fs = require('fs')
   var template = fs.readFileSync(__dirname + '/../../ejs/index.ejs', 'utf8')
 

@@ -20,6 +20,9 @@ module.exports = function (options, callback) {
     }
   }
 
+  global.window.incomingMessage = {}
+  global.window.incomingMessage.defaultTitle = defaultTitle
+
   // prouter needs these globals
   global.addEventListener = global.window.addEventListener
   global.removeEventListener = global.window.removeEventListener
@@ -51,7 +54,6 @@ module.exports = function (options, callback) {
         document: global.document,
         window: global.window,
         rootDOMId: 'universal-app-container',
-        defaultTitle: defaultTitle,
         localStorage: localStorage,
         request: baseRequest
       })
@@ -66,7 +68,7 @@ module.exports = function (options, callback) {
             res.headers.location = path
           }
         } else {
-          res.redirect = function(path, callback) {
+          res.redirect = function (path, callback) {
             if (res.onComplete) {
               res.onComplete()
             }

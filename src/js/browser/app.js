@@ -51,7 +51,6 @@ module.exports = function (options) {
     RootComponent: require('../../jsx/root-component.jsx'),
     app: app,
     rootDOMId: 'universal-app-container',
-    defaultTitle: options.defaultTitle || 'Universal App',
     document: options.document,
     localStorage: options.localStorage
   }))

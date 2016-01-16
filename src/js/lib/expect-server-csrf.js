@@ -7,10 +7,10 @@ module.exports = function (options) {
     return csrfExternal
   }
 
-  return function (req, res, contentProps, rootProps, outgoingMessage, next) {
+  return function (req, res, contentProps, rootProps, next) {
     var csrf = req.csrfToken()
     contentProps.csrf = csrf
-    outgoingMessage.csrf = csrf
+    res.outgoingMessage.csrf = csrf
     csrfExternal = csrf
     next()
   }

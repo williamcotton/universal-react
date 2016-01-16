@@ -1,3 +1,5 @@
+require('node-jsx').install({extension: '.jsx'})
+
 var nodeEnv = process.env.NODE_ENV
 var defaultTitle = process.env.DEFAULT_TITLE
 var EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL = process.env.EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL
