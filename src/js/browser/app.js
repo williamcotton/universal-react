@@ -13,7 +13,7 @@ module.exports = function (options) {
   */
 
   var express = require('browser-express')
-  var app = express({
+  var app = options.app || express({
     interceptLinks: true,
     interceptFormSubmit: true,
     document: options.document,
@@ -32,16 +32,10 @@ module.exports = function (options) {
 
   */
 
-  // expect-browser-localstorage-session
-  app.use(require('../lib/expect-browser-localstorage-session')({
-    localStorage: localStorage
-  }))
-
-  // expect-browser-csrf
-  expectReactRenderer.use(require('../lib/expect-browser-csrf')())
-
   // expect-browser-user-authentication
   app.use(require('../lib/expect-browser-user-authentication')({
+    localStorage: localStorage,
+    app: app,
     expectReactRenderer: expectReactRenderer,
     request: request
   }))
@@ -54,6 +48,12 @@ module.exports = function (options) {
     document: options.document,
     localStorage: options.localStorage
   }))
+
+  app.post('/user.json', function (req, res) {
+    request({url: '/user.json', method: 'post', json: req.body}, function (err, _res, body) {
+      console.log('POST /user.json', body)
+    })
+  })
 
   /*
 

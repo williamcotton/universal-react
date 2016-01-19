@@ -9,7 +9,7 @@ var reactRenderApp = function (options) {
   var template = options.template
   var RootComponent = options.RootComponent ? React.createFactory(options.RootComponent) : React.createClass({propTypes: { content: React.PropTypes.element }, render: function () { return React.DOM.div({ className: 'universal-app-container' }, this.props.content) }})
   var formatTitle = options.formatTitle || function (defaultTitle, title) { return defaultTitle + (title ? ' - ' + title : '') }
-  return function (req, res, next) {
+  return function reactRenderer (req, res, next) {
     res.outgoingMessage.defaultTitle = options.defaultTitle
     var navigate = function (pathname) {
       res.redirect(pathname)

@@ -1,3 +1,66 @@
+/*
+
+CREATE TABLE accounts (
+  uuid            uuid PRIMARY KEY UNIQUE,
+  quick_code      VARCHAR(64) UNIQUE,
+  public_address  VARCHAR(34),
+  created_at      timestamptz,
+  updated_at      timestamptz
+);
+
+CREATE TABLE wallets (
+  blockchain_provider_type  VARCHAR(32),
+  identity_provider_type    VARCHAR(32),
+  created_at      timestamptz,
+  updated_at      timestamptz,
+  identity_uuid   VARCHAR(256),
+  is_public       boolean,
+  address         VARCHAR(34),
+  account_uuid    uuid
+);
+
+CREATE INDEX accounts_uuid_index ON accounts (uuid);
+CREATE INDEX accounts_quick_code_index ON accounts (quick_code);
+CREATE INDEX accounts_public_address_index ON accounts (public_address);
+CREATE INDEX wallets_address_index ON wallets (address);
+CREATE INDEX wallets_account_uuid_index ON wallets (account_uuid);
+CREATE INDEX wallets_identity_uuid_index ON wallets (identity_uuid);
+
+*/
+
+/*
+
+var createUUID = require("node-uuid");
+
+var uuid = createUUID.v4();
+    var createdAt = (new Date).toISOString();
+
+*/
+
+// users table and a user_credentials table? user.uuid = "xxx-xxx-xxxx-xxx", user_credentials.type, user_credentials.uuid, user_credentials.user_uuid
+
+// user_oauths table?
+
+/* 
+
+user_credentials:
+  identity anchor (email, phone)
+  password hash
+  verification status (did they prove they have access to email or phone?)
+  user_uuid
+
+  facebook oauth as an identity anchor...
+    no password hash, checks signed token... token verifies that facebook says this ID is correct
+
+  email as an identity anchor...
+    take a password and match it to the db
+
+  what do we store for facebook? type:'facebook', uuid:'facebook id'
+
+  how do we verify facebook? get a token, verify it was signed by facebook, verify the facebook id matches the credentials
+
+*/
+
 module.exports = function (options) {
   var pgClient = options.pgClient
 

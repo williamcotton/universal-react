@@ -1,6 +1,18 @@
 module.exports = function (options) {
   var defaultTitle = options.defaultTitle
 
+  var fs = require('fs')
+
+  var rsaPrivateKeyPem = fs.readFileSync(__dirname + '/../../../expect-user-authentication-service.pem')
+  var rsaPublicKeyPem = fs.readFileSync(__dirname + '/../../../expect-user-authentication-service-public.pem')
+
+  var userAuthenticationService = require('../lib/expect-user-authentication-service')({
+    userAuthenticationDataStore: options.userAuthenticationDataStore,
+    rsaPrivateKeyPem: rsaPrivateKeyPem,
+    rsaPublicKeyPem: rsaPublicKeyPem,
+    userTokenExpiresIn: '7d'
+  })
+
   /*
 
     express app
@@ -12,7 +24,7 @@ module.exports = function (options) {
   */
 
   var express = require('express')
-  var app = express()
+  var app = options.app || express()
 
   var expectReactRenderer = require('../lib/expect-server-react-renderer')
 
@@ -26,39 +38,7 @@ module.exports = function (options) {
 
   */
 
-  // cookie-session
-  var cookieSession = require('cookie-session')
-  app.use(cookieSession({
-    keys: ['SECRET']
-  }))
-
-  // body-parser
-  var bodyParser = require('body-parser')
-  app.use(bodyParser.urlencoded({ extended: false }))
-  app.use(bodyParser.json())
-
-  // csurf
-  var csrf = require('csurf')
-  app.use(csrf())
-
-  // expect-server-outgoing-message
-  app.use(function (req, res, next) {
-    res.outgoingMessage = {}
-    res.outgoingMessage.method = req.method
-    next()
-  })
-
-  // expect-server-csrf
-  expectReactRenderer.use(require('../lib/expect-server-csrf')({
-    app: app
-  }))
-
   // expect-server-user-authentication
-  var userAuthenticationService = require('../lib/expect-user-authentication-service')({
-    userAuthenticationDataStore: options.userAuthenticationDataStore,
-    userTokenSecret: 'SECRET',
-    userTokenExpiresIn: '7d'
-  })
   app.use(require('../lib/expect-server-user-authentication')({
     app: app,
     userAuthenticationService: userAuthenticationService,
@@ -66,7 +46,6 @@ module.exports = function (options) {
   }))
 
   // expect-server-template
-  var fs = require('fs')
   var template = fs.readFileSync(__dirname + '/../../ejs/index.ejs', 'utf8')
 
   // expect-server-react-renderer
@@ -77,6 +56,10 @@ module.exports = function (options) {
     rootDOMId: 'universal-app-container',
     template: template
   }))
+
+  app.post('/user.json', function (req, res) {
+    res.send(req.user)
+  })
 
   /*
 

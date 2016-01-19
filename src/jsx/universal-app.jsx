@@ -10,7 +10,14 @@ var Login = require('./login.jsx')
 var universalApp = function (options) {
   var app = options.app
 
-  // no user login required
+  // add /signup, /login, /logout routes for user-authentication
+  require('../js/lib/expect-universal-user-authentication')({
+    app: app,
+    login: { component: Login, path: '/login', successRedirect: '/' },
+    signup: { component: Signup, path: '/signup', successRedirect: '/welcome' },
+    logout: { path: '/logout', successRedirect: '/' }
+  })
+
   app.get('/', function (req, res) {
     var content = <FrontPage />
     res.renderApp(content)
@@ -41,14 +48,6 @@ var universalApp = function (options) {
     }
     var content = <Calculator result={result} firstNumber={firstNumber} secondNumber={secondNumber} operation={operation} />
     res.renderApp(content, {title: 'Calculator'})
-  })
-
-  // expect-universal-user-authentication
-  require('../js/lib/expect-universal-user-authentication')({
-    app: app,
-    login: { component: Login, path: '/login', successRedirect: '/' },
-    signup: { component: Signup, path: '/signup', successRedirect: '/welcome' },
-    logout: { path: '/logout', successRedirect: '/' }
   })
 
   var userRequired = function (req, res, next) {

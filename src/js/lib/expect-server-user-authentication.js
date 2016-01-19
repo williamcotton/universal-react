@@ -34,6 +34,47 @@ module.exports = function (options) {
   var expectReactRenderer = options.expectReactRenderer
   var app = options.app
 
+    // cookie-session
+  var cookieSession = require('cookie-session')
+  app.use(cookieSession({
+    keys: ['SECRET']
+  }))
+
+  // body-parser
+  var bodyParser = require('body-parser')
+  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(bodyParser.json())
+
+  // api-user-authentication, consumes userAuthenticationService,
+  // rate limiting
+  // cors
+  // uses audience 'expect-api-session-user' and/or 'expect-cors-session-user'
+  // so electron can login, so cors can login
+
+  // csurf
+  var csrf = require('csurf')
+  app.use(csrf())
+
+  // api-user-authentication csrf override
+  app.use(function (err, req, res, next) {
+    if (err.code === 'EBADCSRFTOKEN' && req.user) {
+      return next()
+    }
+    next(err)
+  })
+
+  // expect-server-outgoing-message
+  app.use(function expectServerOutgoingMessage (req, res, next) {
+    res.outgoingMessage = {}
+    res.outgoingMessage.method = req.method
+    next()
+  })
+
+  // expect-server-csrf
+  expectReactRenderer.use(require('../lib/expect-server-csrf')({
+    app: app
+  }))
+
   app.post('/signup.json', function (req, res) {
     authMiddleware(req, res, function () {
       var credentials = {
@@ -91,7 +132,7 @@ module.exports = function (options) {
     next()
   })
 
-  var authMiddleware = function (req, res, next) { // this can be a plugin
+  var authMiddleware = function expectServerUserAuthentication (req, res, next) { // this can be a plugin
     if (req.signup) {
       return next()
     }
@@ -109,7 +150,7 @@ module.exports = function (options) {
       })
     }
     req.login = function (credentials, callback) {
-      userAuthenticationService.loginServerSessionUserToken(credentials, function (err, user, token) {
+      userAuthenticationService.getToken({credentials: credentials, audience: 'expect-server-session-user'}, function (err, user, token) {
         if (err || !token || !user) {
           return callback(err, false)
         }
@@ -124,7 +165,7 @@ module.exports = function (options) {
       callback(false)
     }
     if (req.session && req.session.userToken) {
-      userAuthenticationService.refreshServerSessionUserToken(req.session.userToken, function (err, user, token) {
+      userAuthenticationService.refreshToken({token: req.session.userToken, audience: 'expect-server-session-user'}, function (err, user, token) {
         if (!err && user && token) {
           req.user = user
           req.session.userToken = token

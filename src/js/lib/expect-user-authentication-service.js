@@ -2,42 +2,56 @@ var jwt = require('jsonwebtoken')
 var bcrypt = require('bcrypt')
 
 module.exports = function (options) {
-  var userTokenSecret = options.userTokenSecret
-  var userTokenPublicKey = options.userTokenPublicKey
   var userAuthenticationDataStore = options.userAuthenticationDataStore
   var userTokenExpiresIn = options.userTokenExpiresIn
-  return { // interface with user credential data store
-    loginServerSessionUserToken: function (credentials, callback) { // verify that email and hash(password) match, issue token for existing account
+  var issuer = options.issuer || 'expect-user-auth'
+  var rsaPrivateKeyPem = options.rsaPrivateKeyPem
+  // openssl genrsa -out expect-user-authentication-service.pem 1024
+  var rsaPublicKeyPem = options.rsaPublicKeyPem
+  // openssl rsa -in expect-user-authentication-service.pem -pubout -out expect-user-authentication-service-public.pem
+  return {
+    getToken: function (options, callback) {
+      var credentials = options.credentials
+      var audience = options.audience
+      // if type: email
+      // TODO: email verification, forgot password reset
       userAuthenticationDataStore.getHash(credentials, function (errHashLookup, hash) {
         bcrypt.compare(credentials.password, hash, function (errHashCompare, res) {
           if (!errHashCompare && !errHashLookup && res) {
             var user = { uuid: credentials.uuid, type: credentials.type }
-            jwt.sign(user, userTokenSecret, {expiresIn: userTokenExpiresIn, issuer: 'expect-user-auth', audience: 'expect-server-session-user'}, function (serverSessionUserToken) {
-              callback(false, user, serverSessionUserToken)
+            jwt.sign(user, rsaPrivateKeyPem, {expiresIn: userTokenExpiresIn, issuer: issuer, audience: audience, algorithm: 'RS256'}, function (token) {
+              callback(false, user, token)
             })
           } else {
             callback(true, false, false)
           }
         })
       })
+      // if type: facebook
+      // TODO: check validity of token, check data store for user.uuid for facebook id
     },
-    verifyServerSessionUserToken: function (serverSessionUserToken, callback) { // verify token
-      jwt.verify(serverSessionUserToken, userTokenSecret, {audience: 'expect-server-session-user', issuer: 'expect-user-auth'}, function (err, user) {
+    verifyToken: function (options, callback) {
+      var token = options.token
+      var audience = options.audience
+      jwt.verify(token, rsaPublicKeyPem, {issuer: issuer, audience: audience, algorithm: 'RS256'}, function (err, user) {
         callback(err || !user, user)
       })
     },
-    refreshServerSessionUserToken: function (serverSessionUserToken, callback) { // verify token and create a new one to extend the lifetime
-      jwt.verify(serverSessionUserToken, userTokenSecret, {audience: 'expect-server-session-user', issuer: 'expect-user-auth'}, function (err, user) {
+    refreshToken: function (options, callback) {
+      var token = options.token
+      var audience = options.audience
+      jwt.verify(token, rsaPublicKeyPem, {issuer: issuer, audience: audience, algorithm: 'RS256'}, function (err, user) {
         if (err) {
           return callback(err, false)
         }
         // TODO: it should only sign a new token if the old one is older than 1 hour - we don't need to sign tokens on every request!
-        jwt.sign(user, userTokenSecret, {expiresIn: userTokenExpiresIn, issuer: 'expect-user-auth', audience: 'expect-server-session-user'}, function (serverSessionUserToken) {
-          callback(false, user, serverSessionUserToken)
+        jwt.sign(user, rsaPrivateKeyPem, {expiresIn: userTokenExpiresIn, issuer: issuer, audience: audience, algorithm: 'RS256'}, function (token) {
+          callback(false, user, token)
         })
       })
     },
-    createUser: function (credentials, callback) { // issue token and create new account, storing email and hash(password)
+    createUser: function (credentials, callback) {
+      // if type: email
       userAuthenticationDataStore.getHash(credentials, function (errHashLookup, hash) {
         if (hash) {
           return callback('UUID_FOR_TYPE_EXISTS')
@@ -54,6 +68,8 @@ module.exports = function (options) {
           })
         })
       })
+      // if type: facebook
+      // TODO: check validity of token, check to see if facebook id is there, if not, make a new user and associate it with the facebook id
     },
     destroyUser: function (credentials, callback) {
       userAuthenticationDataStore.getHash(credentials, function (errHashLookup, hash) {
@@ -66,5 +82,7 @@ module.exports = function (options) {
         })
       })
     }
+    // sign a POST action as a JWT token, authorizing the user - so perhaps middleware that checks req.session.userToken and req.method for POST and signs and notarizes the transaction
+    // notarize a POST action with a valid JWT token, issuing another token with a timestamp
   }
 }

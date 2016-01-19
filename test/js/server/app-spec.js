@@ -1,23 +1,48 @@
 var test = require('tapes')
 
-var methods = ['log', 'warn']
+// var methods = ['log', 'warn']
 
-methods.forEach(function (method) {
-  var old = console[method]
-  console[method] = function () {
-    var stack = (new Error()).stack.split(/\n/)
-    // Chrome includes a single "Error" line, FF doesn't.
-    if (stack[0].indexOf('Error') === 0) {
-      stack = stack.slice(1)
-    }
-    var args = [].slice.apply(arguments).concat([stack[1].trim()])
-    return old.apply(console, args)
-  }
-})
+// methods.forEach(function (method) {
+//   var old = console[method]
+//   console[method] = function () {
+//     var stack = (new Error()).stack.split(/\n/)
+//     // Chrome includes a single "Error" line, FF doesn't.
+//     if (stack[0].indexOf('Error') === 0) {
+//       stack = stack.slice(1)
+//     }
+//     var args = [].slice.apply(arguments).concat([stack[1].trim()])
+//     return old.apply(console, args)
+//   }
+// })
 
 var universalAppSpec = require('../universal-app-spec')
 var serverApp = require('../../../src/js/server/app.js')
 var defaultTitle = 'Test'
+
+// var stackTrace = require('stack-trace')
+
+// serverApp({
+//   app: {
+//     use: function (middleware) {
+//       // let's see what our app middleware is!
+//       // console.log(middleware)
+//       try {
+//         middleware()
+//       } catch (err) {
+//         var trace = stackTrace.parse(err)
+//         var middlewareLayer = trace[0]
+//         var fileName = middlewareLayer.fileName
+//         var dirRoot = '/Users/williamcotton/Projects/universal-react/'
+//         var middlewareFile = fileName.split(dirRoot)[1]
+//         //console.log(middlewareFile)
+//         //console.log(trace)
+//         // console.log(err.stack)
+//       }
+//     },
+//     post: function () {},
+//     get: function () {}
+//   }
+// })
 
 test('serverApp', function (t) {
   var testServerApp = require('./test-server-app')({

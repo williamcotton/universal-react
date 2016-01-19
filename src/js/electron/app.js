@@ -1,5 +1,4 @@
 module.exports = function (options) {
-
   /*
 
     app
@@ -7,8 +6,6 @@ module.exports = function (options) {
     electron browser version
 
   */
-
-  var RootComponent = require('../../jsx/root-component.jsx')
 
   var express = require('browser-express')
   var app = express({
@@ -19,20 +16,15 @@ module.exports = function (options) {
     window: options.window
   })
 
-  var reactRenderApp = require('../browser/react-render-app')
+  var expectReactRenderer = require('../lib/expect-browser-react-renderer')
 
-  app.use(reactRenderApp({
-    RootComponent: RootComponent,
+  app.use(expectReactRenderer({
+    RootComponent: require('../../jsx/root-component.jsx'),
     app: app,
-    contentProps: {},
     rootDOMId: 'universal-app-container',
-    defaultTitle: 'Universal App',
     document: options.document,
     localStorage: options.localStorage
   }))
-
-  // expect-server-render-app
-  // expect-browser-render-app
 
   /*
 
