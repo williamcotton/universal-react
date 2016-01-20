@@ -1,5 +1,6 @@
 module.exports = function (options) {
   var defaultTitle = options.defaultTitle
+  var bookshelf = options.bookshelf
 
   var fs = require('fs')
 
@@ -60,6 +61,22 @@ module.exports = function (options) {
   app.post('/user.json', function (req, res) {
     res.send(req.user)
   })
+
+  var Song = bookshelf.Model.extend({
+    tableName: 'songs'
+  })
+
+  var expectBookshelfModel = require('../lib/expect-server-bookshelf-model')
+
+  app.use(expectBookshelfModel({
+    app: app,
+    model: Song,
+    beforeFind: function (song, callback) {
+      song.set({read_count: song.get('read_count') + 1})
+      song.save()
+      callback(song)
+    }
+  }))
 
   /*
 

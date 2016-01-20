@@ -51,9 +51,16 @@ module.exports = function (options) {
 
   app.post('/user.json', function (req, res) {
     request({url: '/user.json', method: 'post', json: req.body}, function (err, _res, body) {
-      console.log('POST /user.json', body)
+      res.send(body)
     })
   })
+
+  var expectApiModel = require('../lib/expect-browser-api-model')
+
+  app.use(expectApiModel({
+    tableName: 'songs',
+    request: request
+  }))
 
   /*
 

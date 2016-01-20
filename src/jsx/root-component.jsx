@@ -1,15 +1,14 @@
 var React = require('react')
 
-var ReactBootstrap = require('react-bootstrap')
+var Bootstrap = require('react-bootstrap')
 
-var Navbar = ReactBootstrap.Navbar
-var Nav = ReactBootstrap.Nav
-var NavDropdown = ReactBootstrap.NavDropdown
-var NavItem = ReactBootstrap.NavItem
-var MenuItem = ReactBootstrap.MenuItem
+var Navbar = Bootstrap.Navbar
+var Nav = Bootstrap.Nav
+var NavItem = Bootstrap.NavItem
 
 var RootComponent = React.createClass({
   propTypes: {
+    user: React.PropTypes.object,
     content: React.PropTypes.element
   },
   render: function () {
@@ -25,6 +24,7 @@ var RootComponent = React.createClass({
         <Nav pullLeft>
           <NavItem href='/about'>About</NavItem>
           <NavItem href='/calculator'>Calculator</NavItem>
+          <NavItem href='/songs'>Songs</NavItem>
         </Nav>
         <Nav pullRight>
           { this.props.user ? <Navbar.Text>{this.props.user.email}</Navbar.Text> : <NavItem href='/login'>Login</NavItem> }

@@ -16,6 +16,15 @@ module.exports = function (options, callback) {
 
   serverAppConfig.userAuthenticationDataStore = userAuthenticationDataStore
 
+  var knex = require('knex')({
+    client: 'pg',
+    debug: false
+  })
+
+  var bookshelf = require('bookshelf')(knex)
+
+  serverAppConfig.bookshelf = bookshelf
+
   var server, serverAppInstance
 
   var setup = function (callback) {

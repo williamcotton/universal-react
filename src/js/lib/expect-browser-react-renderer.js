@@ -10,6 +10,12 @@ var reactRenderApp = function (options) {
   var formatTitle = options.formatTitle || function (defaultTitle, title) { return defaultTitle + (title ? ' - ' + title : '') }
   return function (req, res, next) {
     res.redirect = app.navigate
+    res.send = function (data) {
+      if (typeof data === 'object') {
+        data = JSON.stringify(data)
+      }
+      options.document.getElementById(options.rootDOMId).innerHTML = data
+    }
     res.renderApp = function (content, opts) {
       var rootProps = {}
       var contentProps = {}

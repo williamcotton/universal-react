@@ -43,7 +43,7 @@ module.exports = function (options) {
   // expect-browser-csrf
   expectReactRenderer.use(require('../lib/expect-browser-csrf')())
 
-  expectReactRenderer.use(function (req, res, contentProps, rootProps, next) { // this can be a plugin
+  expectReactRenderer.use(function (req, res, contentProps, rootProps, next) {
     var user = req.user
     contentProps.user = user
     rootProps.user = user
@@ -56,7 +56,7 @@ module.exports = function (options) {
       if (credentialStatus.errors) {
         return callback(credentialStatus.errors, false)
       }
-      request({method: 'post', url: req.path + '.json', json: credentials, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+      request({method: 'post', url: req.path + '.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
         var errors
         if (err || !res || !res.body) {
           errors = [err]
@@ -73,7 +73,7 @@ module.exports = function (options) {
       })
     }
     req.login = function (credentials, callback) {
-      request({method: 'post', url: req.path + '.json', json: credentials, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+      request({method: 'post', url: req.path + '.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
         if (err || !res || !res.body) {
           var errors = [err]
           return callback(errors, false)

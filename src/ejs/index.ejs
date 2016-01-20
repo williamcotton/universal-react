@@ -12,8 +12,6 @@
 </head>
 <body>
   <div id="<%- rootDOMId %>"><%- HTML %></div>
-  <% if (typeof(dontLoadJS) === 'boolean' && !dontLoadJS) { %>
-  <script src='/build.js' type='text/javascript' charset='utf-8'></script>
-  <% } %>
+  <% if (typeof(dontLoadJS) === 'boolean' && !dontLoadJS) { %><script src='/build.js' type='text/javascript' charset='utf-8'></script><% } %>
 </body>
 </html>

@@ -34,7 +34,7 @@ var defaultTitle = 'Test'
 //         var fileName = middlewareLayer.fileName
 //         var dirRoot = '/Users/williamcotton/Projects/universal-react/'
 //         var middlewareFile = fileName.split(dirRoot)[1]
-//         //console.log(middlewareFile)
+//         console.log(middlewareFile)
 //         //console.log(trace)
 //         // console.log(err.stack)
 //       }

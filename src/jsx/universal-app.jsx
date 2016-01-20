@@ -6,17 +6,12 @@ var Calculator = require('./calculator.jsx')
 var Signup = require('./signup.jsx')
 var Welcome = require('./welcome.jsx')
 var Login = require('./login.jsx')
+var ShowCollection = require('./show-collection.jsx')
+var ShowItem = require('./show-item.jsx')
+var EditItem = require('./edit-item.jsx')
 
 var universalApp = function (options) {
   var app = options.app
-
-  // add /signup, /login, /logout routes for user-authentication
-  require('../js/lib/expect-universal-user-authentication')({
-    app: app,
-    login: { component: Login, path: '/login', successRedirect: '/' },
-    signup: { component: Signup, path: '/signup', successRedirect: '/welcome' },
-    logout: { path: '/logout', successRedirect: '/' }
-  })
 
   app.get('/', function (req, res) {
     var content = <FrontPage />
@@ -50,6 +45,14 @@ var universalApp = function (options) {
     res.renderApp(content, {title: 'Calculator'})
   })
 
+  // add /signup, /login, /logout routes for user-authentication
+  require('../js/lib/expect-universal-user-authentication')({
+    app: app,
+    login: { component: Login, path: '/login', successRedirect: '/' },
+    signup: { component: Signup, path: '/signup', successRedirect: '/welcome' },
+    logout: { path: '/logout', successRedirect: '/' }
+  })
+
   var userRequired = function (req, res, next) {
     if (!req.user) {
       var content = <h2>Login Required!</h2>
@@ -61,6 +64,45 @@ var universalApp = function (options) {
   app.get('/welcome', userRequired, function (req, res) {
     var content = <Welcome />
     res.renderApp(content, {title: 'Welcome'})
+  })
+
+  var songCreateCells = {
+    stars: function (item, col) {
+      var getStarsGlyph = function (numberOfStars) {
+        numberOfStars = parseInt(numberOfStars)
+        var x = function (c, t) { return Array(t + 1).join(c) }
+        return x('★', numberOfStars) + x('☆', 5 - numberOfStars)
+      }
+      var numberOfStars = item[col]
+      return getStarsGlyph(numberOfStars)
+    }
+  }
+
+  app.get('/songs', function (req, res) {
+    req.songs.findAll(function (songs) {
+      var content = <ShowCollection collection={songs} name='Songs' createCells={songCreateCells} baseUrl='/songs' />
+      res.renderApp(content, {title: 'All Songs'})
+    })
+  })
+
+  app.get('/songs/:id', function (req, res) {
+    req.songs.find({id: req.params.id}, function (song) {
+      var content = <ShowItem item={song} name='Song' createCells={songCreateCells} />
+      res.renderApp(content, {title: 'All Songs'})
+    })
+  })
+
+  app.get('/songs/:id/edit', function (req, res) {
+    req.songs.find({id: req.params.id}, function (song) {
+      var content = <EditItem item={song} name='Song' createCells={songCreateCells} baseUrl='/songs'/>
+      res.renderApp(content, {title: 'All Songs'})
+    })
+  })
+
+  app.post('/songs/:id', function (req, res) {
+    req.songs.update({id: req.params.id}, req.body, function (song) {
+      res.redirect(req.path)
+    })
   })
 
   return app

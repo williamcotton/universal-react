@@ -164,7 +164,7 @@ module.exports = function (options) {
       delete req.session.userToken
       callback(false)
     }
-    if (req.session && req.session.userToken) {
+    if (req.session && req.session.userToken && !req.user) {
       userAuthenticationService.refreshToken({token: req.session.userToken, audience: 'expect-server-session-user'}, function (err, user, token) {
         if (!err && user && token) {
           req.user = user
