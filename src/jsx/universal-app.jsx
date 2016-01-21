@@ -113,11 +113,20 @@ var universalApp = function (options) {
     })
   })
 
+  // TODO: add browser-express support for app.put
   app.post('/songs/:id', userRequired, function (req, res) {
     req.songs.update({id: req.params.id}, req.body, function (song) {
       res.redirect(req.path)
     })
   })
+
+  /* TODO: add browser-express support for app.delete
+  app.delete('/songs/:id', userRequired, function (req, res) {
+    req.songs.update({id: req.params.id}, req.body, function (song) {
+      res.redirect(req.path)
+    })
+  })
+  */
 
   return app
 }

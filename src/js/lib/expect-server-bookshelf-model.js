@@ -57,7 +57,6 @@ module.exports = function (options) {
     }
     next()
   }
-
   app.get(baseUrl + '/template.json', userRequired, function (req, res) {
     template(function (item) {
       res.send(item)
