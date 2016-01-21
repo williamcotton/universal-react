@@ -33,7 +33,7 @@ var ShowAll = React.createClass({
         return <td key={modelProp}>{content}</td>
       }
       return <tr key={item.id}>
-        {user ? <td><Glyphicon glyph='edit' /></td> : false}
+        {user ? <td><a href={baseUrl + '/' + item.id + '/edit'}><Glyphicon glyph='edit' /></a></td> : false}
         {modelProperties.map(createCell)}
       </tr>
     }

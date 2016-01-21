@@ -1,10 +1,10 @@
 var async = require('async')
+var React = require('react')
+var ReactDOM = require('react-dom')
 
 var middlewareStack = []
 
 var reactRenderApp = function (options) {
-  var React = require('react')
-  var ReactDOM = require('react-dom')
   var RootComponent = options.RootComponent ? React.createFactory(options.RootComponent) : React.createClass({propTypes: { content: React.PropTypes.element }, render: function () { return React.DOM.div({ className: 'universal-app-container' }, this.props.content) }})
   var app = options.app
   var formatTitle = options.formatTitle || function (defaultTitle, title) { return defaultTitle + (title ? ' - ' + title : '') }

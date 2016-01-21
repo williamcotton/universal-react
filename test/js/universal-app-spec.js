@@ -12,7 +12,7 @@ module.exports = function (options) {
 
   expectUniversalApp.rootComponentToBeRendered(t)
   expectUniversalApp.defaultTitleToBeRendered(t)
-  expectUniversalApp.allGetRoutesToBeRendered(t, {ignore: ['/logout', '/songs']})
+  expectUniversalApp.allGetRoutesToBeRendered(t, {ignore: ['/logout', '/songs', '/songs/:id', '/songs/:id/edit']})
   expectUniversalApp.getRouteClasses(t)
 
   t.test('should POST /calculate and get the correct result', function (t) {

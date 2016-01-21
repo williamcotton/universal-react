@@ -15,6 +15,9 @@ var ShowItem = React.createClass({
       modelProperties.push(prop)
     }
     var createCell = function (modelProp) {
+      if (modelProp === 'id') {
+        return
+      }
       var content = item[modelProp]
       if (createCells[modelProp]) {
         content = createCells[modelProp](item, modelProp)
@@ -23,12 +26,10 @@ var ShowItem = React.createClass({
         {content}
       </Panel>
     }
-    return (
-    <div className='show-item-container'>
-        <h1>{name}</h1>
-        {modelProperties.map(createCell)}
-      </div>
-    )
+    return <div className='show-item-container'>
+      <h1>{name}</h1>
+      {modelProperties.map(createCell)}
+    </div>
   }
 })
 

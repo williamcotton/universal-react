@@ -58,7 +58,7 @@ module.exports = function (options) {
   var expectApiModel = require('../lib/expect-browser-api-model')
 
   app.use(expectApiModel({
-    tableName: 'songs',
+    reqProp: 'songs',
     request: request
   }))
 

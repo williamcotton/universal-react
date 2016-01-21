@@ -70,7 +70,9 @@ module.exports = function (options) {
 
   app.use(expectBookshelfModel({
     app: app,
-    model: Song,
+    bookshelf: bookshelf,
+    Model: Song,
+    reqProp: 'songs',
     beforeFind: function (song, callback) {
       song.set({read_count: song.get('read_count') + 1})
       song.save()
