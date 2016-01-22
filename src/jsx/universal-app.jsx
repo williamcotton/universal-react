@@ -49,7 +49,6 @@ var universalApp = function (options) {
     res.renderApp(content, {title: 'Calculator'})
   })
 
-  // add /signup, /login, /logout routes for user-authentication
   require('../js/lib/expect-universal-user-authentication')({
     app: app,
     login: { component: Login, successRedirect: '/welcome' },
@@ -124,7 +123,6 @@ var universalApp = function (options) {
     })
   })
 
-  // app.put could ignore pushState
   app.post('/songs/:id', userRequired, function (req, res) {
     req.songs.update({id: req.params.id}, req.body, function (song) {
       var title = 'Updated ' + song.name
@@ -133,7 +131,6 @@ var universalApp = function (options) {
     })
   })
 
-  // app.delete could ignore pushState
   app.post('/songs/:id/delete', userRequired, function (req, res) {
     req.songs.delete({id: req.params.id}, req.body, function (song) {
       var title = 'Removed ' + song.name
