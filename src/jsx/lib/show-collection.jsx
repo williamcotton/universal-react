@@ -9,13 +9,13 @@ var ShowAll = React.createClass({
     name: React.PropTypes.string
   },
   render: function () {
-    var name = this.props.name
+    var title = this.props.title
     var user = this.props.user
     var collection = this.props.collection
     var baseUrl = this.props.baseUrl
     var createCells = this.props.createCells
     if (collection.length === 0) {
-      return <h1>There are no {name}s.</h1>
+      return <h1>There are no items.</h1>
     }
     var modelProperties = []
     for (var prop in collection[0]) {
@@ -41,7 +41,7 @@ var ShowAll = React.createClass({
       return <th key={modelProp}>{modelProp}</th>
     }
     return <div className={'show-all-container'}>
-      <h1>All {name}</h1>
+      <h1>{title}</h1>
       <Table striped bordered condensed hover>
         <thead>
           <tr>

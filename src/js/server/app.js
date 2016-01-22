@@ -8,6 +8,7 @@ module.exports = function (options) {
   var rsaPublicKeyPem = fs.readFileSync(__dirname + '/../../../expect-user-authentication-service-public.pem')
 
   var userAuthenticationService = require('../lib/expect-user-authentication-service')({
+    emailService: options.emailService,
     userAuthenticationDataStore: options.userAuthenticationDataStore,
     rsaPrivateKeyPem: rsaPrivateKeyPem,
     rsaPublicKeyPem: rsaPublicKeyPem,
@@ -69,10 +70,10 @@ module.exports = function (options) {
   var expectBookshelfModel = require('../lib/expect-server-bookshelf-model')
 
   app.use(expectBookshelfModel({
+    reqProp: 'songs',
     app: app,
     bookshelf: bookshelf,
     Model: Song,
-    reqProp: 'songs',
     beforeFind: function (song, callback) {
       song.set({read_count: song.get('read_count') + 1})
       song.save()

@@ -14,6 +14,8 @@ var knex = require('knex')({
   connection: BOOKSHELF_MODELS
 })
 
+var emailService
+
 var bookshelf = require('bookshelf')(knex)
 
 pg.connect(EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL, function (err, pgClient, done) {
@@ -28,6 +30,7 @@ pg.connect(EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL, function (err, pg
     defaultTitle: defaultTitle,
     nodeEnv: nodeEnv,
     userAuthenticationDataStore: userAuthenticationDataStore,
+    emailService: emailService,
     bookshelf: bookshelf
   })
 

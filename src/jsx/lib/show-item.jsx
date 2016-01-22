@@ -7,7 +7,7 @@ var Panel = Bootstrap.Panel
 var ShowItem = React.createClass({
   render: function () {
     var item = this.props.item
-    var name = this.props.name
+    var title = this.props.title
     var createCells = this.props.createCells
     var baseUrl = this.props.baseUrl
     var modelProperties = []
@@ -27,7 +27,7 @@ var ShowItem = React.createClass({
       </Panel>
     }
     return <div className='show-item-container'>
-      <h1>{name}</h1>
+      <h1>{title}</h1>
       {modelProperties.map(createCell)}
     </div>
   }

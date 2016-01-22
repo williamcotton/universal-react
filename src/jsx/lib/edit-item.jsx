@@ -9,7 +9,7 @@ var ButtonInput = Bootstrap.ButtonInput
 var EditItem = React.createClass({
   render: function () {
     var item = this.props.item
-    var name = this.props.name
+    var title = this.props.title
     var createCells = this.props.createCells
     var baseUrl = this.props.baseUrl
     var modelProperties = []
@@ -36,7 +36,7 @@ var EditItem = React.createClass({
       </Panel>
     }
     return <div className='edit-item-container'>
-      <h1>Edit {name}</h1>
+      <h1>{title}</h1>
       <form action={baseUrl + '/' + item.id} method='post'>
         <input type='hidden' name='_csrf' value={this.props.csrf} />
         {modelProperties.map(createCell)}

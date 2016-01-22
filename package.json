@@ -35,7 +35,7 @@
     "bcrypt": "^0.8.5",
     "body-parser": "^1.14.2",
     "bookshelf": "^0.9.1",
-    "browser-express": "^1.5.1",
+    "browser-express": "^1.6.0",
     "browser-request": "^0.3.3",
     "browserify": "^12.0.1",
     "compression": "^1.5.2",

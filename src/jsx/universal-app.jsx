@@ -6,10 +6,10 @@ var Calculator = require('./calculator.jsx')
 var Signup = require('./signup.jsx')
 var Welcome = require('./welcome.jsx')
 var Login = require('./login.jsx')
-var ShowCollection = require('./show-collection.jsx')
-var ShowItem = require('./show-item.jsx')
-var EditItem = require('./edit-item.jsx')
-var NewItem = require('./new-item.jsx')
+var ShowCollection = require('./lib/show-collection.jsx')
+var ShowItem = require('./lib/show-item.jsx')
+var EditItem = require('./lib/edit-item.jsx')
+var NewItem = require('./lib/new-item.jsx')
 
 var universalApp = function (options) {
   var app = options.app
@@ -81,52 +81,61 @@ var universalApp = function (options) {
 
   app.get('/songs', function (req, res) {
     req.songs.findAll(function (songs) {
-      var content = <ShowCollection collection={songs} name='Songs' createCells={songCreateCells} baseUrl='/songs' />
-      res.renderApp(content, {title: 'All Songs'})
+      var title = 'All Songs'
+      var content = <ShowCollection collection={songs} title={title} createCells={songCreateCells} baseUrl='/songs' />
+      res.renderApp(content, {title: title})
     })
   })
 
   app.get('/songs/new', userRequired, function (req, res) {
     req.songs.template(function (songTemplate) {
-      var content = <NewItem itemTemplate={songTemplate} name='Song' createCells={songCreateCells} baseUrl='/songs'/>
-      res.renderApp(content, {title: 'All Songs'})
+      var title = 'New Song'
+      var content = <NewItem itemTemplate={songTemplate} title={title} createCells={songCreateCells} baseUrl='/songs'/>
+      res.renderApp(content, {title: title})
     })
   })
 
   app.post('/songs/create', userRequired, function (req, res) {
     req.songs.create(req.body, function (song) {
-      res.redirect('/songs/' + song.id)
+      var title = 'Created ' + song.name
+      var content = <ShowItem item={song} title={title} createCells={songCreateCells} />
+      res.renderApp(content, {title: title})
     })
   })
 
   app.get('/songs/:id', function (req, res) {
     req.songs.find({id: req.params.id}, function (song) {
-      var content = <ShowItem item={song} name='Song' createCells={songCreateCells} />
-      res.renderApp(content, {title: 'All Songs'})
+      var title = song.name
+      var content = <ShowItem item={song} title={title} createCells={songCreateCells} />
+      res.renderApp(content, {title: title})
     })
   })
 
   app.get('/songs/:id/edit', userRequired, function (req, res) {
     req.songs.find({id: req.params.id}, function (song) {
-      var content = <EditItem item={song} name='Song' createCells={songCreateCells} baseUrl='/songs'/>
-      res.renderApp(content, {title: 'All Songs'})
+      var title = 'Editing ' + song.name
+      var content = <EditItem item={song} title={title} createCells={songCreateCells} baseUrl='/songs'/>
+      res.renderApp(content, {title: title})
     })
   })
 
-  // TODO: add browser-express support for app.put
+  // app.put could ignore pushState
   app.post('/songs/:id', userRequired, function (req, res) {
     req.songs.update({id: req.params.id}, req.body, function (song) {
-      res.redirect(req.path)
+      var title = 'Updated ' + song.name
+      var content = <ShowItem item={song} title={title} createCells={songCreateCells} />
+      res.renderApp(content, {title: title})
     })
   })
 
-  /* TODO: add browser-express support for app.delete
-  app.delete('/songs/:id', userRequired, function (req, res) {
-    req.songs.update({id: req.params.id}, req.body, function (song) {
-      res.redirect(req.path)
+  // app.delete could ignore pushState
+  app.post('/songs/:id/delete', userRequired, function (req, res) {
+    req.songs.delete({id: req.params.id}, req.body, function (song) {
+      var title = 'Removed ' + song.name
+      //var content = <RemovedItem item={song} title={title} createCells={songCreateCells} />
+      //res.renderApp(content, {title: title})
     })
   })
-  */
 
   return app
 }

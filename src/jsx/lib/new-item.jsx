@@ -9,7 +9,7 @@ var ButtonInput = Bootstrap.ButtonInput
 var NewItem = React.createClass({
   render: function () {
     var itemTemplate = this.props.itemTemplate
-    var name = this.props.name
+    var title = this.props.title
     var baseUrl = this.props.baseUrl
     var modelProperties = []
     for (var prop in itemTemplate) {
@@ -38,7 +38,7 @@ var NewItem = React.createClass({
       </Panel>
     }
     return <div className='new-item-container'>
-      <h1>New {name}</h1>
+      <h1>{title}</h1>
       <form action={baseUrl + '/create'} method='post'>
         <input type='hidden' name='_csrf' value={this.props.csrf} />
         {modelProperties.map(createCell)}
