@@ -3,6 +3,7 @@ var ReactBootstrap = require('react-bootstrap')
 
 var ButtonInput = ReactBootstrap.ButtonInput
 var Input = ReactBootstrap.Input
+var Alert = ReactBootstrap.Alert
 
 var ResetPassword = React.createClass({
   propTypes: {
@@ -13,6 +14,7 @@ var ResetPassword = React.createClass({
     var formAction = this.props.formAction
     return <div className='reset-password-container'>
       <h1>Reset Password</h1>
+      { this.props.expired ? <Alert bsStyle='warning'>Your password reset token has expired. Please start over.</Alert> : false }
       <form action={formAction} method='post'>
         <input type='hidden' name='_csrf' value={this.props.csrf} />
         <p>Forgot your password?</p>

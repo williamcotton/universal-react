@@ -8,6 +8,7 @@ var Welcome = require('./welcome.jsx')
 var Login = require('./login.jsx')
 var ResetPassword = require('./reset-password.jsx')
 var NewPassword = require('./new-password.jsx')
+var ResetPasswordEmailSent = require('./reset-password-email-sent.jsx')
 var ShowCollection = require('./lib/show-collection.jsx')
 var ShowItem = require('./lib/show-item.jsx')
 var EditItem = require('./lib/edit-item.jsx')
@@ -51,11 +52,11 @@ var universalApp = function (options) {
   // add /signup, /login, /logout routes for user-authentication
   require('../js/lib/expect-universal-user-authentication')({
     app: app,
-    login: { component: Login, path: '/login', successRedirect: '/' },
-    signup: { component: Signup, path: '/signup', successRedirect: '/welcome' },
-    logout: { path: '/logout', successRedirect: '/' },
-    resetPassword: { component: ResetPassword, path: '/reset_password', successRedirect: '/' },
-    newPassword: { component: NewPassword, path: '/new_password', successRedirect: '/login' }
+    login: { component: Login, successRedirect: '/welcome' },
+    signup: { component: Signup, successRedirect: '/welcome' },
+    logout: { successRedirect: '/' },
+    resetPassword: { component: ResetPassword, successComponent: ResetPasswordEmailSent },
+    newPassword: { component: NewPassword }
   })
 
   var userRequired = function (req, res, next) {

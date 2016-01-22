@@ -3,28 +3,29 @@ var ReactBootstrap = require('react-bootstrap')
 
 var Input = ReactBootstrap.Input
 var ButtonInput = ReactBootstrap.ButtonInput
+var Alert = ReactBootstrap.Alert
 
 var Login = React.createClass({
   propTypes: {
-    loggedIn: React.PropTypes.object,
-    uuid: React.PropTypes.number,
-    formAction: React.PropTypes.string
+    error: React.PropTypes.object,
+    uuid: React.PropTypes.string,
+    formAction: React.PropTypes.string,
+    updatePasswordSuccess: React.PropTypes.bool
   },
   render: function () {
-    var loggedIn = this.props.loggedIn
-    var email = this.props.uuid
+    var error = this.props.error
+    var updatePasswordSuccess = this.props.updatePasswordSuccess
     var formAction = this.props.formAction
     return <div className='login-container'>
       <h1>Login</h1>
+      { updatePasswordSuccess ? <Alert bsStyle='success'>You have successfully reset your password.</Alert> : false }
       <form action={formAction} method='post'>
         <input type='hidden' name='_csrf' value={this.props.csrf} />
         <input type='hidden' name='type' value='email' />
-        <Input name='uuid' type='text' label='Email Address' />
-        <Input name='password' type='password' label='Password' />
+        <Input name='uuid' type='text' label='Email Address' defaultValue={this.props.uuid} />
+        <Input bsStyle={ error ? 'error' : ''} name='password' type='password' label='Password' />
         <ButtonInput type='submit' value='Login' />
-        <div className='result'>
-          { !loggedIn && email ? 'We are sorry ' + email + ', but there was an error logging in!' : false }
-        </div>
+        <a href='/reset_password'>Forgot Password?</a>
       </form>
     </div>
   }

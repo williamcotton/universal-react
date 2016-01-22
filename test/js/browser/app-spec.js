@@ -21,7 +21,7 @@ test('browserApp', function (t) {
     t.test('should /signup', function (t) {
       baseRequest({url: '/signup'}, function (err, res, body) {
         rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
-          t.equal(res.headers.location, '/welcome', 'redirect to welcome page')
+          t.equal(res.headers.location, '/welcome', 'redirect to /wecome')
           t.end()
         })
       })
@@ -30,7 +30,7 @@ test('browserApp', function (t) {
     t.test('should /login', function (t) {
       baseRequest({url: '/login'}, function (err, res, body) {
         rq({followRedirect: false, method: 'post', url: '/login', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234'}}, function ($, res) {
-          t.equal(res.headers.location, '/', 'redirect to front page')
+          t.equal(res.headers.location, '/welcome', 'redirect to /welcome')
           t.end()
         })
       })

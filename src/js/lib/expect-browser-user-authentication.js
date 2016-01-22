@@ -51,6 +51,8 @@ module.exports = function (options) {
   })
 
   return function (req, res, next) { // this can be a plugin
+    window.req = req
+    window.res = res
     req.signup = function (credentials, callback) {
       var credentialStatus = validateCredentials(credentials)
       if (credentialStatus.errors) {
@@ -74,8 +76,13 @@ module.exports = function (options) {
     }
     req.login = function (credentials, callback) {
       request({method: 'post', url: '/login.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+        var errors
         if (err || !res || !res.body) {
-          var errors = [err]
+          errors = [err]
+          return callback(errors, false)
+        }
+        if (res.statusCode >= 500) {
+          errors = [res.body]
           return callback(errors, false)
         }
         var user = res.body
@@ -86,12 +93,31 @@ module.exports = function (options) {
     }
     req.sendResetPasswordEmail = function (options, callback) {
       request({method: 'post', url: '/send_reset_password_email.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+        var errors
         if (err || !res || !res.body) {
-          var errors = [err]
+          errors = [err]
+          return callback(errors, false)
+        }
+        if (res.statusCode >= 500) {
+          errors = [res.body]
           return callback(errors, false)
         }
         var emailReceipt = res.body
         callback(err, emailReceipt)
+      })
+    }
+    req.checkResetPasswordToken = function (options, callback) {
+      request({method: 'post', url: '/check_reset_password_token.json', json: options, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+        var errors
+        if (err || !res || !res.body) {
+          errors = [err]
+          return callback(errors, false)
+        }
+        if (res.statusCode >= 500) {
+          errors = res.body
+          return callback(errors, false)
+        }
+        callback(err, res.body)
       })
     }
     req.updatePassword = function (options, callback) {
@@ -105,8 +131,7 @@ module.exports = function (options) {
           errors = res.body
           return callback(errors, false)
         }
-        var success = res.body
-        callback(err, success)
+        callback(err, res.body)
       })
     }
     req.logout = function (callback) {

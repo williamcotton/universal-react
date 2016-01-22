@@ -33,6 +33,7 @@ module.exports = function (options) {
   var userAuthenticationService = options.userAuthenticationService
   var verificationSuccessPath = options.verificationSuccessPath
   var newPasswordPath = options.newPasswordPath
+  var expiredResetPasswordTokenPath = options.expiredResetPasswordTokenPath || '/reset_password'
   var expectReactRenderer = options.expectReactRenderer
   var app = options.app
 
@@ -96,6 +97,8 @@ module.exports = function (options) {
     userAuthenticationService.verifyResetPasswordUrlToken({token: token}, function (err, credentials) {
       if (credentials) {
         res.redirect(newPasswordPath + '?token=' + token)
+      } else if (err === 'TOKEN_EXPIRED') {
+        res.redirect(expiredResetPasswordTokenPath + '?expired=true')
       } else {
         res.redirect('/')
       }
@@ -159,16 +162,28 @@ module.exports = function (options) {
     })
   })
 
+  app.post('/check_reset_password_token.json', function (req, res) {
+    authMiddleware(req, res, function () {
+      var token = req.body.token
+      req.checkResetPasswordToken({token: token}, function (err, credentials) {
+        if (err) {
+          return res.status(500).send(err)
+        }
+        res.send(credentials)
+      })
+    })
+  })
+
   app.post('/update_password.json', function (req, res) {
     authMiddleware(req, res, function () {
       var token = req.body.token
       var password = req.body.password
       var repeatPassword = req.body.repeat_password
-      req.updatePassword({token: token, password: password, repeatPassword: repeatPassword}, function (err, user) {
+      req.updatePassword({token: token, password: password, repeatPassword: repeatPassword}, function (err, credentials) {
         if (err) {
           return res.status(500).send(err)
         }
-        res.send(true)
+        res.send(credentials)
       })
     })
   })
@@ -230,6 +245,15 @@ module.exports = function (options) {
         })
       })
     }
+    req.checkResetPasswordToken = function (options, callback) {
+      var token = options.token
+      userAuthenticationService.verifyResetPasswordUrlToken({token: token}, function (err, credentials) {
+        if (err) {
+          return callback([err], false)
+        }
+        callback(false, credentials)
+      })
+    }
     req.updatePassword = function (options, callback) {
       var token = options.token
       var password = options.password
@@ -252,7 +276,7 @@ module.exports = function (options) {
           return callback(credentialStatus.errors, false)
         }
         userAuthenticationService.setNewPassword({token: token, newPassword: password}, function (err, credentials) {
-          callback(err, true)
+          callback(err, credentials)
         })
       })
     }

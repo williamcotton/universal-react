@@ -13,6 +13,7 @@ module.exports = function (options) {
   var loginComponent = React.createFactory(login.component)
   var resetPasswordComponent = React.createFactory(resetPassword.component)
   var newPasswordComponent = React.createFactory(newPassword.component)
+  var resetPasswordSuccessComponent = React.createFactory(resetPassword.successComponent)
 
   var signupPath = signup.path || '/signup'
   var loginPath = login.path || '/login'
@@ -23,8 +24,8 @@ module.exports = function (options) {
   var signupSuccessRedirect = signup.successRedirect || '/'
   var loginSuccessRedirect = login.successRedirect || '/'
   var logoutSuccessRedirect = logout.successRedirect || '/'
-  var resetPasswordSuccessRedirect = resetPassword.successRedirect || '/'
-  var newPasswordSuccessRedirect = newPassword.successRedirect || '/'
+  var resetPasswordSuccessRedirect = resetPassword.successRedirect || '/reset_password_email_sent'
+  var newPasswordSuccessRedirect = newPassword.successRedirect || '/login'
 
   var signupTitle = signup.title || 'Signup'
   var loginTitle = login.title || 'Login'
@@ -63,7 +64,9 @@ module.exports = function (options) {
   })
 
   app.get(loginPath, function (req, res) {
-    var content = loginComponent({formAction: loginPath})
+    var uuid = req.query.uuid
+    var updatePasswordSuccess = req.query.update_password_success
+    var content = loginComponent({formAction: loginPath, uuid: uuid, updatePasswordSuccess: updatePasswordSuccess})
     res.renderApp(content, {title: loginTitle})
   })
 
@@ -79,7 +82,7 @@ module.exports = function (options) {
       if (!err) {
         return res.redirect(loginSuccessRedirect)
       } else {
-        content = loginComponent({formAction: loginPath, loggedIn: false, uuid: credentials.uuid})
+        content = loginComponent({formAction: loginPath, error: err, uuid: credentials.uuid})
         title += ' - Errors'
       }
       res.renderApp(content, {title: title})
@@ -93,7 +96,8 @@ module.exports = function (options) {
   })
 
   app.get(resetPasswordPath, function (req, res) {
-    var content = resetPasswordComponent({formAction: resetPasswordPath})
+    var expired = req.query.expired
+    var content = resetPasswordComponent({formAction: resetPasswordPath, expired: expired})
     res.renderApp(content, {title: resetPasswordTitle})
   })
 
@@ -103,7 +107,6 @@ module.exports = function (options) {
       uuid: req.body.uuid
     }
     req[resetPasswordRequestFunction](credentials, function (err, emailReceipt) {
-      console.log(err, emailReceipt)
       var content
       var title = resetPasswordTitle
       if (!err) {
@@ -118,27 +121,38 @@ module.exports = function (options) {
 
   app.get(newPasswordPath, function (req, res) {
     var token = req.query.token
-    var content = newPasswordComponent({token: token, formAction: newPasswordPath})
-    res.renderApp(content, {title: newPasswordTitle})
+    req.checkResetPasswordToken({token: token}, function (err, credentials) {
+      if (!credentials) {
+        return res.redirect(loginPath)
+      }
+      credentials.token = token
+      var content = newPasswordComponent({credentials: credentials, formAction: newPasswordPath})
+      res.renderApp(content, {title: newPasswordTitle})
+    })
   })
 
   app.post(newPasswordPath, function (req, res) {
-    var credentials = {
+    var checkCredentials = {
+      uuid: req.body.uuid,
       token: req.body.token,
       password: req.body.password,
       repeatPassword: req.body.repeat_password
     }
-    req[newPasswordRequestFunction](credentials, function (credentialErrors) {
-      console.log('new passwd', credentialErrors)
+    req[newPasswordRequestFunction](checkCredentials, function (credentialErrors, credentials) {
       var content
       var title = newPasswordTitle
       if (!credentialErrors) {
-        return res.redirect(newPasswordSuccessRedirect)
+        return res.redirect(newPasswordSuccessRedirect + '?uuid=' + credentials.uuid + '&update_password_success=true')
       } else {
-        content = newPasswordComponent({formAction: newPasswordPath, errors: credentialErrors, password: credentials.password, token: credentials.token})
+        content = newPasswordComponent({formAction: newPasswordPath, errors: credentialErrors, credentials: checkCredentials})
         title += ' - Errors'
       }
       res.renderApp(content, {title: title})
     })
+  })
+
+  app.get(resetPasswordSuccessRedirect, function (req, res) {
+    var content = resetPasswordSuccessComponent({})
+    res.renderApp(content, {title: resetPasswordTitle})
   })
 }

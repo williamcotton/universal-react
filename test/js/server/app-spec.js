@@ -77,7 +77,7 @@ test('serverApp', function (t) {
     t.test('should /login (redirect disabled)', function (t) {
       baseRequest({url: '/login'}, function () {
         rq({followRedirect: false, method: 'post', url: '/login', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234'}}, function ($, res) {
-          t.equal(res.headers.location, '/', 'redirects to /')
+          t.equal(res.headers.location, '/welcome', 'redirects to /welcome')
           t.end()
         })
       })
