@@ -6,11 +6,13 @@ module.exports = function (options) {
   var emailService = options.emailService
   var userTokenExpiresIn = options.userTokenExpiresIn
   var verificationPath = options.verificationPath
+  var resetPasswordPath = options.resetPasswordPath
   var issuer = options.issuer || 'expect-user-auth' // issuer owns rsaPrivateKeyPem and rsaPublicKeyPem
   var rsaPrivateKeyPem = options.rsaPrivateKeyPem // openssl genrsa -out expect-user-authentication-service.pem 1024
   var rsaPublicKeyPem = options.rsaPublicKeyPem // openssl rsa -in expect-user-authentication-service.pem -pubout -out expect-user-authentication-service-public.pem
-  var userAuthService = {
+  var userAuthenticationService = {
     verificationPath: verificationPath,
+    resetPasswordPath: resetPasswordPath,
     getToken: function (options, callback) {
       var credentials = options.credentials
       var password = credentials.password
@@ -57,29 +59,29 @@ module.exports = function (options) {
         })
       })
     },
+    getCredentials: function (options, callback) {
+      userAuthenticationDataStore.getUserCredentials(options, function (err, credentials) {
+        callback(err, {
+          uuid: credentials.uuid,
+          type: credentials.type,
+          verified: credentials.verified
+        })
+      })
+    },
     createVerificationUrl: function (options, callback) {
       var audience = 'expect-verification-url'
-      var user = {
+      var credentials = {
         uuid: options.uuid,
         type: options.type
       }
-      jwt.sign(user, rsaPrivateKeyPem, {expiresIn: userTokenExpiresIn, issuer: issuer, audience: audience, algorithm: 'RS256'}, function (token) {
+      jwt.sign(credentials, rsaPrivateKeyPem, {expiresIn: userTokenExpiresIn, issuer: issuer, audience: audience, algorithm: 'RS256'}, function (token) {
         var verificationUrl = options.baseUrl + verificationPath.replace(':token', token)
         callback(false, verificationUrl)
       })
     },
-    verifyVerificationUrlToken: function (options, callback) {
-      var audience = 'expect-verification-url'
-      var token = options.token
-      jwt.verify(token, rsaPublicKeyPem, {issuer: issuer, audience: audience, algorithm: 'RS256'}, function (err, user) {
-        userAuthenticationDataStore.setVerified({uuid: user.uuid}, function (err, verified) {
-          callback(false, verified)
-        })
-      })
-    },
     sendVerificationEmail: function (options, callback) {
       var emailAddress = options.emailAddress
-      userAuthService.createVerificationUrl({
+      userAuthenticationService.createVerificationUrl({
         baseUrl: options.baseUrl,
         uuid: emailAddress,
         type: 'email'
@@ -90,24 +92,91 @@ module.exports = function (options) {
         }, callback)
       })
     },
-    createUser: function (credentials, callback) {
+    verifyVerificationUrlToken: function (options, callback) {
+      var audience = 'expect-verification-url'
+      var token = options.token
+      jwt.verify(token, rsaPublicKeyPem, {issuer: issuer, audience: audience, algorithm: 'RS256'}, function (err, credentials) {
+        userAuthenticationDataStore.setVerified({uuid: credentials.uuid}, function (err, verified) {
+          credentials.verified = verified
+          callback(false, credentials)
+        })
+      })
+    },
+    createResetPasswordUrl: function (options, callback) {
+      var audience = 'expect-reset-password-url'
+      var credentials = {
+        uuid: options.uuid,
+        type: options.type
+      }
+      jwt.sign(credentials, rsaPrivateKeyPem, {expiresIn: '10m', issuer: issuer, audience: audience, algorithm: 'RS256'}, function (token) {
+        var resetPasswordUrl = options.baseUrl + resetPasswordPath.replace(':token', token)
+        callback(false, resetPasswordUrl)
+      })
+    },
+    sendResetPasswordEmail: function (options, callback) {
+      var emailAddress = options.emailAddress
+      userAuthenticationService.createResetPasswordUrl({
+        baseUrl: options.baseUrl,
+        uuid: emailAddress,
+        type: 'email'
+      }, function (err, resetPasswordUrl) {
+        emailService.sendResetPasswordUrl({
+          emailAddress: emailAddress,
+          resetPasswordUrl: resetPasswordUrl
+        }, callback)
+      })
+    },
+    verifyResetPasswordUrlToken: function (options, callback) {
+      var audience = 'expect-reset-password-url'
+      var token = options.token
+      jwt.verify(token, rsaPublicKeyPem, {issuer: issuer, audience: audience, algorithm: 'RS256'}, function (err, credentials) {
+        if (err && err.name === 'TokenExpiredError') {
+          return callback('TOKEN_EXPIRED', false)
+        }
+        callback(false, credentials)
+      })
+    },
+    setNewPassword: function (options, callback) {
+      var audience = 'expect-reset-password-url'
+      var token = options.token
+      var newPassword = options.newPassword
+      jwt.verify(token, rsaPublicKeyPem, {issuer: issuer, audience: audience, algorithm: 'RS256'}, function (err, credentials) {
+        if (err || !credentials) {
+          return callback(err, false)
+        }
+        bcrypt.genSalt(10, function (errGetSalt, salt) {
+          bcrypt.hash(newPassword, salt, function (errGetHash, hash) {
+            userAuthenticationDataStore.setHash({uuid: credentials.uuid, hash: hash}, function (err, hash) {
+              callback(false, credentials)
+            })
+          })
+        })
+      })
+    },
+    createUser: function (options, callback) {
       // if type: email
-      userAuthenticationDataStore.getUserCredentials({uuid: credentials.uuid, type: credentials.type}, function (errHashLookup, existingCredentials) {
+      var uuid = options.uuid
+      var type = options.type
+      var password = options.password
+      var baseUrl = options.baseUrl
+      var credentials = {uuid: uuid, type: type}
+      userAuthenticationDataStore.getUserCredentials(credentials, function (errHashLookup, existingCredentials) {
         var hash = existingCredentials.hash
         if (hash) {
           return callback('UUID_FOR_TYPE_EXISTS')
         }
         bcrypt.genSalt(10, function (errGetSalt, salt) {
-          bcrypt.hash(credentials.password, salt, function (errGetHash, hash) {
-            userAuthenticationDataStore.create(credentials, hash, function (err, newCredentials) {
+          bcrypt.hash(password, salt, function (errGetHash, hash) {
+            credentials.hash = hash
+            userAuthenticationDataStore.create(credentials, function (err, newCredentials) {
               var newUser = {
                 uuid: newCredentials.user_uuid,
                 type: newCredentials.type,
                 verified: newCredentials.verified
               }
               if (newUser.type === 'email') {
-                userAuthService.sendVerificationEmail({
-                  baseUrl: credentials.baseUrl,
+                userAuthenticationService.sendVerificationEmail({
+                  baseUrl: baseUrl,
                   emailAddress: newCredentials.uuid
                 }, function () {})
               }
@@ -140,5 +209,5 @@ module.exports = function (options) {
     // notarize a POST action with a valid JWT token, issuing another token with a timestamp
   }
 
-  return userAuthService
+  return userAuthenticationService
 }

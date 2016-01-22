@@ -6,6 +6,8 @@ var Calculator = require('./calculator.jsx')
 var Signup = require('./signup.jsx')
 var Welcome = require('./welcome.jsx')
 var Login = require('./login.jsx')
+var ResetPassword = require('./reset-password.jsx')
+var NewPassword = require('./new-password.jsx')
 var ShowCollection = require('./lib/show-collection.jsx')
 var ShowItem = require('./lib/show-item.jsx')
 var EditItem = require('./lib/edit-item.jsx')
@@ -51,7 +53,9 @@ var universalApp = function (options) {
     app: app,
     login: { component: Login, path: '/login', successRedirect: '/' },
     signup: { component: Signup, path: '/signup', successRedirect: '/welcome' },
-    logout: { path: '/logout', successRedirect: '/' }
+    logout: { path: '/logout', successRedirect: '/' },
+    resetPassword: { component: ResetPassword, path: '/reset_password', successRedirect: '/' },
+    newPassword: { component: NewPassword, path: '/new_password', successRedirect: '/login' }
   })
 
   var userRequired = function (req, res, next) {

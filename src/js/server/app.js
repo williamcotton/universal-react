@@ -10,6 +10,7 @@ module.exports = function (options) {
   var userAuthenticationService = require('../lib/expect-user-authentication-service')({
     emailService: options.emailService,
     verificationPath: '/verify/:token',
+    resetPasswordPath: '/reset_password/:token',
     userAuthenticationDataStore: options.userAuthenticationDataStore,
     rsaPrivateKeyPem: rsaPrivateKeyPem,
     rsaPublicKeyPem: rsaPublicKeyPem,
@@ -46,7 +47,8 @@ module.exports = function (options) {
     app: app,
     userAuthenticationService: userAuthenticationService,
     expectReactRenderer: expectReactRenderer,
-    verificationSuccessPath: '/welcome'
+    verificationSuccessPath: '/welcome',
+    newPasswordPath: '/new_password'
   }))
 
   // expect-server-template

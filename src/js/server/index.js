@@ -21,18 +21,20 @@ var emailService = {
       text: 'Thanks for signing up with Acme, Inc. \n\nPlease visit this link to complete your account creation: \n\n' + verificationUrl
     }
     console.log(payload)
+    callback(false, payload)
     //sendgrid.send(payload, callback)
   },
-  sendPasswordResetUrl: function (options, callback) {
+  sendResetPasswordUrl: function (options, callback) {
     var emailAddress = options.emailAddress
-    var passwordResetUrl = options.passwordResetUrl
+    var resetPasswordUrl = options.resetPasswordUrl
     var payload = {
       to: emailAddress,
       from: 'admin@acme-inc.com',
       subject: 'Password Reset',
-      text: 'We received a request to change your password with Acme, Inc. \n\nPlease visit this link to set your new password: \n\n' + passwordResetUrl
+      text: 'We received a request to change your password with Acme, Inc. \n\nPlease visit this link to set your new password: \n\n' + resetPasswordUrl
     }
     console.log(payload)
+    callback(false, payload)
     //sendgrid.send(payload, callback)
   }
 }

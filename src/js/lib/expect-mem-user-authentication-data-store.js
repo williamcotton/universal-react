@@ -18,12 +18,12 @@ module.exports = function (options) {
         })
       })
     },
-    create: function (credentials, hash, callback) {
+    create: function (credentials, callback) {
       var user = {
         type: credentials.type,
         uuid: credentials.uuid,
         verified: false,
-        hash: hash
+        hash: credentials.hash
       }
       db.insert(user, function (err, newUser) {
         callback(err, newUser)

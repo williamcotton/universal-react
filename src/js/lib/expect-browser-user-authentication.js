@@ -56,7 +56,7 @@ module.exports = function (options) {
       if (credentialStatus.errors) {
         return callback(credentialStatus.errors, false)
       }
-      request({method: 'post', url: req.path + '.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+      request({method: 'post', url: '/signup.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
         var errors
         if (err || !res || !res.body) {
           errors = [err]
@@ -73,7 +73,7 @@ module.exports = function (options) {
       })
     }
     req.login = function (credentials, callback) {
-      request({method: 'post', url: req.path + '.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+      request({method: 'post', url: '/login.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
         if (err || !res || !res.body) {
           var errors = [err]
           return callback(errors, false)
@@ -82,6 +82,31 @@ module.exports = function (options) {
         req.user = user
         req.session.user = user
         callback(err, user)
+      })
+    }
+    req.sendResetPasswordEmail = function (options, callback) {
+      request({method: 'post', url: '/send_reset_password_email.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+        if (err || !res || !res.body) {
+          var errors = [err]
+          return callback(errors, false)
+        }
+        var emailReceipt = res.body
+        callback(err, emailReceipt)
+      })
+    }
+    req.updatePassword = function (options, callback) {
+      request({method: 'post', url: '/update_password.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+        var errors
+        if (err || !res || !res.body) {
+          errors = [err]
+          return callback(errors, false)
+        }
+        if (res.statusCode >= 500) {
+          errors = res.body
+          return callback(errors, false)
+        }
+        var success = res.body
+        callback(err, success)
       })
     }
     req.logout = function (callback) {

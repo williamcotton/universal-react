@@ -32,6 +32,7 @@ var validateCredentials = function (credentials) {
 module.exports = function (options) {
   var userAuthenticationService = options.userAuthenticationService
   var verificationSuccessPath = options.verificationSuccessPath
+  var newPasswordPath = options.newPasswordPath
   var expectReactRenderer = options.expectReactRenderer
   var app = options.app
 
@@ -81,9 +82,20 @@ module.exports = function (options) {
 
   app.get(userAuthenticationService.verificationPath, function (req, res) {
     var token = req.params.token
-    userAuthenticationService.verifyVerificationUrlToken({token: token}, function (err, success) {
-      if (success) {
+    userAuthenticationService.verifyVerificationUrlToken({token: token}, function (err, credentials) {
+      if (credentials) {
         res.redirect(verificationSuccessPath)
+      } else {
+        res.redirect('/')
+      }
+    })
+  })
+
+  app.get(userAuthenticationService.resetPasswordPath, function (req, res) {
+    var token = req.params.token
+    userAuthenticationService.verifyResetPasswordUrlToken({token: token}, function (err, credentials) {
+      if (credentials) {
+        res.redirect(newPasswordPath + '?token=' + token)
       } else {
         res.redirect('/')
       }
@@ -134,6 +146,33 @@ module.exports = function (options) {
     })
   })
 
+  app.post('/send_reset_password_email.json', function (req, res) {
+    authMiddleware(req, res, function () {
+      var uuid = req.body.uuid
+      var type = req.body.type
+      req.sendResetPasswordEmail({uuid: uuid, type: type}, function (err, emailReceipt) {
+        if (err) {
+          return res.status(500).send(err)
+        }
+        res.send(emailReceipt)
+      })
+    })
+  })
+
+  app.post('/update_password.json', function (req, res) {
+    authMiddleware(req, res, function () {
+      var token = req.body.token
+      var password = req.body.password
+      var repeatPassword = req.body.repeat_password
+      req.updatePassword({token: token, password: password, repeatPassword: repeatPassword}, function (err, user) {
+        if (err) {
+          return res.status(500).send(err)
+        }
+        res.send(true)
+      })
+    })
+  })
+
   expectReactRenderer.use(function (req, res, contentProps, rootProps, next) { // this can be a plugin
     if (req.user) {
       var user = {
@@ -175,7 +214,52 @@ module.exports = function (options) {
         callback(false, user)
       })
     }
+    req.sendResetPasswordEmail = function (options, callback) {
+      var uuid = options.uuid
+      var type = options.type
+      userAuthenticationService.getCredentials({uuid: uuid, type: type}, function (err, credentials) {
+        var emailAddress = credentials.uuid
+        var baseUrl = (req.connection.encrypted ? 'https://' : 'http://') + req.headers.host
+        userAuthenticationService.sendResetPasswordEmail({
+          emailAddress: emailAddress,
+          baseUrl: baseUrl
+        }, function (err, emailReceipt) {
+          callback(err, {
+            success: true
+          })
+        })
+      })
+    }
+    req.updatePassword = function (options, callback) {
+      var token = options.token
+      var password = options.password
+      var repeatPassword = options.repeatPassword
+      if (!token) {
+        return callback(['NO_TOKEN'], false)
+      }
+      userAuthenticationService.verifyResetPasswordUrlToken({token: token}, function (err, credentials) {
+        if (err) {
+          return callback([err], false)
+        }
+        var newCredentials = {
+          type: credentials.type,
+          uuid: credentials.uuid,
+          password: password,
+          repeatPassword: repeatPassword
+        }
+        var credentialStatus = validateCredentials(newCredentials)
+        if (credentialStatus.errors) {
+          return callback(credentialStatus.errors, false)
+        }
+        userAuthenticationService.setNewPassword({token: token, newPassword: password}, function (err, credentials) {
+          callback(err, true)
+        })
+      })
+    }
     req.logout = function (callback) {
+      if (!req.user || !req.session.userToken) {
+        return callback(true, false)
+      }
       delete req.user
       delete req.session.userToken
       callback(false)

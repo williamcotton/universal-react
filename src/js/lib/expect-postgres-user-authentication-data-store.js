@@ -90,8 +90,8 @@ module.exports = function (options) {
   var pgClient = options.pgClient
 
   return {
-    getUserCredentials: function (credentials, callback) {
-      pgClient.query('SELECT * FROM user_credentials WHERE uuid = $1 AND type = $2', [credentials.uuid, credentials.type], function (err, result) {
+    getUserCredentials: function (options, callback) {
+      pgClient.query('SELECT * FROM user_credentials WHERE uuid = $1 AND type = $2', [options.uuid, options.type], function (err, result) {
         if (result && result.rowCount) {
           var row = result.rows[0]
           var hash = row.hash
@@ -119,15 +119,18 @@ module.exports = function (options) {
       })
     },
     setHash: function (options, callback) {
+      if (!options.hash) {
+        callback(true, false)
+      }
       pgClient.query('UPDATE user_credentials SET (hash) = ($1) WHERE uuid = $2', [options.hash, options.uuid], function (err, result) {
         callback(false, options.hash)
       })
     },
-    create: function (credentials, hash, callback) {
+    create: function (options, callback) {
       var user_credential = {
-        type: credentials.type,
-        uuid: credentials.uuid,
-        hash: hash
+        type: options.type,
+        uuid: options.uuid,
+        hash: options.hash
       }
       var user_uuid = createUUID.v4()
       pgClient.query('INSERT INTO users (uuid) VALUES ($1)', [user_uuid], function (err, result) {
