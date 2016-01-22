@@ -31,6 +31,7 @@ var validateCredentials = function (credentials) {
 
 module.exports = function (options) {
   var userAuthenticationService = options.userAuthenticationService
+  var verificationSuccessPath = options.verificationSuccessPath
   var expectReactRenderer = options.expectReactRenderer
   var app = options.app
 
@@ -77,6 +78,17 @@ module.exports = function (options) {
   expectReactRenderer.use(require('../lib/expect-server-csrf')({
     app: app
   }))
+
+  app.get(userAuthenticationService.verificationPath, function (req, res) {
+    var token = req.params.token
+    userAuthenticationService.verifyVerificationUrlToken({token: token}, function (err, success) {
+      if (success) {
+        res.redirect(verificationSuccessPath)
+      } else {
+        res.redirect('/')
+      }
+    })
+  })
 
   app.post('/signup.json', function (req, res) {
     authMiddleware(req, res, function () {
@@ -144,6 +156,7 @@ module.exports = function (options) {
       if (credentialStatus.errors) {
         return callback(credentialStatus.errors, false)
       }
+      credentials.baseUrl = (req.connection.encrypted ? 'https://' : 'http://') + req.headers.host
       userAuthenticationService.createUser(credentials, function (err, user) {
         if (err || !user) {
           var errors = [err]

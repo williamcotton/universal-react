@@ -25,6 +25,12 @@ module.exports = function (options, callback) {
 
   serverAppConfig.bookshelf = bookshelf
 
+  serverAppConfig.emailService = {
+    sendVerificationUrl: function (options, callback) {
+      callback(false, true)
+    }
+  }
+
   var server, serverAppInstance
 
   var setup = function (callback) {

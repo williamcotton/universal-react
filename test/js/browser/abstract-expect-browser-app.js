@@ -50,10 +50,12 @@ module.exports = function (options, callback) {
         baseUrl: testServerApp.baseUrl,
         jar: cookieJar
       })
+      var rootDOMId = 'universal-app-container'
+      global.window.$('#' + rootDOMId).html('')
       browserAppInstance = browserApp({
         document: global.document,
         window: global.window,
-        rootDOMId: 'universal-app-container',
+        rootDOMId: rootDOMId,
         localStorage: localStorage,
         request: baseRequest
       })
@@ -62,10 +64,10 @@ module.exports = function (options, callback) {
           res.headers = res.headers || {}
           rqResponse = res
           res.redirect = function (path) {
+            res.headers.location = path
             if (res.onComplete) {
               res.onComplete()
             }
-            res.headers.location = path
           }
         } else {
           res.redirect = function (path, callback) {

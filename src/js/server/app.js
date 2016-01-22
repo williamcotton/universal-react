@@ -9,6 +9,7 @@ module.exports = function (options) {
 
   var userAuthenticationService = require('../lib/expect-user-authentication-service')({
     emailService: options.emailService,
+    verificationPath: '/verify/:token',
     userAuthenticationDataStore: options.userAuthenticationDataStore,
     rsaPrivateKeyPem: rsaPrivateKeyPem,
     rsaPublicKeyPem: rsaPublicKeyPem,
@@ -44,7 +45,8 @@ module.exports = function (options) {
   app.use(require('../lib/expect-server-user-authentication')({
     app: app,
     userAuthenticationService: userAuthenticationService,
-    expectReactRenderer: expectReactRenderer
+    expectReactRenderer: expectReactRenderer,
+    verificationSuccessPath: '/welcome'
   }))
 
   // expect-server-template

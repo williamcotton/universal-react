@@ -3,19 +3,26 @@ module.exports = function (options) {
   var db = new Datastore()
 
   return {
-    getHash: function (credentials, callback) {
+    getUserCredentials: function (credentials, callback) {
       db.find({ uuid: credentials.uuid, type: credentials.type }, function (err, users) {
         var user = users[0]
         if (err || !user) {
           return callback(err, false)
         }
-        callback(err, user.hash)
+        callback(err, {
+          hash: user.hash,
+          type: user.type,
+          uuid: user.uuid,
+          user_uuid: user._id,
+          verified: user.verified
+        })
       })
     },
     create: function (credentials, hash, callback) {
       var user = {
         type: credentials.type,
         uuid: credentials.uuid,
+        verified: false,
         hash: hash
       }
       db.insert(user, function (err, newUser) {

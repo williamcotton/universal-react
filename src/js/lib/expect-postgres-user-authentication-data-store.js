@@ -6,7 +6,7 @@ CREATE TABLE accounts (
   public_address  VARCHAR(34),
   created_at      timestamptz,
   updated_at      timestamptz
-);
+)
 
 CREATE TABLE wallets (
   blockchain_provider_type  VARCHAR(32),
@@ -17,23 +17,46 @@ CREATE TABLE wallets (
   is_public       boolean,
   address         VARCHAR(34),
   account_uuid    uuid
-);
+)
 
-CREATE INDEX accounts_uuid_index ON accounts (uuid);
-CREATE INDEX accounts_quick_code_index ON accounts (quick_code);
-CREATE INDEX accounts_public_address_index ON accounts (public_address);
-CREATE INDEX wallets_address_index ON wallets (address);
-CREATE INDEX wallets_account_uuid_index ON wallets (account_uuid);
-CREATE INDEX wallets_identity_uuid_index ON wallets (identity_uuid);
+CREATE TABLE email_auth_accounts (
+  uuid            VARCHAR(254) UNIQUE,
+  salt            VARCHAR(64),
+  peppered_hash   VARCHAR(256),
+  verified        boolean DEFAULT false,
+  verified_at     timestamptz,
+  created_at      timestamptz,
+  updated_at      timestamptz   
+)
+
+CREATE UNIQUE INDEX email_auth_accounts_uuid_index ON email_auth_accounts ((lower(uuid)))
+
+CREATE INDEX accounts_uuid_index ON accounts (uuid)
+CREATE INDEX accounts_quick_code_index ON accounts (quick_code)
+CREATE INDEX accounts_public_address_index ON accounts (public_address)
+CREATE INDEX wallets_address_index ON wallets (address)
+CREATE INDEX wallets_account_uuid_index ON wallets (account_uuid)
+CREATE INDEX wallets_identity_uuid_index ON wallets (identity_uuid)
+
+default timestamp:
+
+CREATE TABLE users (
+  id serial not null,
+  firstname varchar(100),
+  middlename varchar(100),
+  lastname varchar(100),
+  email varchar(200),
+  timestamp timestamp default current_timestamp
+)
 
 */
 
 /*
 
-var createUUID = require("node-uuid");
+var createUUID = require("node-uuid")
 
-var uuid = createUUID.v4();
-    var createdAt = (new Date).toISOString();
+var uuid = createUUID.v4()
+    var createdAt = (new Date).toISOString()
 
 */
 
@@ -61,27 +84,63 @@ user_credentials:
 
 */
 
+var createUUID = require('node-uuid')
+
 module.exports = function (options) {
   var pgClient = options.pgClient
 
   return {
-    getHash: function (credentials, callback) {
-      pgClient.query('SELECT * FROM users WHERE uuid = $1 AND type = $2', [credentials.uuid, credentials.type], function (err, result) {
+    getUserCredentials: function (credentials, callback) {
+      pgClient.query('SELECT * FROM user_credentials WHERE uuid = $1 AND type = $2', [credentials.uuid, credentials.type], function (err, result) {
         if (result && result.rowCount) {
           var row = result.rows[0]
           var hash = row.hash
-          callback(err, hash)
+          var type = row.type
+          var uuid = row.uuid
+          var verified = row.verified
+          var user_uuid = row.user_uuid
+          callback(err, {
+            hash: hash,
+            type: type,
+            uuid: uuid,
+            verified: verified,
+            user_uuid: user_uuid
+          })
+        } else {
+          callback(false, {})
         }
       })
     },
+    setVerified: function (options, callback) {
+      var verified_at = (new Date).toISOString()
+      var verified = true
+      pgClient.query('UPDATE user_credentials SET (verified, verified_at) = ($1, $2) WHERE uuid = $3', [verified, verified_at, options.uuid], function (err, result) {
+        callback(false, verified)
+      })
+    },
+    setHash: function (options, callback) {
+      pgClient.query('UPDATE user_credentials SET (hash) = ($1) WHERE uuid = $2', [options.hash, options.uuid], function (err, result) {
+        callback(false, options.hash)
+      })
+    },
     create: function (credentials, hash, callback) {
-      var user = {
+      var user_credential = {
         type: credentials.type,
         uuid: credentials.uuid,
         hash: hash
       }
-      pgClient.query('INSERT INTO users (type, hash, uuid) VALUES ($1,$2,$3)', [user.type, user.hash, user.uuid], function (err, result) {
-        callback(err, user)
+      var user_uuid = createUUID.v4()
+      pgClient.query('INSERT INTO users (uuid) VALUES ($1)', [user_uuid], function (err, result) {
+        var user = {
+          user_uuid: user_uuid
+        }
+        pgClient.query('INSERT INTO user_credentials (type, hash, uuid, user_uuid) VALUES ($1,$2,$3,$4)', [user_credential.type, user_credential.hash, user_credential.uuid, user_uuid], function (err, result) {
+          user.uuid = user_credential.uuid
+          user.type = user_credential.type
+          user.verified = false
+          user.hash = user_credential.hash
+          callback(err, user)
+        })
       })
     },
     destroy: function (credentials, callback) {
