@@ -92,7 +92,7 @@ module.exports = function (options) {
       })
     }
     req.sendResetPasswordEmail = function (options, callback) {
-      request({method: 'post', url: '/send_reset_password_email.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+      request({method: 'post', url: '/send-reset-password-email.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
         var errors
         if (err || !res || !res.body) {
           errors = [err]
@@ -107,7 +107,7 @@ module.exports = function (options) {
       })
     }
     req.checkResetPasswordToken = function (options, callback) {
-      request({method: 'post', url: '/check_reset_password_token.json', json: options, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+      request({method: 'post', url: '/check-reset-password-token.json', json: options, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
         var errors
         if (err || !res || !res.body) {
           errors = [err]
@@ -121,7 +121,7 @@ module.exports = function (options) {
       })
     }
     req.updatePassword = function (options, callback) {
-      request({method: 'post', url: '/update_password.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
+      request({method: 'post', url: '/update-password.json', json: req.body, headers: {'x-csrf-token': req.csrf}}, function (err, res, body) {
         var errors
         if (err || !res || !res.body) {
           errors = [err]

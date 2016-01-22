@@ -1,89 +1,3 @@
-/*
-
-CREATE TABLE accounts (
-  uuid            uuid PRIMARY KEY UNIQUE,
-  quick_code      VARCHAR(64) UNIQUE,
-  public_address  VARCHAR(34),
-  created_at      timestamptz,
-  updated_at      timestamptz
-)
-
-CREATE TABLE wallets (
-  blockchain_provider_type  VARCHAR(32),
-  identity_provider_type    VARCHAR(32),
-  created_at      timestamptz,
-  updated_at      timestamptz,
-  identity_uuid   VARCHAR(256),
-  is_public       boolean,
-  address         VARCHAR(34),
-  account_uuid    uuid
-)
-
-CREATE TABLE email_auth_accounts (
-  uuid            VARCHAR(254) UNIQUE,
-  salt            VARCHAR(64),
-  peppered_hash   VARCHAR(256),
-  verified        boolean DEFAULT false,
-  verified_at     timestamptz,
-  created_at      timestamptz,
-  updated_at      timestamptz   
-)
-
-CREATE UNIQUE INDEX email_auth_accounts_uuid_index ON email_auth_accounts ((lower(uuid)))
-
-CREATE INDEX accounts_uuid_index ON accounts (uuid)
-CREATE INDEX accounts_quick_code_index ON accounts (quick_code)
-CREATE INDEX accounts_public_address_index ON accounts (public_address)
-CREATE INDEX wallets_address_index ON wallets (address)
-CREATE INDEX wallets_account_uuid_index ON wallets (account_uuid)
-CREATE INDEX wallets_identity_uuid_index ON wallets (identity_uuid)
-
-default timestamp:
-
-CREATE TABLE users (
-  id serial not null,
-  firstname varchar(100),
-  middlename varchar(100),
-  lastname varchar(100),
-  email varchar(200),
-  timestamp timestamp default current_timestamp
-)
-
-*/
-
-/*
-
-var createUUID = require("node-uuid")
-
-var uuid = createUUID.v4()
-    var createdAt = (new Date).toISOString()
-
-*/
-
-// users table and a user_credentials table? user.uuid = "xxx-xxx-xxxx-xxx", user_credentials.type, user_credentials.uuid, user_credentials.user_uuid
-
-// user_oauths table?
-
-/* 
-
-user_credentials:
-  identity anchor (email, phone)
-  password hash
-  verification status (did they prove they have access to email or phone?)
-  user_uuid
-
-  facebook oauth as an identity anchor...
-    no password hash, checks signed token... token verifies that facebook says this ID is correct
-
-  email as an identity anchor...
-    take a password and match it to the db
-
-  what do we store for facebook? type:'facebook', uuid:'facebook id'
-
-  how do we verify facebook? get a token, verify it was signed by facebook, verify the facebook id matches the credentials
-
-*/
-
 var createUUID = require('node-uuid')
 
 module.exports = function (options) {
@@ -146,10 +60,15 @@ module.exports = function (options) {
         })
       })
     },
-    destroy: function (credentials, callback) {
-      // db.remove({ uuid: credentials.uuid, type: credentials.type }, function (err, removedUser) {
-      //   callback(err)
-      // })
+    destroy: function (options, callback) {
+      if (!options.user_uuid) {
+        callback(true, false)
+      }
+      pgClient.query('DELETE FROM user_credentials WHERE user_uuid = $1', [options.user_uuid], function (err, result) {
+        pgClient.query('DELETE FROM users WHERE uuid = $1', [options.user_uuid], function (err, result) {
+          callback(err, !err)
+        })
+      })
     },
     setup: function (callback) {
       pgClient.query('CREATE TABLE users (id serial, type varchar(40), hash varchar(256), uuid varchar(256))', callback)

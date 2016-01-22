@@ -24,7 +24,7 @@ var Signup = React.createClass({
         <input type='hidden' name='type' value='email' />
         <Input bsStyle={ emailInvalid || emailAlreadyExists ? 'error' : ''} name='uuid' type='text' label='Email Address' defaultValue={ emailInvalid || emailAlreadyExists ? '' : this.props.uuid} />
         <Input bsStyle={ passwordTooShort ? 'error' : ''} name='password' type='password' label='Password' defaultValue={ passwordTooShort ? '' : this.props.password} />
-        <Input bsStyle={ passwordMismatch ? 'error' : ''} name='repeat_password' type='password' label='Repeat Password' autoFocus />
+        <Input bsStyle={ passwordMismatch ? 'error' : ''} name='repeatPassword' type='password' label='Repeat Password' autoFocus />
         <ButtonInput type='submit' value='Signup' />
       </form>
     </div>

@@ -20,7 +20,7 @@ test('browserApp', function (t) {
   }, function (expect, t, rq, baseRequest) {
     t.test('should /signup', function (t) {
       baseRequest({url: '/signup'}, function (err, res, body) {
-        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
           t.equal(res.headers.location, '/welcome', 'redirect to /wecome')
           t.end()
         })
@@ -38,7 +38,7 @@ test('browserApp', function (t) {
 
     t.test('should NOT /signup again with existing uuid', function (t) {
       baseRequest({url: '/signup'}, function (err, res, body) {
-        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
           t.equal(res.headers.location, undefined, 'no redirect')
           t.ok($('.signup-container').html(), 'has signup-container')
           t.end()

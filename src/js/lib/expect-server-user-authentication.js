@@ -33,7 +33,7 @@ module.exports = function (options) {
   var userAuthenticationService = options.userAuthenticationService
   var verificationSuccessPath = options.verificationSuccessPath
   var newPasswordPath = options.newPasswordPath
-  var expiredResetPasswordTokenPath = options.expiredResetPasswordTokenPath || '/reset_password'
+  var expiredResetPasswordTokenPath = options.expiredResetPasswordTokenPath || '/reset-password'
   var expectReactRenderer = options.expectReactRenderer
   var app = options.app
 
@@ -111,7 +111,7 @@ module.exports = function (options) {
         type: req.body.type,
         uuid: req.body.uuid,
         password: req.body.password,
-        repeatPassword: req.body.repeat_password
+        repeatPassword: req.body.repeatPassword
       }
       req.signup(credentials, function (err, user) {
         if (err) {
@@ -149,7 +149,7 @@ module.exports = function (options) {
     })
   })
 
-  app.post('/send_reset_password_email.json', function (req, res) {
+  app.post('/send-reset-password-email.json', function (req, res) {
     authMiddleware(req, res, function () {
       var uuid = req.body.uuid
       var type = req.body.type
@@ -162,7 +162,7 @@ module.exports = function (options) {
     })
   })
 
-  app.post('/check_reset_password_token.json', function (req, res) {
+  app.post('/check-reset-password-token.json', function (req, res) {
     authMiddleware(req, res, function () {
       var token = req.body.token
       req.checkResetPasswordToken({token: token}, function (err, credentials) {
@@ -174,11 +174,11 @@ module.exports = function (options) {
     })
   })
 
-  app.post('/update_password.json', function (req, res) {
+  app.post('/update-password.json', function (req, res) {
     authMiddleware(req, res, function () {
       var token = req.body.token
       var password = req.body.password
-      var repeatPassword = req.body.repeat_password
+      var repeatPassword = req.body.repeatPassword
       req.updatePassword({token: token, password: password, repeatPassword: repeatPassword}, function (err, credentials) {
         if (err) {
           return res.status(500).send(err)

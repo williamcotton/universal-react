@@ -12,7 +12,7 @@ module.exports = function (options) {
 
   expectUniversalApp.rootComponentToBeRendered(t)
   expectUniversalApp.defaultTitleToBeRendered(t)
-  expectUniversalApp.allGetRoutesToBeRendered(t, {ignore: ['/logout', '/songs', '/songs/:id', '/songs/:id/edit']})
+  expectUniversalApp.allGetRoutesToBeRendered(t, {ignore: ['/login', '/reset-password', '/new-password', '/logout', '/songs', '/songs/:id', '/songs/:id/edit']})
   expectUniversalApp.getRouteClasses(t)
 
   t.test('should POST /calculate and get the correct result', function (t) {
@@ -36,7 +36,7 @@ module.exports = function (options) {
   t.test('should /signup', function (t) {
     baseRequest({url: '/signup'}, function (err, res, body) {
       // console.log('body', body)
-      rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve4@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+      rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve4@test.com', password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
         // console.log($('body').html())
         // console.log(res.headers)
         t.ok(true)

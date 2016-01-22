@@ -18,13 +18,13 @@ module.exports = function (options) {
   var signupPath = signup.path || '/signup'
   var loginPath = login.path || '/login'
   var logoutPath = logout.path || '/logout'
-  var resetPasswordPath = resetPassword.path || '/reset_password'
-  var newPasswordPath = newPassword.path || '/new_password'
+  var resetPasswordPath = resetPassword.path || '/reset-password'
+  var newPasswordPath = newPassword.path || '/new-password'
 
   var signupSuccessRedirect = signup.successRedirect || '/'
   var loginSuccessRedirect = login.successRedirect || '/'
   var logoutSuccessRedirect = logout.successRedirect || '/'
-  var resetPasswordSuccessRedirect = resetPassword.successRedirect || '/reset_password_email_sent'
+  var resetPasswordSuccessRedirect = resetPassword.successRedirect || '/reset-password-email-sent'
   var newPasswordSuccessRedirect = newPassword.successRedirect || '/login'
 
   var signupTitle = signup.title || 'Signup'
@@ -48,7 +48,7 @@ module.exports = function (options) {
       type: req.body.type,
       uuid: req.body.uuid,
       password: req.body.password,
-      repeatPassword: req.body.repeat_password
+      repeatPassword: req.body.repeatPassword
     }
     req[signupRequestFunction](credentials, function (credentialErrors) {
       var content
@@ -65,7 +65,7 @@ module.exports = function (options) {
 
   app.get(loginPath, function (req, res) {
     var uuid = req.query.uuid
-    var updatePasswordSuccess = req.query.update_password_success
+    var updatePasswordSuccess = req.query['update-password-success']
     var content = loginComponent({formAction: loginPath, uuid: uuid, updatePasswordSuccess: updatePasswordSuccess})
     res.renderApp(content, {title: loginTitle})
   })
@@ -136,13 +136,13 @@ module.exports = function (options) {
       uuid: req.body.uuid,
       token: req.body.token,
       password: req.body.password,
-      repeatPassword: req.body.repeat_password
+      repeatPassword: req.body.repeatPassword
     }
     req[newPasswordRequestFunction](checkCredentials, function (credentialErrors, credentials) {
       var content
       var title = newPasswordTitle
       if (!credentialErrors) {
-        return res.redirect(newPasswordSuccessRedirect + '?uuid=' + credentials.uuid + '&update_password_success=true')
+        return res.redirect(newPasswordSuccessRedirect + '?uuid=' + credentials.uuid + '&update-password-success=true')
       } else {
         content = newPasswordComponent({formAction: newPasswordPath, errors: credentialErrors, credentials: checkCredentials})
         title += ' - Errors'

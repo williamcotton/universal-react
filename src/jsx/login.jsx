@@ -25,7 +25,7 @@ var Login = React.createClass({
         <Input name='uuid' type='text' label='Email Address' defaultValue={this.props.uuid} />
         <Input bsStyle={ error ? 'error' : ''} name='password' type='password' label='Password' />
         <ButtonInput type='submit' value='Login' />
-        <a href='/reset_password'>Forgot Password?</a>
+        <a href='/reset-password'>Forgot Password?</a>
       </form>
     </div>
   }

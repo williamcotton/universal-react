@@ -24,7 +24,7 @@ var NewPassword = React.createClass({
         <input type='hidden' name='token' value={credentials.token} />
         <input type='hidden' name='uuid' value={credentials.uuid} />
         <Input bsStyle={ passwordTooShort ? 'error' : ''} name='password' type='password' label='Password' defaultValue={ passwordTooShort ? '' : credentials.password} autoFocus />
-        <Input bsStyle={ passwordMismatch ? 'error' : ''} name='repeat_password' type='password' label='Repeat Password' />
+        <Input bsStyle={ passwordMismatch ? 'error' : ''} name='repeatPassword' type='password' label='Repeat Password' />
         <ButtonInput type='submit' value='Update Password' />
       </form>
     </div>

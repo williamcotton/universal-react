@@ -58,7 +58,7 @@ test('serverApp', function (t) {
   }, function (expect, t, rq, baseRequest) {
     t.test('should /signup (redirect disabled)', function (t) {
       baseRequest({url: '/signup'}, function () {
-        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
           t.equal(res.headers.location, '/welcome', 'redirects to /welcome')
           t.end()
         })
@@ -94,7 +94,7 @@ test('serverApp', function (t) {
 
     t.test('should /signup.json', function (t) {
       baseRequest({url: '/signup'}, function () {
-        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: 'steve1@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: 'steve1@test.com', password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
           var user = JSON.parse(res.body)
           // t.equal(user.uuid, 'steve1@test.com')
           t.equal(user.type, 'email')
@@ -116,7 +116,7 @@ test('serverApp', function (t) {
 
     t.test('should NOT /signup.json again with existing uuid', function (t) {
       baseRequest({url: '/signup'}, function () {
-        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: 'steve1@test.com', password: 'test1234', repeat_password: 'test1234'}}, function ($, res) {
+        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: 'steve1@test.com', password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
           var user = JSON.parse(res.body)
           t.equal(user.uuid, undefined)
           t.equal(user.type, undefined)
