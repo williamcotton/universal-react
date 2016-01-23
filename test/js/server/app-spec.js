@@ -193,7 +193,7 @@ test('serverApp', function (t) {
       })
     })
 
-    t.test('should /reset-password', function (t) {
+    t.test('should /reset-password and get a valid token', function (t) {
       t.plan(5)
       var uuid = 'steve@test.com'
       emailService.sendResetPasswordUrl = function (options, callback) {
