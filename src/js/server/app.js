@@ -4,6 +4,13 @@ module.exports = function (options) {
 
   var fs = require('fs')
 
+  /*
+
+    user authentication service
+    ---------------------------
+
+  */
+
   var rsaPrivateKeyPem = fs.readFileSync(__dirname + '/../../../expect-user-authentication-service.pem')
   var rsaPublicKeyPem = fs.readFileSync(__dirname + '/../../../expect-user-authentication-service-public.pem')
 
@@ -63,32 +70,44 @@ module.exports = function (options) {
     template: template
   }))
 
-  app.post('/user.json', function (req, res) {
-    res.send(req.user)
+  /*
+
+    models
+    ------
+    bookshelf
+
+  */
+
+  var expectBookshelfModel = require('../lib/expect-server-bookshelf-model')({
+    app: app,
+    bookshelf: bookshelf
   })
 
+  // Song -> req.songs
   var Song = bookshelf.Model.extend({
     tableName: 'songs'
   })
-
-  var expectBookshelfModel = require('../lib/expect-server-bookshelf-model')
-
   app.use(expectBookshelfModel({
     reqProp: 'songs',
-    app: app,
-    bookshelf: bookshelf,
     Model: Song,
-    beforeFind: function (song, callback) {
+    beforeFind: function (song, req, res, callback) {
       song.set({read_count: song.get('read_count') + 1})
       song.save()
       callback(song)
+    },
+    findAll: function (Song) {
+      return function (req, res, callback) {
+        Song.query('orderBy', 'id', 'asc').fetchAll().then(function (songs) {
+          callback(songs.toJSON())
+        })
+      }
     }
   }))
 
   /*
 
-    universalApp
-    ------------
+    universal app
+    -------------
     server version
 
   */

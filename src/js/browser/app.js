@@ -49,22 +49,26 @@ module.exports = function (options) {
     localStorage: options.localStorage
   }))
 
-  app.post('/user.json', function (req, res) {
-    request({url: '/user.json', method: 'post', json: req.body}, function (err, _res, body) {
-      res.send(body)
-    })
+  /*
+
+    models
+    ------
+    browser proxy
+
+  */
+
+  var expectProxyModel = require('../lib/expect-browser-proxy-model')({
+    request: request
   })
 
-  var expectApiModel = require('../lib/expect-browser-api-model')
-
-  app.use(expectApiModel({
-    reqProp: 'songs',
-    request: request
+  // Song -> req.songs
+  app.use(expectProxyModel({
+    reqProp: 'songs'
   }))
 
   /*
 
-    universalApp
+    universal app
     ------------
     browser version
 
