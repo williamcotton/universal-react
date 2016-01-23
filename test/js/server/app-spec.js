@@ -67,6 +67,11 @@ test('serverApp', function (t) {
     defaultTitle: defaultTitle,
     t: t
   }, function (expect, t, rq, baseRequest) {
+    var uuid = 'server-user-0@test.com'
+    var anotherUuid = 'server-user-1@test.com'
+    var password = 'test1234'
+    var newPassword = 'test1111'
+
     t.beforeEach(function (t) {
       t.end()
     })
@@ -79,7 +84,6 @@ test('serverApp', function (t) {
 
     t.test('should /signup (redirect disabled)', function (t) {
       t.plan(4)
-      var uuid = 'steve@test.com'
       emailService.sendVerificationUrl = function (options, callback) {
         t.equal(options.verificationUrl.indexOf('http://localhost:12345/verify/'), 0, 'has base verificationUrl')
         t.equal(options.emailAddress, uuid, 'emailService called with uuid')
@@ -90,7 +94,7 @@ test('serverApp', function (t) {
         })
       }
       baseRequest({url: '/signup'}, function () {
-        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: uuid, password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
+        rq({followRedirect: false, method: 'post', url: '/signup', form: {type: 'email', uuid: uuid, password: password, repeatPassword: password}}, function ($, res) {
           t.equal(res.headers.location, '/welcome', 'redirects to /welcome')
         })
       })
@@ -107,7 +111,6 @@ test('serverApp', function (t) {
 
     t.test('should /reset-password (redirect disabled)', function (t) {
       t.plan(4)
-      var uuid = 'steve@test.com'
       emailService.sendResetPasswordUrl = function (options, callback) {
         t.equal(options.resetPasswordUrl.indexOf('http://localhost:12345/reset-password/'), 0, 'has base verificationUrl')
         t.equal(options.emailAddress, uuid, 'emailService called with uuid')
@@ -126,7 +129,7 @@ test('serverApp', function (t) {
 
     t.test('should /login (redirect disabled)', function (t) {
       baseRequest({url: '/login'}, function () {
-        rq({followRedirect: false, method: 'post', url: '/login', form: {type: 'email', uuid: 'steve@test.com', password: 'test1234'}}, function ($, res) {
+        rq({followRedirect: false, method: 'post', url: '/login', form: {type: 'email', uuid: uuid, password: 'test1234'}}, function ($, res) {
           t.equal(res.headers.location, '/welcome', 'redirects to /welcome')
           t.end()
         })
@@ -135,19 +138,18 @@ test('serverApp', function (t) {
 
     t.test('should NOT /login with bad credentials (redirect disabled)', function (t) {
       baseRequest({url: '/login'}, function () {
-        rq({followRedirect: false, method: 'post', url: '/login', form: {type: 'email', uuid: 'steve@test.com', password: 'bad'}}, function ($, res) {
+        rq({followRedirect: false, method: 'post', url: '/login', form: {type: 'email', uuid: uuid, password: 'bad'}}, function ($, res) {
           t.ok($('.login-container'), 'still on login page')
           t.end()
         })
       })
     })
 
-    t.test('should /signup.json', function (t) {
+    t.test('should /signup.json with anotherUuid', function (t) {
       t.plan(6)
-      var uuid = 'steve1@test.com'
       emailService.sendVerificationUrl = function (options, callback) {
         t.equal(options.verificationUrl.indexOf('http://localhost:12345/verify/'), 0, 'has base verificationUrl')
-        t.equal(options.emailAddress, uuid, 'emailService called with uuid')
+        t.equal(options.emailAddress, anotherUuid, 'emailService called with anotherUuid')
         var url = options.verificationUrl.split('http://localhost:12345')[1]
         rq({followRedirect: false, url: url}, function ($, res) {
           t.equal(res.headers.location, '/welcome', 'redirects to /welcome')
@@ -155,7 +157,7 @@ test('serverApp', function (t) {
         callback(false, true)
       }
       baseRequest({url: '/signup'}, function () {
-        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: uuid, password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
+        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: anotherUuid, password: password, repeatPassword: password}}, function ($, res) {
           var user = JSON.parse(res.body)
           t.ok(user.uuid, 'has uuid')
           t.equal(user.verified, false, 'is not verified')
@@ -164,9 +166,9 @@ test('serverApp', function (t) {
       })
     })
 
-    t.test('should /login.json', function (t) {
+    t.test('should /login.json with anotherUuid', function (t) {
       baseRequest({url: '/login'}, function () {
-        rq({method: 'post', url: '/login.json', form: {type: 'email', uuid: 'steve1@test.com', password: 'test1234'}}, function ($, res) {
+        rq({method: 'post', url: '/login.json', form: {type: 'email', uuid: anotherUuid, password: password}}, function ($, res) {
           var user = JSON.parse(res.body)
           // t.equal(user.uuid, 'steve1@test.com')
           t.equal(user.type, 'email', 'type ok')
@@ -175,9 +177,9 @@ test('serverApp', function (t) {
       })
     })
 
-    t.test('should NOT /signup.json again with existing uuid', function (t) {
+    t.test('should NOT /signup.json again with existing anotherUuid', function (t) {
       baseRequest({url: '/signup'}, function () {
-        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: 'steve1@test.com', password: 'test1234', repeatPassword: 'test1234'}}, function ($, res) {
+        rq({method: 'post', url: '/signup.json', form: {type: 'email', uuid: anotherUuid, password: password, repeatPassword: password}}, function ($, res) {
           var user = JSON.parse(res.body)
           t.equal(user.uuid, undefined, 'no uuid')
           t.equal(user.type, undefined, 'no type')
@@ -195,7 +197,6 @@ test('serverApp', function (t) {
 
     t.test('should /reset-password and get a valid token', function (t) {
       t.plan(5)
-      var uuid = 'steve@test.com'
       emailService.sendResetPasswordUrl = function (options, callback) {
         t.equal(options.resetPasswordUrl.indexOf('http://localhost:12345/reset-password/'), 0, 'has base verificationUrl')
         t.equal(options.emailAddress, uuid, 'emailService called with uuid')
@@ -216,7 +217,6 @@ test('serverApp', function (t) {
 
     t.test('should /reset-password and set a new password', function (t) {
       t.plan(2)
-      var uuid = 'steve@test.com'
       emailService.sendResetPasswordUrl = function (options, callback) {
         callback(false, true)
         var url = options.resetPasswordUrl.split('http://localhost:12345')[1]
@@ -224,7 +224,7 @@ test('serverApp', function (t) {
           var action = $('form')[0].attribs.action
           var uuid = $('input[name="uuid"]').val()
           var token = $('input[name="token"]').val()
-          rq({followRedirect: false, method: 'post', url: action, form: {token: token, uuid: uuid, password: 'test1111', repeatPassword: 'test1111'}}, function ($, res) {
+          rq({followRedirect: false, method: 'post', url: action, form: {token: token, uuid: uuid, password: newPassword, repeatPassword: newPassword}}, function ($, res) {
             var locationUrl = urlparse(res.headers.location, true)
             t.equal(locationUrl.query.uuid, uuid, 'uuid matches')
             t.equal(locationUrl.query['update-password-success'], 'true', 'update-password-success')

@@ -40,6 +40,9 @@ module.exports = function (options, callback) {
   serverAppConfig.emailService = options.emailService || {
     sendVerificationUrl: function (options, callback) {
       callback(false, true)
+    },
+    sendResetPasswordUrl: function (options, callback) {
+      callback(false, true)
     }
   }
 
