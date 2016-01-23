@@ -10,7 +10,7 @@ var Login = React.createClass({
     error: React.PropTypes.object,
     uuid: React.PropTypes.string,
     formAction: React.PropTypes.string,
-    updatePasswordSuccess: React.PropTypes.bool
+    updatePasswordSuccess: React.PropTypes.string
   },
   render: function () {
     var error = this.props.error
@@ -23,7 +23,7 @@ var Login = React.createClass({
         <input type='hidden' name='_csrf' value={this.props.csrf} />
         <input type='hidden' name='type' value='email' />
         <Input name='uuid' type='text' label='Email Address' defaultValue={this.props.uuid} />
-        <Input bsStyle={ error ? 'error' : ''} name='password' type='password' label='Password' />
+        <Input bsStyle={ error ? 'error' : null} name='password' type='password' label='Password' />
         <ButtonInput type='submit' value='Login' />
         <a href='/reset-password'>Forgot Password?</a>
       </form>
