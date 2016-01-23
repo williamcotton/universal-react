@@ -45,7 +45,7 @@ module.exports = function (options, callback) {
     if (options.form && csrf) {
       options.form._csrf = csrf
     }
-    baseRequest(options, function(err, res, body) {
+    baseRequest(options, function (err, res, body) {
       var $ = cheerio.load(body, {xmlMode: true})
       csrf = $('input[name="_csrf"]').val()
       callback(err, res, body)

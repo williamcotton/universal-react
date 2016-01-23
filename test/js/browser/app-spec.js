@@ -46,6 +46,13 @@ test('browserApp', function (t) {
       })
     })
 
+    t.test('should /logout', function (t) {
+      rq({followRedirect: false, url: '/logout'}, function ($, res) {
+        t.equal(global.window.location.pathname, '/logout', 'loaded logout path')
+        t.end()
+      })
+    })
+
     expect.universalAppSpecsToPass(t)
     t.end()
   })

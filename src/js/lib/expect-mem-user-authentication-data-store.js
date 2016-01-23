@@ -18,6 +18,24 @@ module.exports = function (options) {
         })
       })
     },
+    setVerified: function (options, callback) {
+      db.find(options, function (err, users) {
+        var user = users[0]
+        user.verified = true
+        db.update(options, user, {}, function () {
+          callback(false, user)
+        })
+      })
+    },
+    setHash: function (options, callback) {
+      db.find({uuid: options.uuid}, function (err, users) {
+        var user = users[0]
+        user.hash = options.hash
+        db.update(options, user, {}, function () {
+          callback(false, user)
+        })
+      })
+    },
     create: function (credentials, callback) {
       var user = {
         type: credentials.type,

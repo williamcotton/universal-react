@@ -1,3 +1,15 @@
+var overwrite = function (a, b) {
+  var o = {}
+  var prop
+  for (prop in a) {
+    o[prop] = a[prop]
+  }
+  for (prop in b) {
+    o[prop] = b[prop]
+  }
+  return o
+}
+
 module.exports = function (options, callback) {
   var serverApp = options.serverApp
   var defaultTitle = options.defaultTitle
@@ -25,7 +37,7 @@ module.exports = function (options, callback) {
 
   serverAppConfig.bookshelf = bookshelf
 
-  serverAppConfig.emailService = {
+  serverAppConfig.emailService = options.emailService || {
     sendVerificationUrl: function (options, callback) {
       callback(false, true)
     }
@@ -33,8 +45,9 @@ module.exports = function (options, callback) {
 
   var server, serverAppInstance
 
-  var setup = function (callback) {
-    serverAppInstance = serverApp(serverAppConfig)
+  var setup = function (callback, otherConfig) {
+    var config = overwrite(serverAppConfig, otherConfig)
+    serverAppInstance = serverApp(config)
     server = serverAppInstance.listen(port, function () {
       callback(serverAppInstance)
     })
