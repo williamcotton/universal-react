@@ -105,6 +105,15 @@ module.exports = function (options) {
   }))
 
   /*
+    rpc middleware
+    --------------
+  */
+
+  var expectRpcModel = require('../lib/expect-server-rpc-model')({
+    app: app
+  })
+
+  /*
 
     universal app
     -------------

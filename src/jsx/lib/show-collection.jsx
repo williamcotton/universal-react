@@ -4,10 +4,6 @@ var Table = Bootstrap.Table
 var Glyphicon = Bootstrap.Glyphicon
 
 var ShowAll = React.createClass({
-  propTypes: {
-    collection: React.PropTypes.array,
-    name: React.PropTypes.string
-  },
   render: function () {
     var title = this.props.title
     var user = this.props.user
@@ -41,7 +37,10 @@ var ShowAll = React.createClass({
       return <th key={modelProp}>{modelProp}</th>
     }
     return <div className={'show-all-container'}>
-      <h1>{title}</h1>
+      <div className='title-bar'>
+        <h1>{title}</h1>
+        <a href={baseUrl + '/new'}>Create New</a>
+      </div>
       <Table striped bordered condensed hover>
         <thead>
           <tr>
@@ -54,6 +53,13 @@ var ShowAll = React.createClass({
         </tbody>
       </Table>
     </div>
+  },
+  propTypes: {
+    collection: React.PropTypes.array,
+    user: React.PropTypes.object,
+    title: React.PropTypes.string,
+    baseUrl: React.PropTypes.string,
+    createCells: React.PropTypes.object
   }
 })
 

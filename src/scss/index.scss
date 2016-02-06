@@ -1,3 +1,18 @@
+/* 
+  @brand-primary #337AB7
+  http://getbootstrap.com/customize/?id=a173626c83cdec7d7968
+*/
+@import 'bootstrap.min';
+$brand-primary: #337AB7;
+
 @import 'reset';
-@import 'app';
+@import 'root-container';
 @import 'front-page';
+
+#universal-app-container {
+  height: 100%;
+}
+
+body { 
+  height: 100%;
+}

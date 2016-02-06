@@ -23,7 +23,13 @@ var reactRenderApp = function (options) {
       async.each(middlewareStack, function (middlewareFunction, callback) {
         middlewareFunction(req, res, contentProps, rootProps, callback)
       }, function () {
-        var contentWithProps = React.cloneElement(content, contentProps)
+        contentProps.Form = require('../../jsx/lib/form.jsx')(req, res, rootProps, contentProps)
+        var contentWithProps
+        if (typeof content.type === 'string') {
+          contentWithProps = content
+        } else {
+          contentWithProps = React.cloneElement(content, contentProps)
+        }
         rootProps.content = contentWithProps
         rootProps.opts = opts
         var HTML = ReactDOMServer.renderToStaticMarkup(RootComponent(rootProps))

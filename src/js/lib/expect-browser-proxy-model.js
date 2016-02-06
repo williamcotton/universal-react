@@ -14,8 +14,10 @@ module.exports = function (outerOptions) {
           callback(cachedResponses.findAll)
         } else {
           request({url: baseUrl + '/all.json', json: true}, function (err, _res, body) {
-            cachedResponses.findAll = body
-            callback(body)
+            var collection = body
+            collection.reqProp = reqProp
+            cachedResponses.findAll = collection
+            callback(collection)
           })
         }
       }
@@ -35,6 +37,7 @@ module.exports = function (outerOptions) {
         request({url: baseUrl + '/' + options.id + '.json', json: true}, function (err, _res, body) {
           cachedResponses.find = cachedResponses.find || []
           var item = body
+          item.reqProp = reqProp
           cachedResponses.find.push({options: options, item: item})
           callback(item)
         })
@@ -44,6 +47,7 @@ module.exports = function (outerOptions) {
         request({url: baseUrl + '/' + findOptions.id + '.json', json: options, method: 'put', headers: {'x-csrf-token': req.csrf}}, function (err, _res, body) {
           cachedResponses.find = cachedResponses.find || []
           var item = body
+          item.reqProp = reqProp
           if (cachedResponses.findAll) {
             cachedResponses.findAll.forEach(function (_item) {
               if (_item.id === item.id) {
@@ -61,6 +65,7 @@ module.exports = function (outerOptions) {
         request({url: baseUrl + '/create.json', json: options, method: 'post', headers: {'x-csrf-token': req.csrf}}, function (err, _res, body) {
           cachedResponses.find = cachedResponses.find || []
           var item = body
+          item.reqProp = reqProp
           cachedResponses.find.push({options: {id: item.id}, item: item})
           callback(item)
         })
@@ -69,6 +74,7 @@ module.exports = function (outerOptions) {
       var template = function (callback) {
         request({url: baseUrl + '/template.json', json: options, method: 'get', headers: {'x-csrf-token': req.csrf}}, function (err, _res, body) {
           var item = body
+          item.reqProp = reqProp
           callback(item)
         })
       }

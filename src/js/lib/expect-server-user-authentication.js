@@ -190,10 +190,7 @@ module.exports = function (options) {
 
   expectReactRenderer.use(function (req, res, contentProps, rootProps, next) { // this can be a plugin
     if (req.user) {
-      var user = {
-        type: req.user.type,
-        uuid: req.user.uuid
-      }
+      var user = req.user
       contentProps.user = user
       rootProps.user = user
       res.outgoingMessage.user = user
@@ -288,7 +285,7 @@ module.exports = function (options) {
       delete req.session.userToken
       callback(false)
     }
-    if (req.session && req.session.userToken && !req.user) {
+    if (req.session && req.session.userToken) {
       userAuthenticationService.refreshToken({token: req.session.userToken, audience: 'expect-server-session-user'}, function (err, user, token) {
         if (!err && user && token) {
           req.user = user

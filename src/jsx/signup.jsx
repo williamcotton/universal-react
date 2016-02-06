@@ -17,16 +17,16 @@ var Signup = React.createClass({
     var emailInvalid = this.props.errors ? this.props.errors.indexOf('EMAIL_INVALID') > -1 : false
     var emailAlreadyExists = this.props.errors ? this.props.errors.indexOf('UUID_FOR_TYPE_EXISTS') > -1 : false
     var formAction = this.props.formAction
+    var Form = this.props.Form
     return <div className='signup-container'>
       <h1>Signup</h1>
-      <form action={formAction} method='post'>
-        <input type='hidden' name='_csrf' value={this.props.csrf} />
+      <Form action={formAction} method='post'>
         <input type='hidden' name='type' value='email' />
         <Input bsStyle={ emailInvalid || emailAlreadyExists ? 'error' : null} name='uuid' type='text' label='Email Address' defaultValue={ emailInvalid || emailAlreadyExists ? '' : this.props.uuid} />
         <Input bsStyle={ passwordTooShort ? 'error' : null} name='password' type='password' label='Password' defaultValue={ passwordTooShort ? '' : this.props.password} />
         <Input bsStyle={ passwordMismatch ? 'error' : null} name='repeatPassword' type='password' label='Repeat Password' autoFocus />
         <ButtonInput type='submit' value='Signup' />
-      </form>
+      </Form>
     </div>
   }
 })

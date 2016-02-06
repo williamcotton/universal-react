@@ -5,18 +5,13 @@ var Input = ReactBootstrap.Input
 var ButtonInput = ReactBootstrap.ButtonInput
 
 var Calculator = React.createClass({
-  propTypes: {
-    result: React.PropTypes.number,
-    firstNumber: React.PropTypes.number,
-    secondNumber: React.PropTypes.number,
-    operation: React.PropTypes.string
-  },
   render: function () {
+    var Form = this.props.Form
     return <div className='calculator-container'>
       <h1>Calculator</h1>
-      <form action='/calculator' method='post'>
-        <input type='hidden' name='_csrf' value={this.props.csrf} />
-        <input type='hidden' name='_replay' value={true} />
+      <Form action='/calculator' method='post'>
+        <input type='hidden' name='_push' value='true' />
+        <input type='hidden' name='_replay' value='true' />
         <Input name='firstNumber' type='number' defaultValue={this.props.firstNumber} />
         <Input name='operation' type='select' defaultValue={this.props.operation} placeholder='+'>
           <option value='+'>+</option>
@@ -27,8 +22,15 @@ var Calculator = React.createClass({
         <div className='result'>
           { this.props.result ? this.props.firstNumber + ' ' + this.props.operation + ' ' + this.props.secondNumber + ' = ' + this.props.result : false }
         </div>
-      </form>
+      </Form>
     </div>
+  },
+  propTypes: {
+    result: React.PropTypes.number,
+    firstNumber: React.PropTypes.number,
+    secondNumber: React.PropTypes.number,
+    operation: React.PropTypes.string,
+    Form: React.PropTypes.func
   }
 })
 

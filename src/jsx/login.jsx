@@ -16,17 +16,17 @@ var Login = React.createClass({
     var error = this.props.error
     var updatePasswordSuccess = this.props.updatePasswordSuccess
     var formAction = this.props.formAction
+    var Form = this.props.Form
     return <div className='login-container'>
       <h1>Login</h1>
       { updatePasswordSuccess ? <Alert bsStyle='success'>You have successfully reset your password.</Alert> : false }
-      <form action={formAction} method='post'>
-        <input type='hidden' name='_csrf' value={this.props.csrf} />
+      <Form action={formAction} method='post'>
         <input type='hidden' name='type' value='email' />
         <Input name='uuid' type='text' label='Email Address' defaultValue={this.props.uuid} />
         <Input bsStyle={ error ? 'error' : null} name='password' type='password' label='Password' />
-        <ButtonInput type='submit' value='Login' />
+        <ButtonInput bsStyle='primary' type='submit' value='Login' />
         <a href='/reset-password'>Forgot Password?</a>
-      </form>
+      </Form>
     </div>
   }
 })

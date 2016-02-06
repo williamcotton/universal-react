@@ -296,7 +296,7 @@ function localStorageSession (options) {
           localStorage.setItem(name, '')
         } else if ((!sess.isNew || sess.isPopulated) && sess.isChanged) {
           // save populated or non-new changed session
-          sess.save()
+          // sess.save()
         }
       } catch (e) {}
     })

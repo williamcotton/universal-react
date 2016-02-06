@@ -12,16 +12,16 @@ var ResetPassword = React.createClass({
   },
   render: function () {
     var formAction = this.props.formAction
+    var Form = this.props.Form
     return <div className='reset-password-container'>
       <h1>Reset Password</h1>
       { this.props.expired ? <Alert bsStyle='warning'>Your password reset token has expired. Please start over.</Alert> : false }
-      <form action={formAction} method='post'>
-        <input type='hidden' name='_csrf' value={this.props.csrf} />
+      <Form action={formAction} method='post'>
         <p>Forgot your password?</p>
         <input type='hidden' name='type' value='email' />
         <Input name='uuid' type='text' label='Email Address' />
         <ButtonInput type='submit' value='Send Reset Password Email' />
-      </form>
+      </Form>
     </div>
   }
 })

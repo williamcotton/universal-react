@@ -67,6 +67,16 @@ module.exports = function (options) {
   }))
 
   /*
+    rpc middleware
+    --------------
+    fileRegistrations
+  */
+
+  app.use(require('../lib/expect-browser-rpc-model')({
+    request: request
+  }))
+
+  /*
 
     universal app
     ------------

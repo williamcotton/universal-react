@@ -17,7 +17,7 @@ module.exports = function (outerOptions) {
     var findCreateOptions = options.findCreateOptions || function (options, req, res, callback) { callback(options) }
 
     var findAll = options.findAll ? options.findAll(Model) : function (req, res, callback) {
-      Model.fetchAll().then(function (models) {
+      new Model().fetchAll().then(function (models) {
         beforeFindAll(models, req, res, function (models) {
           var collection = models.toJSON()
           callback(collection)
@@ -115,12 +115,14 @@ module.exports = function (outerOptions) {
       req[reqProp] = {
         findAll: function (callback) {
           findAll(req, res, function (collection) {
+            collection.reqProp = reqProp
             cachedResponses.findAll = collection
             callback(collection)
           })
         },
         find: function (options, callback) {
           find(req, res, options, function (item) {
+            item.reqProp = reqProp
             cachedResponses.find = cachedResponses.find || []
             cachedResponses.find.push({options: options, item: item})
             callback(item)
@@ -131,6 +133,7 @@ module.exports = function (outerOptions) {
             return callback(false)
           }
           update(req, res, findOptions, options, function (item) {
+            item.reqProp = reqProp
             cachedResponses.find = cachedResponses.find || []
             cachedResponses.find.push({options: options, item: item})
             callback(item)
@@ -141,6 +144,7 @@ module.exports = function (outerOptions) {
             return callback(false)
           }
           create(req, res, options, function (item) {
+            item.reqProp = reqProp
             cachedResponses.find = cachedResponses.find || []
             cachedResponses.find.push({options: options, item: item})
             callback(item)
@@ -150,7 +154,7 @@ module.exports = function (outerOptions) {
           if (!req.user) {
             return callback(false)
           }
-          template(callback)
+          template(req, res, callback)
         }
       }
       next()

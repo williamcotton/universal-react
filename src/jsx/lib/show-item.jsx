@@ -1,7 +1,8 @@
 var React = require('react')
 
 var Bootstrap = require('react-bootstrap')
-
+var Breadcrumb = Bootstrap.Breadcrumb
+var BreadcrumbItem = Bootstrap.BreadcrumbItem
 var Panel = Bootstrap.Panel
 
 var ShowItem = React.createClass({
@@ -27,9 +28,24 @@ var ShowItem = React.createClass({
       </Panel>
     }
     return <div className='show-item-container'>
+      <Breadcrumb>
+        <BreadcrumbItem href={baseUrl}>
+          { item.reqProp.charAt(0).toUpperCase() + item.reqProp.slice(1) }
+        </BreadcrumbItem>
+        <BreadcrumbItem active>
+          {title}
+        </BreadcrumbItem>
+      </Breadcrumb>
       <h1>{title}</h1>
       {modelProperties.map(createCell)}
     </div>
+  },
+  propTypes: {
+    item: React.PropTypes.object,
+    title: React.PropTypes.string,
+    baseUrl: React.PropTypes.string,
+    createCells: React.PropTypes.object,
+    Form: React.PropTypes.func
   }
 })
 

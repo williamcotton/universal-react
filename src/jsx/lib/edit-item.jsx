@@ -10,7 +10,7 @@ var EditItem = React.createClass({
   render: function () {
     var item = this.props.item
     var title = this.props.title
-    var createCells = this.props.createCells
+    // var createCells = this.props.createCells
     var baseUrl = this.props.baseUrl
     var modelProperties = []
     for (var prop in item) {
@@ -35,14 +35,21 @@ var EditItem = React.createClass({
         <Input type={inputType} defaultValue={content} name={modelProp} />
       </Panel>
     }
+    var Form = this.props.Form
     return <div className='edit-item-container'>
       <h1>{title}</h1>
-      <form action={baseUrl + '/' + item.id} method='post'>
-        <input type='hidden' name='_csrf' value={this.props.csrf} />
+      <Form action={baseUrl + '/' + item.id} method='post'>
         {modelProperties.map(createCell)}
         <ButtonInput type='submit' value='Update' />
-      </form>
+      </Form>
     </div>
+  },
+  propTypes: {
+    item: React.PropTypes.object,
+    title: React.PropTypes.string,
+    baseUrl: React.PropTypes.string,
+    createCells: React.PropTypes.object,
+    Form: React.PropTypes.func
   }
 })
 

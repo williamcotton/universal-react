@@ -37,14 +37,20 @@ var NewItem = React.createClass({
         <Input type={inputType} name={modelProp} />
       </Panel>
     }
+    var Form = this.props.Form
     return <div className='new-item-container'>
       <h1>{title}</h1>
-      <form action={baseUrl + '/create'} method='post'>
-        <input type='hidden' name='_csrf' value={this.props.csrf} />
+      <Form action={baseUrl + '/create'} method='post'>
         {modelProperties.map(createCell)}
         <ButtonInput type='submit' value='Create' />
-      </form>
+      </Form>
     </div>
+  },
+  propTypes: {
+    itemTemplate: React.PropTypes.object,
+    title: React.PropTypes.string,
+    baseUrl: React.PropTypes.string,
+    Form: React.PropTypes.func
   }
 })
 

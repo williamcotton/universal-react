@@ -33,10 +33,11 @@ module.exports = function (options) {
       })
     },
     setHash: function (options, callback) {
+      var updated_at = (new Date).toISOString()
       if (!options.hash) {
         callback(true, false)
       }
-      pgClient.query('UPDATE user_credentials SET (hash) = ($1) WHERE uuid = $2', [options.hash, options.uuid], function (err, result) {
+      pgClient.query('UPDATE user_credentials SET (hash, updated_at) = ($1, $2) WHERE uuid = $3', [options.hash, updated_at, options.uuid], function (err, result) {
         callback(false, options.hash)
       })
     },
@@ -69,9 +70,6 @@ module.exports = function (options) {
           callback(err, !err)
         })
       })
-    },
-    setup: function (callback) {
-      pgClient.query('CREATE TABLE users (id serial, type varchar(40), hash varchar(256), uuid varchar(256))', callback)
     }
   }
 }

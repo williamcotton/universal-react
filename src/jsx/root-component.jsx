@@ -13,27 +13,48 @@ var RootComponent = React.createClass({
   },
   render: function () {
     var content = this.props.content
+
+    const navRight = this.props.user ? [
+      <NavItem key='/logout' href='/logout'>Logout</NavItem>
+    ] : [
+      <NavItem key='/login' href='/login'>Login</NavItem>,
+      <NavItem key='/signup' href='/signup'>Signup</NavItem>
+    ]
+
     return <div className='root-component-container'>
-      <Navbar inverse className='navbar-container'>
+      <Navbar className='navbar-container navbar-default hidden-xs'>
         <Navbar.Header>
           <Navbar.Brand>
-            <a href='/'>Universal App</a>
+            <a href='/'>Expect</a>
           </Navbar.Brand>
-          <Navbar.Toggle />
         </Navbar.Header>
         <Nav pullLeft>
-          <NavItem href='/about'>About</NavItem>
           <NavItem href='/calculator'>Calculator</NavItem>
+          <NavItem href='/canvas'>Canvas</NavItem>
+          <NavItem href='/d3'>d3</NavItem>
           <NavItem href='/songs'>Songs</NavItem>
         </Nav>
         <Nav pullRight>
-          { this.props.user ? <Navbar.Text>{this.props.user.email}</Navbar.Text> : <NavItem href='/login'>Login</NavItem> }
-          { this.props.user ? <NavItem href='/logout'>Logout</NavItem> : <NavItem href='/signup'>Signup</NavItem> }
+          {navRight}
         </Nav>
       </Navbar>
-      <div className='content'>
+      <div className='container main-container'>
         { content }
       </div>
+      <footer>
+        <div className='container'>
+          <div className='footer-copyright'>
+            Expect © 2016
+          </div>
+          <div className='footer-menu'>
+            <ul>
+              <li>
+                <a href='/about'>About</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </footer>
     </div>
   }
 })

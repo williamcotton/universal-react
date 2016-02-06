@@ -1,0 +1,45 @@
+.root-component-container {
+  height: 100%;
+
+  .navbar-container {
+     -webkit-app-region: drag;
+    border-radius: 0px;
+  }
+
+  .main-container {
+    margin: 0 auto;
+    height: 100%;
+  }
+
+  footer {
+    color: #fff;
+    background: $brand-primary;
+    border: 1px solid $brand-primary;
+    padding-top: 15px;
+    padding-bottom: 5px;
+    line-height: 22px;
+
+    .footer-copyright {
+      float: left;
+    }
+
+    .footer-menu {
+      a {
+        text-decoration: none;
+        color: #fff;
+      }
+      a:hover, a:focus, a:active {
+        text-decoration: none;
+        color: #fff;
+      }
+    }
+    .footer-menu>ul>li {
+      position: relative;
+      display: block;
+      padding: 0px 15px;
+      display: inline;
+      text-decoration: none;
+    }
+  }
+
+}

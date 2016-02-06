@@ -21,11 +21,19 @@ var reactRenderApp = function (options) {
       var contentProps = {}
       rootProps.navigate = app.navigate
       contentProps.navigate = app.navigate
+      rootProps.submit = app.submit
+      contentProps.submit = app.submit
       options.document.title = formatTitle(req.defaultTitle, opts ? opts.title : false)
       async.each(middlewareStack, function (middlewareFunction, callback) {
         middlewareFunction(req, res, contentProps, rootProps, callback)
       }, function () {
-        var contentWithProps = React.cloneElement(content, contentProps)
+        contentProps.Form = require('../../jsx/lib/form.jsx')(req, res, rootProps, contentProps)
+        var contentWithProps
+        if (typeof content.type === 'string') {
+          contentWithProps = content
+        } else {
+          contentWithProps = React.cloneElement(content, contentProps)
+        }
         rootProps.content = contentWithProps
         rootProps.opts = opts
         ReactDOM.render(RootComponent(rootProps), options.document.getElementById(options.rootDOMId), function () {

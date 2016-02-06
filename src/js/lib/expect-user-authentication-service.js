@@ -86,6 +86,7 @@ module.exports = function (options) {
         uuid: emailAddress,
         type: 'email'
       }, function (err, verificationUrl) {
+        if (err) return callback(err)
         emailService.sendVerificationUrl({
           emailAddress: emailAddress,
           verificationUrl: verificationUrl
@@ -96,7 +97,9 @@ module.exports = function (options) {
       var audience = 'expect-verification-url'
       var token = options.token
       jwt.verify(token, rsaPublicKeyPem, {issuer: issuer, audience: audience, algorithm: 'RS256'}, function (err, credentials) {
+        if (err) return callback(err)
         userAuthenticationDataStore.setVerified({uuid: credentials.uuid}, function (err, verified) {
+          if (err) return callback(err)
           credentials.verified = verified
           callback(false, credentials)
         })
@@ -120,6 +123,7 @@ module.exports = function (options) {
         uuid: emailAddress,
         type: 'email'
       }, function (err, resetPasswordUrl) {
+        if (err) return callback(err)
         emailService.sendResetPasswordUrl({
           emailAddress: emailAddress,
           resetPasswordUrl: resetPasswordUrl
@@ -146,7 +150,9 @@ module.exports = function (options) {
         }
         bcrypt.genSalt(10, function (errGetSalt, salt) {
           bcrypt.hash(newPassword, salt, function (errGetHash, hash) {
+            if (err) return callback(err)
             userAuthenticationDataStore.setHash({uuid: credentials.uuid, hash: hash}, function (err, hash) {
+              if (err) return callback(err)
               callback(false, credentials)
             })
           })

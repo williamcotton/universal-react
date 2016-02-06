@@ -71,6 +71,7 @@ module.exports = function (options) {
         var user = res.body
         req.user = user
         req.session.user = user
+        req.session.save()
         callback(err, user)
       })
     }
@@ -88,6 +89,7 @@ module.exports = function (options) {
         var user = res.body
         req.user = user
         req.session.user = user
+        req.session.save()
         callback(err, user)
       })
     }
@@ -135,9 +137,10 @@ module.exports = function (options) {
       })
     }
     req.logout = function (callback) {
-      delete req.user
       delete req.session.user
-      res.loadPage(req.path)
+      req.session.save()
+      delete req.user
+      setTimeout(() => res.loadPage(req.path), 20)
     }
     if (req.session && req.session.user) {
       req.user = req.session.user
