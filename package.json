@@ -2,7 +2,6 @@
   "name": "universal-react",
   "version": "1.0.0",
   "description": "Universal React",
-  "main": "src/js/electron/main.js",
   "engines": {
     "node": "5.5.x",
     "npm": "3.3.x"
@@ -14,9 +13,6 @@
     "build-dev": "watchify src/js/browser/index.js -o public/build.js -t [ babelify --presets [ es2015 react ] ] -v -d",
     "build-css-dev": "nodemon -w ./src/scss --ext css,scss --exec make -- build_debug_css",
     "start-dev": "NODE_ENV=development foreman start -f Procfile_dev",
-    "lint": "eslint ./src ./test ./migrations",
-    "build-electron-dev": "watchify src/js/electron/index.js -o app/build.js -t [ babelify --presets [ es2015 react ] ] -v -d",
-    "start-electron": "electron .",
     "postinstall": "make"
   },
   "repository": {
