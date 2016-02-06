@@ -94,13 +94,6 @@ module.exports = function (options, callback) {
     })
 
     var rq = function (options, callback) {
-      var csrf = serverInstanceApp.getCsrf()
-      if (options.form && csrf) {
-        options.form._csrf = csrf
-      }
-      if (options.body && csrf) {
-        options.body._csrf = csrf
-      }
       if (typeof (options.followRedirect) !== 'undefined') {
         followRedirect = options.followRedirect
       }

@@ -1,6 +1,4 @@
 module.exports = function (options) {
-  var request = options.request
-  var localStorage = options.localStorage
 
   /*
 
@@ -32,14 +30,6 @@ module.exports = function (options) {
 
   */
 
-  // expect-browser-user-authentication
-  app.use(require('../lib/expect-browser-user-authentication')({
-    localStorage: localStorage,
-    app: app,
-    expectReactRenderer: expectReactRenderer,
-    request: request
-  }))
-
   // expect-browser-react-renderer
   app.use(expectReactRenderer({
     RootComponent: require('../../jsx/root-component.jsx'),
@@ -47,33 +37,6 @@ module.exports = function (options) {
     rootDOMId: 'universal-app-container',
     document: options.document,
     localStorage: options.localStorage
-  }))
-
-  /*
-
-    models
-    ------
-    browser proxy
-
-  */
-
-  var expectProxyModel = require('../lib/expect-browser-proxy-model')({
-    request: request
-  })
-
-  // Song -> req.songs
-  app.use(expectProxyModel({
-    reqProp: 'songs'
-  }))
-
-  /*
-    rpc middleware
-    --------------
-    fileRegistrations
-  */
-
-  app.use(require('../lib/expect-browser-rpc-model')({
-    request: request
   }))
 
   /*
