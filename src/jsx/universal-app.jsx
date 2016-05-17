@@ -14,12 +14,9 @@ var ShowItem = require('./lib/show-item.jsx')
 var EditItem = require('./lib/edit-item.jsx')
 var NewItem = require('./lib/new-item.jsx')
 
-var universalApp = (options) => {
-  var app = options.app
-
-  app.get('/', (req, res) => {
-    var content = <FrontPage />
-    res.renderApp(content)
+var universalApp = ({app}) => {
+  app.get('/', (req, {renderApp}) => {
+    renderApp(<FrontPage />)
   })
 
   /*
@@ -27,9 +24,8 @@ var universalApp = (options) => {
     ------
   */
 
-  app.get('/about', (req, res) => {
-    var content = <About />
-    res.renderApp(content, {title: 'About'})
+  app.get('/about', (req, {renderApp}) => {
+    renderApp(<About />, {title: 'About'})
   })
 
   /*
@@ -46,17 +42,15 @@ var universalApp = (options) => {
     newPassword: { component: NewPassword }
   })
 
-  var userRequired = (req, res, next) => {
-    if (!req.user) {
-      var content = <h2>Login Required!</h2>
-      return res.renderApp(content, {title: 'Login Required'})
+  var userRequired = ({user}, {renderApp}, next) => {
+    if (!user) {
+      return renderApp(<h2>Login Required!</h2>, {title: 'Login Required'})
     }
     next()
   }
 
-  app.get('/welcome', userRequired, (req, res) => {
-    var content = <Welcome />
-    res.renderApp(content, {title: 'Welcome'})
+  app.get('/welcome', userRequired, (req, {renderApp}) => {
+    renderApp(<Welcome />, {title: 'Welcome'})
   })
 
   /*
@@ -64,15 +58,11 @@ var universalApp = (options) => {
     ----------
   */
 
-  app.get('/calculator', (req, res) => {
-    var content = <Calculator />
-    res.renderApp(content, {title: 'Calculator'})
+  app.get('/calculator', (req, {renderApp}) => {
+    renderApp(<Calculator />, {title: 'Calculator'})
   })
 
-  app.post('/calculator', (req, res) => {
-    var firstNumber = parseFloat(req.body.firstNumber)
-    var secondNumber = parseFloat(req.body.secondNumber)
-    var operation = req.body.operation
+  app.post('/calculator', ({body: {firstNumber, secondNumber, operation}}, {renderApp}) => {
     var result
     switch (operation) {
       case '+':
@@ -83,7 +73,7 @@ var universalApp = (options) => {
         break
     }
     var content = <Calculator result={result} firstNumber={firstNumber} secondNumber={secondNumber} operation={operation} />
-    res.renderApp(content, {title: 'Calculator'})
+    renderApp(content, {title: 'Calculator'})
   })
 
   /*
@@ -91,10 +81,10 @@ var universalApp = (options) => {
     -----------
   */
 
-  app.get('/canvas', (req, res) => {
-    var width = req.query.width || 150
-    var height = req.query.height || 150
-    res.renderApp(<canvas style={{
+  app.get('/canvas', ({query}, {renderApp}) => {
+    var width = query.width || 150
+    var height = query.height || 150
+    renderApp(<canvas style={{
       borderStyle: 'solid',
       borderColor: 'black',
       borderWidth: 1,
@@ -119,7 +109,7 @@ var universalApp = (options) => {
     -------
   */
 
-  app.get('/d3', (req, res) => {
+  app.get('/d3', (req, {renderApp}) => {
     var data = [{color: 'red', value: 20}, {color: 'blue', value: 12}, {color: 'green', value: 18}]
     var d3 = require('d3')
     var ReactFauxDOM = require('react-faux-dom')
@@ -140,14 +130,14 @@ var universalApp = (options) => {
         d3.select(this)
           .style('background-color', 'orange')
         // ReactFauxDOM is designed to use React components and setState(), but as a hack we can do this...
-        res.renderApp(list.toReact())
+        renderApp(list.toReact())
       })
       .on('mouseout', function (d) {
         d3.select(this)
           .style('background-color', d.color)
-        res.renderApp(list.toReact())
+        renderApp(list.toReact())
       })
-    res.renderApp(list.toReact())
+    renderApp(list.toReact())
   })
 
   /*
@@ -168,56 +158,56 @@ var universalApp = (options) => {
     }
   }
 
-  app.get('/songs', (req, res) => {
-    req.songs.findAll(songs => {
+  app.get('/songs', ({songs}, {renderApp}) => {
+    songs.findAll(songs => {
       var title = 'All Songs'
       var content = <ShowCollection collection={songs} title={title} createCells={songCreateCells} baseUrl='/songs' />
-      res.renderApp(content, {title: title})
+      renderApp(content, {title: title})
     })
   })
 
-  app.get('/songs/new', userRequired, (req, res) => {
+  app.get('/songs/new', userRequired, (req, {renderApp}) => {
     req.songs.template(songTemplate => {
       var title = 'New Song'
       var content = <NewItem itemTemplate={songTemplate} title={title} createCells={songCreateCells} baseUrl='/songs'/>
-      res.renderApp(content, {title: title})
+      renderApp(content, {title: title})
     })
   })
 
-  app.post('/songs/create', userRequired, (req, res) => {
+  app.post('/songs/create', userRequired, (req, {renderApp}) => {
     req.songs.create(req.body, song => {
       var title = 'Created ' + song.name
       var content = <ShowItem item={song} title={title} createCells={songCreateCells} />
-      res.renderApp(content, {title: title})
+      renderApp(content, {title: title})
     })
   })
 
-  app.get('/songs/:id', (req, res) => {
-    req.songs.find({id: req.params.id}, song => {
+  app.get('/songs/:id', ({songs, params: {id}}, {renderApp}) => {
+    songs.find({id: id}, song => {
       var title = song.name
       var content = <ShowItem item={song} title={title} createCells={songCreateCells} baseUrl='/songs' />
-      res.renderApp(content, {title: title})
+      renderApp(content, {title: title})
     })
   })
 
-  app.get('/songs/:id/edit', userRequired, (req, res) => {
-    req.songs.find({id: req.params.id}, song => {
+  app.get('/songs/:id/edit', userRequired, ({songs, params: {id}}, {renderApp}) => {
+    songs.find({id: id}, song => {
       var title = 'Editing ' + song.name
       var content = <EditItem item={song} title={title} createCells={songCreateCells} baseUrl='/songs'/>
-      res.renderApp(content, {title: title})
+      renderApp(content, {title: title})
     })
   })
 
-  app.post('/songs/:id', userRequired, (req, res) => {
-    req.songs.update({id: req.params.id}, req.body, song => {
+  app.post('/songs/:id', userRequired, ({songs, body, params: {id}}, {renderApp}) => {
+    songs.update({id: id}, body, song => {
       var title = 'Updated ' + song.name
       var content = <ShowItem item={song} title={title} createCells={songCreateCells} />
-      res.renderApp(content, {title: title})
+      renderApp(content, {title: title})
     })
   })
 
-  app.post('/songs/:id/delete', userRequired, (req, res) => {
-    req.songs.delete({id: req.params.id}, req.body, song => {
+  app.post('/songs/:id/delete', userRequired, ({songs, body, params: {id}}, {renderApp}) => {
+    songs.delete({id: id}, body, song => {
       // var title = 'Removed ' + song.name
       // var content = <RemovedItem item={song} title={title} createCells={songCreateCells} />
       // res.renderApp(content, {title: title})
@@ -229,8 +219,8 @@ var universalApp = (options) => {
     -----------
   */
 
-  app.get('/certificate', (req, res) => {
-    res.renderApp(<canvas style={{
+  app.get('/certificate', (req, {renderApp}) => {
+    renderApp(<canvas style={{
       border: '0px solid black',
       margin: '30px auto',
       width: '600px',
@@ -310,6 +300,62 @@ var universalApp = (options) => {
         drawRadialLines(rlc).then(next)
       })
     }} />)
+  })
+
+  app.get('/record_audio', (req, {renderApp}) => {
+    renderApp(<div ref={div => {
+      require('webrtc-adapter')
+      console.log('loaded')
+      var recordedData = []
+      let config = {
+        video: false,
+        audio: true
+      }
+      let audioContext = new AudioContext()
+      let deletePendingRecording = false
+      let reject = err => {
+        console.log('reject', err)
+      }
+      let resolve = audioData => {
+        console.log('resolve', audioData)
+      }
+      let onStreamSuccess = stream => {
+        console.log('onStreamSuccess', stream)
+        // let sourceNode = this.audioContext.createMediaStreamSource(stream)
+        let recorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm'
+        })
+        recorder.addEventListener('error', evt => {
+          reject(evt)
+        })
+        recorder.addEventListener('dataavailable', evt => {
+          if (typeof evt.data === 'undefined') return
+          if (evt.data.size === 0) return
+          recordedData.push(evt.data)
+        })
+        recorder.addEventListener('stop', evt => {
+          console.log('stop!')
+          let tracks = stream.getTracks()
+          tracks.forEach(track => track.stop())
+          let audioData = new Blob(recordedData, {
+            type: 'audio/webm'
+          })
+          if (deletePendingRecording) {
+            deletePendingRecording = false
+            audioData = null
+          }
+          resolve(audioData)
+        })
+        let stop = () => {
+          console.log('stop', recorder)
+          recorder.stop()
+        }
+        setTimeout(stop, 2000)
+        console.log('start')
+        recorder.start(10)
+      }
+      navigator.getUserMedia(config, onStreamSuccess, err => reject(err))
+    }} ></div>)
   })
 
   return app

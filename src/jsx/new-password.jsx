@@ -9,7 +9,8 @@ var NewPassword = React.createClass({
   propTypes: {
     credentials: React.PropTypes.object,
     errors: React.PropTypes.array,
-    formAction: React.PropTypes.string
+    formAction: React.PropTypes.string,
+    Form: React.PropTypes.object
   },
   render: function () {
     var passwordMismatch = this.props.errors ? this.props.errors.indexOf('PASSWORD_MISMATCH') > -1 : false

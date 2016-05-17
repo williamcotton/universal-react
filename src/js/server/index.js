@@ -2,13 +2,13 @@ require('node-jsx').install({extension: '.jsx'})
 
 var nodeEnv = process.env.NODE_ENV
 var defaultTitle = process.env.DEFAULT_TITLE
-var EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL = process.env.EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL
-var BOOKSHELF_MODELS = process.env.BOOKSHELF_MODELS
+var userAuthConnectionUrl = process.env.EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL
+var bookshelfConnection = process.env.BOOKSHELF_MODELS
 var port = process.env.PORT || 5000
-var SENDGRID_APP_SECRET = process.env.SENDGRID_APP_SECRET
-var SENDGRID_APP_ID = process.env.SENDGRID_APP_ID
+var sendgridAppSecret = process.env.SENDGRID_APP_SECRET
+var sendgridAppId = process.env.SENDGRID_APP_ID
 
-var sendgrid = require('sendgrid')(SENDGRID_APP_ID, SENDGRID_APP_SECRET)
+var sendgrid = require('sendgrid')(sendgridAppId, sendgridAppSecret)
 
 var emailService = {
   sendVerificationUrl: function (options, callback) {
@@ -20,9 +20,12 @@ var emailService = {
       subject: 'Email Verification',
       text: 'Thanks for signing up with Acme, Inc. \n\nPlease visit this link to complete your account creation: \n\n' + verificationUrl
     }
-    console.log(payload)
+    if (nodeEnv === 'development') {
+      console.log(payload)
+    } else {
+      sendgrid.send(payload, callback)
+    }
     callback(false, payload)
-    //sendgrid.send(payload, callback)
   },
   sendResetPasswordUrl: function (options, callback) {
     var emailAddress = options.emailAddress
@@ -33,39 +36,36 @@ var emailService = {
       subject: 'Password Reset',
       text: 'We received a request to change your password with Acme, Inc. \n\nPlease visit this link to set your new password: \n\n' + resetPasswordUrl
     }
-    console.log(payload)
+    if (nodeEnv === 'development') {
+      console.log(payload)
+    } else {
+      sendgrid.send(payload, callback)
+    }
     callback(false, payload)
-    //sendgrid.send(payload, callback)
   }
 }
-
-var pg = require('pg')
 
 var knex = require('knex')({
   client: 'pg',
   debug: false,
-  connection: BOOKSHELF_MODELS
+  connection: bookshelfConnection
 })
 
 var bookshelf = require('bookshelf')(knex)
 
-pg.connect(EXPECT_POSTGRES_USER_AUTHENTICATION_DATA_STORE_URL, function (err, pgClient, done) {
-  if (err) {}
+var userAuthenticationDataStore = require('../lib/expect-postgres-user-authentication-data-store')({
+  connection: userAuthConnectionUrl
+})
 
-  var userAuthenticationDataStore = require('../lib/expect-postgres-user-authentication-data-store')({
-    pgClient: pgClient
-  })
+var universalServerApp = require('./app')({
+  port: port,
+  defaultTitle: defaultTitle,
+  nodeEnv: nodeEnv,
+  userAuthenticationDataStore: userAuthenticationDataStore,
+  emailService: emailService,
+  bookshelf: bookshelf
+})
 
-  var universalServerApp = require('./app')({
-    port: port,
-    defaultTitle: defaultTitle,
-    nodeEnv: nodeEnv,
-    userAuthenticationDataStore: userAuthenticationDataStore,
-    emailService: emailService,
-    bookshelf: bookshelf
-  })
-
-  universalServerApp.listen(port, function () {
-    console.log('universalServerApp is running in %s mode on port %s', nodeEnv, port)
-  })
+universalServerApp.listen(port, function () {
+  console.log('universalServerApp is running in %s mode on port %s', nodeEnv, port)
 })

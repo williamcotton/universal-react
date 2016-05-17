@@ -1,7 +1,15 @@
 var createUUID = require('node-uuid')
+var pg = require('pg')
 
 module.exports = function (options) {
-  var pgClient = options.pgClient
+  var pgClient = {
+    query: () => {}
+  }
+  var connection = options.connection
+
+  pg.connect(connection, function (err, _pgClient, done) {
+    pgClient = _pgClient
+  })
 
   return {
     getUserCredentials: function (options, callback) {
